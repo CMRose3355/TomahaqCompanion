@@ -5,11 +5,11 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TomahaqCompanion", "TomahaqCompanion\TomahaqCompanion.csproj", "{D6A044FB-CB1C-4F6E-AB2B-408B45196493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSMSL", "..\CSMSL\CSMSL\CSMSL.csproj", "{3C8C9F05-9C19-4251-95FA-05D7EDC8CAE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSMSL", "..\..\CSMSL\CSMSL\CSMSL.csproj", "{3C8C9F05-9C19-4251-95FA-05D7EDC8CAE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thermo", "..\CSMSL\CSMSL\IO\Thermo\Thermo.csproj", "{24DC85FF-E97B-4140-9614-77DD8FDDD32F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thermo", "..\..\CSMSL\CSMSL\IO\Thermo\Thermo.csproj", "{24DC85FF-E97B-4140-9614-77DD8FDDD32F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlMethodChanger.lib", "..\meth-modifications\xmlmethodchanger\XmlMethodChanger.lib\XmlMethodChanger.lib.csproj", "{E820AEF9-F002-4DC3-9BB6-38669B1803D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlMethodChanger.lib", "..\Thermo\meth-modifications\xmlmethodchanger\XmlMethodChanger.lib\XmlMethodChanger.lib.csproj", "{E820AEF9-F002-4DC3-9BB6-38669B1803D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

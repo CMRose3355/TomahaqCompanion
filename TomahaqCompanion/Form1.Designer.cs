@@ -73,7 +73,8 @@
             this.targetTextBox.Name = "targetTextBox";
             this.targetTextBox.Size = new System.Drawing.Size(287, 20);
             this.targetTextBox.TabIndex = 4;
-            this.targetTextBox.Text = "C:\\Users\\thom100\\Desktop\\HumanPeptides13.csv";
+            this.targetTextBox.Text = "C:\\Users\\Orbitrap_Lumos\\Desktop\\XmlMethodModifications\\Examples\\Fusion\\SPS\\HumanP" +
+    "eptides13.csv";
             // 
             // label1
             // 
@@ -141,7 +142,6 @@
             this.rawFileBox.Name = "rawFileBox";
             this.rawFileBox.Size = new System.Drawing.Size(293, 20);
             this.rawFileBox.TabIndex = 44;
-            this.rawFileBox.Text = "C:\\Users\\thom100\\Desktop\\HumanPeptides13.raw";
             // 
             // label3
             // 
@@ -238,7 +238,8 @@
             this.templateBox.Name = "templateBox";
             this.templateBox.Size = new System.Drawing.Size(343, 20);
             this.templateBox.TabIndex = 53;
-            this.templateBox.Text = "C:\\Users\\thom100\\Desktop\\Template.meth";
+            this.templateBox.Text = "C:\\Users\\Orbitrap_Lumos\\Desktop\\XmlMethodModifications\\Examples\\Fusion\\SPS\\Templa" +
+    "te.meth";
             // 
             // label4
             // 
