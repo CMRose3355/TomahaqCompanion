@@ -104,70 +104,74 @@ namespace TomahaqCompanion
 
         private void createMethod_Click(object sender, EventArgs e)
         {
-            Priming = true;
-            Analysis = false;
-
-            string templateMethod = templateBox.Text;
-            string outputMethod = templateMethod.Replace(".meth","_modified.meth");
-
-            //Import the modifications
-            UpdateLog("Importing Modifications");
-            Dictionary<Modification, string> staticMods = new Dictionary<Modification, string> ();
-            Dictionary<Modification, char> dynMods = new Dictionary<Modification, char>();
-            AddModifications(out staticMods, out dynMods);
-
-            //Determine the quantification channels --Not necessary for priming run--
-            UpdateLog("Determining Quantification Channels");
-            Dictionary<string, double> quantChannelDict = AddQuantitationChannels(staticMods);
-
-            //Import the Peptides
-            UpdateLog("Importing Target Peptides");
-            string targetFile = targetTextBox.Text;
-            SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, staticMods, dynMods);
-
-            //Iterate through the peptides, create ms1, ms2, and potentially ms3 lists
-            if(rawPrimingRun.Checked)
+            try
             {
-                UpdateLog("Opening Raw File");
-                ThermoRawFile rawFile = new ThermoRawFile(rawFileBox.Text);
-                rawFile.Open();
+                Priming = true;
+                Analysis = false;
 
-                //Build a map of the MS/MS scan events
-                UpdateLog("Mapping MS Scans");
-                Dictionary<int, int> TriggerMS2toMS1 = null;
-                Dictionary<int, int> TriggerMS2toTargetMS2 = null;
-                Dictionary<int, int> TargetMS2toTargetMS3 = null;
-                List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
+                string templateMethod = templateBox.Text;
+                string outputMethod = templateMethod.Replace(".meth", "_modified.meth");
 
-                //Extract MS1 Information
-                UpdateLog("Extracting MS1 XICs");
-                ExtractMS1XIC(rawFile, ms1Scans, targetList);
+                //Import the modifications
+                UpdateLog("Importing Modifications");
+                Dictionary<Modification, string> staticMods = new Dictionary<Modification, string>();
+                Dictionary<Modification, char> dynMods = new Dictionary<Modification, char>();
+                AddModifications(out staticMods, out dynMods);
 
-                //Populate the trigger ms2 data
-                UpdateLog("Extracting MS/MS Data");
-                ExtractData(rawFile, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, quantChannelDict);
+                //Determine the quantification channels --Not necessary for priming run--
+                UpdateLog("Determining Quantification Channels");
+                Dictionary<string, double> quantChannelDict = AddQuantitationChannels(staticMods);
 
-                UpdateLog("Closing Raw File");
-                rawFile.Dispose();
+                //Import the Peptides
+                UpdateLog("Importing Target Peptides");
+                string targetFile = targetTextBox.Text;
+                SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, staticMods, dynMods);
+
+                //Iterate through the peptides, create ms1, ms2, and potentially ms3 lists
+                if (rawPrimingRun.Checked)
+                {
+                    UpdateLog("Opening Raw File");
+                    ThermoRawFile rawFile = new ThermoRawFile(rawFileBox.Text);
+                    rawFile.Open();
+
+                    //Build a map of the MS/MS scan events
+                    UpdateLog("Mapping MS Scans");
+                    Dictionary<int, int> TriggerMS2toMS1 = null;
+                    Dictionary<int, int> TriggerMS2toTargetMS2 = null;
+                    Dictionary<int, int> TargetMS2toTargetMS3 = null;
+                    List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
+
+                    //Extract MS1 Information
+                    UpdateLog("Extracting MS1 XICs");
+                    ExtractMS1XIC(rawFile, ms1Scans, targetList);
+
+                    //Populate the trigger ms2 data
+                    UpdateLog("Extracting MS/MS Data");
+                    ExtractData(rawFile, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, quantChannelDict);
+
+                    UpdateLog("Closing Raw File");
+                    rawFile.Dispose();
+                }
+
+                //Populate Target SPS Ions
+                foreach (TargetPeptide target in targetList.Values)
+                {
+                    target.PopulateTargetSPSIons();
+                    target.PopulateTriggerIons();
+                }
+
+                //Make the XML
+                string xmlFile = BuildMethodXML(targetFile, targetList.Values.ToList());
+
+                //Export the method
+                MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+
+                //Plot the peptide selected
             }
-
-            //Populate Target SPS Ions
-            foreach(TargetPeptide target in targetList.Values)
+            catch (Exception exp)
             {
-                target.PopulateTargetSPSIons();
-                target.PopulateTriggerIons();
+                UpdateLog("Error! " + exp.Message);
             }
-
-            //Make the XML
-            string xmlFile = BuildMethodXML(targetFile, targetList.Values.ToList());
-
-            //Edit the method
-            MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
-
-            //Plot the peptide selected
-
-            //Export the method
-
         }
 
         private void analyzeRun_Click(object sender, EventArgs e)
@@ -962,6 +966,11 @@ namespace TomahaqCompanion
             }
 
             return file;
+        }
+
+        private void analysisTab_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
