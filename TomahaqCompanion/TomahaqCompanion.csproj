@@ -110,15 +110,15 @@
     <Content Include="License-LGPL.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CSMSL\CSMSL\CSMSL.csproj">
+    <ProjectReference Include="..\..\CSMSL\CSMSL\CSMSL.csproj">
       <Project>{3c8c9f05-9c19-4251-95fa-05d7edc8cae6}</Project>
       <Name>CSMSL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\CSMSL\CSMSL\IO\Thermo\Thermo.csproj">
+    <ProjectReference Include="..\..\CSMSL\CSMSL\IO\Thermo\Thermo.csproj">
       <Project>{24dc85ff-e97b-4140-9614-77dd8fddd32f}</Project>
       <Name>Thermo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Thermo\meth-modifications\xmlmethodchanger\XmlMethodChanger.lib\XmlMethodChanger.lib.csproj">
+    <ProjectReference Include="..\..\meth-modifications\xmlmethodchanger\XmlMethodChanger.lib\XmlMethodChanger.lib.csproj">
       <Project>{e820aef9-f002-4dc3-9bb6-38669b1803d3}</Project>
       <Name>XmlMethodChanger.lib</Name>
     </ProjectReference>

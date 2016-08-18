@@ -50,13 +50,13 @@ namespace TomahaqCompanion
         public PointPairList TriggerMS1XicPoints { get; set; }
         public PointPairList TargetMS1XicPoints { get; set; }
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<Modification, string> staticMods, Dictionary<Modification, char> dynMods, List<double> targetSPSIons)
+        public TargetPeptide(string peptideString, int charge, Dictionary<Modification, string> staticMods, Dictionary<Modification, char> dynMods, List<double> targetSPSIons, List<double> triggerFragIons)
         {
             //Save the original peptide string
             PeptideString = peptideString;
             Charge = charge;
             TargetSPSIons = targetSPSIons;
-            TriggerIons = new List<double>();
+            TriggerIons = triggerFragIons;
 
             //Build the dynamic modification dictionary and return the stripped string
             string strippedPepString = BuildDynamicModDict(peptideString, dynMods);
@@ -180,16 +180,23 @@ namespace TomahaqCompanion
 
         public void PopulateTriggerIons()
         {
-            //Determine the maximum charge
-            int maxCharge = Charge - 1;
-            if (maxCharge > 2) { maxCharge = 2; }
-
-            //Add in the fragment ions
-            for (int i = 1; i <= maxCharge; i++)
+            if (TriggerIons.Count > 0)
             {
-                foreach (Fragment frag in TriggerFrags)
+                return;
+            }
+            else
+            {
+                //Determine the maximum charge
+                int maxCharge = Charge - 1;
+                if (maxCharge > 2) { maxCharge = 2; }
+
+                //Add in the fragment ions
+                for (int i = 1; i <= maxCharge; i++)
                 {
-                    TriggerIons.Add(frag.ToMz(i));
+                    foreach (Fragment frag in TriggerFrags)
+                    {
+                        TriggerIons.Add(frag.ToMz(i));
+                    }
                 }
             }
         }

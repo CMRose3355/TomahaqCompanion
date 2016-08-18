@@ -102,7 +102,7 @@ namespace TomahaqCompanion
             }
         }
 
-        private void createMethod_Click(object sender, EventArgs e)
+        private void createMethod_Click_1(object sender, EventArgs e)
         {
             try
             {
@@ -128,10 +128,10 @@ namespace TomahaqCompanion
                 SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, staticMods, dynMods);
 
                 //Iterate through the peptides, create ms1, ms2, and potentially ms3 lists
-                if (rawPrimingRun.Checked)
+                if (primingRawBox.Text != "")
                 {
                     UpdateLog("Opening Raw File");
-                    ThermoRawFile rawFile = new ThermoRawFile(rawFileBox.Text);
+                    ThermoRawFile rawFile = new ThermoRawFile(primingRawBox.Text);
                     rawFile.Open();
 
                     //Build a map of the MS/MS scan events
@@ -160,13 +160,21 @@ namespace TomahaqCompanion
                     target.PopulateTriggerIons();
                 }
 
-                //Make the XML
-                string xmlFile = BuildMethodXML(targetFile, targetList.Values.ToList());
-
-                //Export the method
-                MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
-
                 //Plot the peptide selected
+
+
+                //Make the XMLfile that will be used to alter the method
+                //Only change the parameters the user wants to
+                UpdateLog("Building XML");
+                bool addMS1TargetedMass = addMS1TargetMassList.Checked;
+                bool addMS2TriggerMass = addMS2TriggerMassList.Checked;
+                bool addMS2IsoOffset = addMS2IsolationOffset.Checked;
+                bool addMS3TargetedMass = addMS3TargetMassList.Checked;
+                string xmlFile = BuildMethodXML(targetFile, targetList.Values.ToList(), addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass);
+
+                //Export the method last in case it fails due to the program not being run on the instrument
+                UpdateLog("Creating New Method");
+                MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
             }
             catch (Exception exp)
             {
@@ -176,65 +184,72 @@ namespace TomahaqCompanion
 
         private void analyzeRun_Click(object sender, EventArgs e)
         {
-            Priming = false;
-            Analysis = true;
-
-            //Import the modifications
-            UpdateLog("Importing Modifications");
-            Dictionary<Modification, string> staticMods = new Dictionary<Modification, string>();
-            Dictionary<Modification, char> dynMods = new Dictionary<Modification, char>();
-            AddModifications(out staticMods, out dynMods);
-
-            //Determine the quantification channels --Not necessary for priming run--
-            UpdateLog("Determining Quantification Channels");
-            QuantChannelsInUse = AddQuantitationChannels(staticMods);
-
-            //Import the Peptides
-            UpdateLog("Importing Target Peptides");
-            string targetFile = targetTextBox.Text;
-            SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, staticMods, dynMods);
-
-            //Iterate through the peptides, create ms1, ms2, and potentially ms3 lists
-            UpdateLog("Opening Raw File");
-            ThermoRawFile rawFile = new ThermoRawFile(rawFileBox.Text);
-            rawFile.Open();
-
-            //Build a map of the MS/MS scan events
-            UpdateLog("Mapping MS Scans");
-            Dictionary<int, int> TriggerMS2toMS1 = null;
-            Dictionary<int, int> TriggerMS2toTargetMS2 = null;
-            Dictionary<int, int> TargetMS2toTargetMS3 = null;
-            List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
-
-            //Extract MS1 Information
-            UpdateLog("Extracting MS1 XICs");
-            ExtractMS1XIC(rawFile, ms1Scans, targetList);
-
-            //Populate the trigger ms2 data
-            UpdateLog("Extracting MS/MS Data");
-            ExtractData(rawFile, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, QuantChannelsInUse);
-
-            //Close the Raw file
-            UpdateLog("Closing Raw File");
-            rawFile.Dispose();
-
-            //Build the User GUI data for each target
-            UpdateLog("Consolidating Data for GUI Tables");
-            Targets.Clear();
-            foreach (TargetPeptide target in targetList.Values)
+            try
             {
-                //Here we will populate all of the data necessary for analysis of the data
-                target.PopulateAnalysisData();
+                Priming = false;
+                Analysis = true;
 
-                //This is building the target line that will go into the GUI
-                Targets.Add(new TargetPeptideLine(target));
+                //Import the modifications
+                UpdateLog("Importing Modifications");
+                Dictionary<Modification, string> staticMods = new Dictionary<Modification, string>();
+                Dictionary<Modification, char> dynMods = new Dictionary<Modification, char>();
+                AddModifications(out staticMods, out dynMods);
+
+                //Determine the quantification channels --Not necessary for priming run--
+                UpdateLog("Determining Quantification Channels");
+                QuantChannelsInUse = AddQuantitationChannels(staticMods);
+
+                //Import the Peptides
+                UpdateLog("Importing Target Peptides");
+                string targetFile = targetTextBox.Text;
+                SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, staticMods, dynMods);
+
+                //Iterate through the peptides, create ms1, ms2, and potentially ms3 lists
+                UpdateLog("Opening Raw File");
+                ThermoRawFile rawFile = new ThermoRawFile(rawFileBox.Text);
+                rawFile.Open();
+
+                //Build a map of the MS/MS scan events
+                UpdateLog("Mapping MS Scans");
+                Dictionary<int, int> TriggerMS2toMS1 = null;
+                Dictionary<int, int> TriggerMS2toTargetMS2 = null;
+                Dictionary<int, int> TargetMS2toTargetMS3 = null;
+                List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
+
+                //Extract MS1 Information
+                UpdateLog("Extracting MS1 XICs");
+                ExtractMS1XIC(rawFile, ms1Scans, targetList);
+
+                //Populate the trigger ms2 data
+                UpdateLog("Extracting MS/MS Data");
+                ExtractData(rawFile, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, QuantChannelsInUse);
+
+                //Close the Raw file
+                UpdateLog("Closing Raw File");
+                rawFile.Dispose();
+
+                //Build the User GUI data for each target
+                UpdateLog("Consolidating Data for GUI Tables");
+                Targets.Clear();
+                foreach (TargetPeptide target in targetList.Values)
+                {
+                    //Here we will populate all of the data necessary for analysis of the data
+                    target.PopulateAnalysisData();
+
+                    //This is building the target line that will go into the GUI
+                    Targets.Add(new TargetPeptideLine(target));
+                }
+
+                //Plot the first peptide
+                TargetPeptide firstPeptide = targetList.ElementAt(0).Value;
+
+                //Update the plots
+                UpdatePlotsAnalysis(firstPeptide);
             }
-
-            //Plot the first peptide
-            TargetPeptide firstPeptide = targetList.ElementAt(0).Value;
-
-            //Update the plots
-            UpdatePlotsAnalysis(firstPeptide);
+            catch (Exception exp)
+            {
+                UpdateLog("Error! " + exp.Message);
+            }
         }
 
         private void AddModifications(out Dictionary<Modification, string> staticMods, out Dictionary<Modification, char> dynMods)
@@ -292,17 +307,24 @@ namespace TomahaqCompanion
                         maxCharge = minCharge;
                     }
 
+                    //Determine if the user wants to use specific trigger masses
+                    List<double> triggerFragIons = new List<double>();
+                    if (headers.Contains("MS2 Trigger m/z"))
+                    {
+                        triggerFragIons = LoadUserIons(reader["MS2 Trigger m/z"]);
+                    }
+
                     //Determine if the user input SPS ions that they want to use 
                     List<double> targetSPSIons = new List<double>();
-                    if(headers.Contains("MS3 Inclusion m/z"))
+                    if(headers.Contains("MS3 Target m/z"))
                     {
-                        targetSPSIons = LoadUserSPSIons(reader["MS3 Inclusion m/z"]);
+                        targetSPSIons = LoadUserIons(reader["MS3 Target m/z"]);
                     }
 
                     //
-                    for(int charge = minCharge; charge <= maxCharge;charge++)
+                    for (int charge = minCharge; charge <= maxCharge;charge++)
                     {
-                        TargetPeptide target = new TargetPeptide(peptideString, charge, staticMods, dynMods, targetSPSIons);
+                        TargetPeptide target = new TargetPeptide(peptideString, charge, staticMods, dynMods, targetSPSIons, triggerFragIons);
 
                         TargetPeptide outPep = null;
                         if (!retList.TryGetValue(target.Trigger.ToMz(charge), out outPep))
@@ -311,7 +333,7 @@ namespace TomahaqCompanion
                         }
                         else
                         {
-                            Console.WriteLine("Multiple targets with same mass detected");
+                            UpdateLog("Error! Multiple targets with same mass detected");
                         }
                     }
                 }
@@ -320,7 +342,7 @@ namespace TomahaqCompanion
             return retList;
         }
 
-        private List<double> LoadUserSPSIons(string entry)
+        private List<double> LoadUserIons(string entry)
         {
             List<double> targetSPSIons = new List<double>();
             List<string> targetSPSIonsStrings = entry.Split(';').ToList();
@@ -850,11 +872,6 @@ namespace TomahaqCompanion
             spectrumGraphControl2.Refresh();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void scanGridView_SelectionChanged(object sender, EventArgs e)
         {
             if (ScanEvents.Count != 0)
@@ -899,8 +916,14 @@ namespace TomahaqCompanion
             }
         }
 
-        private string BuildMethodXML(string inputFile, List<TargetPeptide> targetList)
+        private string BuildMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
         {
+            //Only change the parameters the user wants to
+            bool addMS1TargetedMass = ms1Target;
+            bool addMS2TriggerMass = ms2Trigger;
+            bool addMS2IsoOffset = ms2Offset;
+            bool addMS3TargetedMass = ms3target;
+
             //Save the xml for future use
             string file = inputFile.Replace(".csv","_method.xml");
 
@@ -913,7 +936,7 @@ namespace TomahaqCompanion
             //First we will make sure we have enough trees for all of the peptides
             int modCount = 1;
             int experimentIndex = 0;
-            foreach (TargetPeptide target in targetList)
+            for(int i = 1;i<targetList.Count;i++)
             {
                 int sourceNodeForCopy = modCount - 1;
                 MethodExp addExp = new MethodExp(experimentIndex);
@@ -929,33 +952,54 @@ namespace TomahaqCompanion
             int treeIndex = 0;
             foreach (TargetPeptide target in targetList)
             {
-                //Add in the MS1 inclusion list, and MS2 isolation offset
-                MethodExp addExp = new MethodExp(experimentIndex);
-                addExp.ChangeScanParams(treeIndex, target.MassShift);
-                addExp.AddMS1InclusionSingle(treeIndex, target.TriggerMZ, target.Charge);
+                if(addMS2IsoOffset)
+                {
+                    //Add in the MS2 isolation offset
+                    MethodExp addExp = new MethodExp(experimentIndex);
+                    addExp.ChangeScanParams(treeIndex, target.MassShift);
 
-                MethodMod addMod = new MethodMod(modCount, addExp);
-                methodMods.Modification.Add(addMod);
+                    MethodMod addMod = new MethodMod(modCount, addExp);
+                    methodMods.Modification.Add(addMod);
 
-                modCount++;
+                    modCount++;
+                }
+                
+                if(addMS1TargetedMass)
+                {
+                    //Add in the MS1 inclusion list, and MS2 isolation offset
+                    MethodExp addExp0 = new MethodExp(experimentIndex);
+                    addExp0.AddMS1InclusionSingle(treeIndex, target.TriggerMZ, target.Charge);
 
-                //Add the MS2 trigger mass List
-                MethodExp addExp1 = new MethodExp(experimentIndex);
-                addExp1.AddMS2TriggerList(treeIndex, target.TriggerIons);
+                    MethodMod addMod0 = new MethodMod(modCount, addExp0);
+                    methodMods.Modification.Add(addMod0);
 
-                MethodMod addMod1 = new MethodMod(modCount, addExp1);
-                methodMods.Modification.Add(addMod1);
+                    modCount++;
+                }
 
-                modCount++;
+                if (addMS2TriggerMass)
+                {
+                    //Add the MS2 trigger mass List
+                    MethodExp addExp1 = new MethodExp(experimentIndex);
+                    addExp1.AddMS2TriggerList(treeIndex, target.TriggerIons);
 
-                //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
-                MethodExp addExp2 = new MethodExp(experimentIndex);
-                addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIons);
+                    MethodMod addMod1 = new MethodMod(modCount, addExp1);
+                    methodMods.Modification.Add(addMod1);
 
-                MethodMod addMod2 = new MethodMod(modCount, addExp2);
-                methodMods.Modification.Add(addMod2);
+                    modCount++;
+                }
+                
+                if(addMS3TargetedMass)
+                {
+                    //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
+                    MethodExp addExp2 = new MethodExp(experimentIndex);
+                    addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIons);
 
-                modCount++;
+                    MethodMod addMod2 = new MethodMod(modCount, addExp2);
+                    methodMods.Modification.Add(addMod2);
+
+                    modCount++;
+                }
+                
                 treeIndex++;
             }
 
@@ -968,9 +1012,64 @@ namespace TomahaqCompanion
             return file;
         }
 
+        #region Unused Code
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void analysisTab_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void addMS1TargetMassList_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label10_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+
+        private void rawFileBrowser_Click(object sender, EventArgs e)
+        {
+            if (rawFileFDB.ShowDialog() == DialogResult.OK)
+            {
+                rawFileBox.Text = rawFileFDB.FileName;
+            }
+        }
+
+        private void targetBoxBrowse_Click(object sender, EventArgs e)
+        {
+            if (targetOnlyFDB.ShowDialog() == DialogResult.OK)
+            {
+                targetTextBox.Text = targetOnlyFDB.FileName;
+            }
+        }
+
+        private void templateMethodBrowse_Click_1(object sender, EventArgs e)
+        {
+            if (templateMethodFDB.ShowDialog() == DialogResult.OK)
+            {
+                templateBox.Text = templateMethodFDB.FileName;
+            }
+        }
+
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void primingRunBrowse_Click(object sender, EventArgs e)
+        {
+            if (primingRawOFDia.ShowDialog() == DialogResult.OK)
+            {
+                primingRawBox.Text = primingRawOFDia.FileName;
+            }
         }
     }
 }
