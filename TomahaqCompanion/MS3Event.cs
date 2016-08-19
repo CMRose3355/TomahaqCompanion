@@ -18,15 +18,20 @@ namespace TomahaqCompanion
     public class MS3Event
     {
         public int ScanNumber { get; set; }
+
         public double RetentionTime { get; set; }
         public double InjectionTime { get; set; }
+
         public PointPairList AllPeaks { get; set; }
         public PointPairList QuantPeaks { get; set; }
+
+        public List<double> SPSIons { get; set; }
         public int SPSIonCount { get; set; }
 
-        public MS3Event(int scanNumber, double retentionTime, ThermoSpectrum ms3spectrum, List<ThermoMzPeak> peaks, double injectionTime, Dictionary<string, double> quantChannelDict, int numSPSIons)
+        public MS3Event(int scanNumber, double retentionTime, ThermoSpectrum ms3spectrum, List<ThermoMzPeak> peaks, double injectionTime, Dictionary<string, double> quantChannelDict, List<double> spsIons)
         {
-            SPSIonCount = numSPSIons;
+            SPSIons = spsIons;
+            SPSIonCount = spsIons.Count;
             ScanNumber = scanNumber;
             RetentionTime = retentionTime;
             InjectionTime = injectionTime;
@@ -43,7 +48,7 @@ namespace TomahaqCompanion
             foreach(double quantMZ in quantChannelDict.Values)
             {
                 MzRange quantRange = new MzRange(quantMZ, new Tolerance(ToleranceUnit.PPM, 10));
-                ThermoMzPeak peak = ms3spectrum.GetClosestPeak(quantRange);
+                ThermoMzPeak peak = GetTallestPeak(quantRange, ms3spectrum);
 
                 if(peak == null)
                 {
@@ -56,6 +61,25 @@ namespace TomahaqCompanion
 
                 peakCount++;
             }
+        }
+
+        private ThermoMzPeak GetTallestPeak(MzRange range, ThermoSpectrum spectrum)
+        {
+            ThermoMzPeak retPeak = null;
+            List<ThermoMzPeak> peaks = null;
+
+            if (spectrum.TryGetPeaks(range, out peaks))
+            {
+                foreach (ThermoMzPeak peak in peaks)
+                {
+                    if (retPeak == null || peak.Intensity > retPeak.Intensity)
+                    {
+                        retPeak = peak;
+                    }
+                }
+            }
+
+            return retPeak;
         }
     }
 }

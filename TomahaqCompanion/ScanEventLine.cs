@@ -10,6 +10,7 @@ namespace TomahaqCompanion
     public class ScanEventLine
     {
         public MS2Event ScanEvent { get; set; }
+        public string MS1TriggerIntensity { get; set; }
         public string MS2RetentionTime { get; set; }
         public string MS2ScanNumber { get; set; }
         public string MS3ScanNumber { get; set; }
@@ -34,8 +35,9 @@ namespace TomahaqCompanion
             MS2RetentionTime = Math.Round(ms2ScanEvent.RetentionTime,2).ToString();
             MS2ScanNumber = ms2ScanEvent.ScanNumber.ToString();
             MS2InjectionTime = Math.Round(ms2ScanEvent.InjectionTime,1).ToString();
+            MS1TriggerIntensity = Math.Round(Math.Log10(ms2ScanEvent.MS1Intensity), 2).ToString();
 
-            if(ms2ScanEvent.MS3 != null)
+            if (ms2ScanEvent.MS3 != null)
             {
                 MS3Event ms3 = ms2ScanEvent.MS3;
                 MS3ScanNumber = ms3.ScanNumber.ToString();

@@ -30,6 +30,7 @@ namespace TomahaqCompanion
         private bool Analysis;
         private bool Priming;
         private BindingList<TargetPeptideLine> Targets;
+        private BindingList<TargetPeptideLine> TargetsDisplayed;
         private BindingList<ModificationLine> ModLines;
         private BindingList<ScanEventLine> ScanEvents;
         private Dictionary<string, Dictionary<string, double>> QuantChannelDict;
@@ -48,8 +49,9 @@ namespace TomahaqCompanion
 
             //Initialize the Target Grid View
             Targets = new BindingList<TargetPeptideLine>();
+            TargetsDisplayed = new BindingList<TargetPeptideLine>();
             targetGridView.AutoGenerateColumns = false;
-            targetGridView.DataSource = Targets;
+            targetGridView.DataSource = TargetsDisplayed;
             InitializeTargetGrid();
 
             //Initialize the Modification Grid View
@@ -68,16 +70,6 @@ namespace TomahaqCompanion
             QuantChannelDict = BiuldQuantificationDictionary();
 
             InitializePrimingRunGraphs();
-        }
-
-        private void sortTargetsMZ_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void sortTargetsRT_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void primingTargetList_Click(object sender, EventArgs e)
@@ -108,9 +100,6 @@ namespace TomahaqCompanion
             {
                 Priming = true;
                 Analysis = false;
-
-                string templateMethod = templateBox.Text;
-                string outputMethod = templateMethod.Replace(".meth", "_modified.meth");
 
                 //Import the modifications
                 UpdateLog("Importing Modifications");
@@ -147,21 +136,33 @@ namespace TomahaqCompanion
 
                     //Populate the trigger ms2 data
                     UpdateLog("Extracting MS/MS Data");
-                    ExtractData(rawFile, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, quantChannelDict);
+                    ExtractData(rawFile, TriggerMS2toMS1, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, quantChannelDict);
 
                     UpdateLog("Closing Raw File");
                     rawFile.Dispose();
                 }
 
                 //Populate Target SPS Ions
+                UpdateLog("Consolidating Data for GUI Tables");
+                Targets.Clear();
+                TargetsDisplayed.Clear();
                 foreach (TargetPeptide target in targetList.Values)
                 {
-                    target.PopulateTargetSPSIons();
+                    //If a raw file was provided then we will use that data for the target list
+                    if (primingRawBox.Text != "")
+                    {
+                        target.PopulatePrimingData();
+                        target.UpdateTargetSPSIons(10);
+                    }
+
+                    target.PopulateTargetSPSIons(20);
                     target.PopulateTriggerIons();
+
+                    //This is building the target line that will go into the GUI
+                    Targets.Add(new TargetPeptideLine(target));
+                    TargetsDisplayed.Add(new TargetPeptideLine(target));
+
                 }
-
-                //Plot the peptide selected
-
 
                 //Make the XMLfile that will be used to alter the method
                 //Only change the parameters the user wants to
@@ -174,7 +175,17 @@ namespace TomahaqCompanion
 
                 //Export the method last in case it fails due to the program not being run on the instrument
                 UpdateLog("Creating New Method");
-                MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+                if(templateBox.Text != "")
+                {
+                    string templateMethod = templateBox.Text;
+                    string outputMethod = targetFile.Replace(".csv", ".meth");
+                    MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+                }
+                else
+                {
+                    UpdateLog("Cannot Create New Method Because No Template Was Provided");
+                }
+                
             }
             catch (Exception exp)
             {
@@ -222,7 +233,7 @@ namespace TomahaqCompanion
 
                 //Populate the trigger ms2 data
                 UpdateLog("Extracting MS/MS Data");
-                ExtractData(rawFile, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, QuantChannelsInUse);
+                ExtractData(rawFile, TriggerMS2toMS1, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, QuantChannelsInUse);
 
                 //Close the Raw file
                 UpdateLog("Closing Raw File");
@@ -231,6 +242,7 @@ namespace TomahaqCompanion
                 //Build the User GUI data for each target
                 UpdateLog("Consolidating Data for GUI Tables");
                 Targets.Clear();
+                TargetsDisplayed.Clear();
                 foreach (TargetPeptide target in targetList.Values)
                 {
                     //Here we will populate all of the data necessary for analysis of the data
@@ -238,6 +250,7 @@ namespace TomahaqCompanion
 
                     //This is building the target line that will go into the GUI
                     Targets.Add(new TargetPeptideLine(target));
+                    TargetsDisplayed.Add(new TargetPeptideLine(target));
                 }
 
                 //Plot the first peptide
@@ -245,11 +258,186 @@ namespace TomahaqCompanion
 
                 //Update the plots
                 UpdatePlotsAnalysis(firstPeptide);
+
+                //This will switch the GUI to the data analysis tab, whose index is 1
+                tabControl.SelectTab(1);
             }
             catch (Exception exp)
             {
                 UpdateLog("Error! " + exp.Message);
             }
+        }
+
+        private void addUserModifications_Click(object sender, EventArgs e)
+        {
+            //Save the indexes for the rows that will be deleted
+            List<int> indexToDelete = new List<int>();
+
+            //Cycle through the rows
+            foreach (DataGridViewRow row in userModGridView.Rows)
+            {
+                //If it is a new row then we don't want to do anything
+                if (!row.IsNewRow)
+                {
+                    //Check the values entered by the user
+                    bool trigger = CheckBoolValue(row.Cells["triggerCB"].Value);
+                    bool target = CheckBoolValue(row.Cells["targetCB"].Value);
+                    bool both = CheckBoolValue(row.Cells["bothCB"].Value);
+                    string name = CheckStringValue(row.Cells["nameBox"].Value);
+                    double mass = CheckDoubValue(row.Cells["massBox"].Value);
+                    string type = CheckStringValue(row.Cells["typeCombo"].Value);
+                    string symbol = CheckStringValue(row.Cells["symbolBox"].Value);
+                    string sites = CheckStringValue(row.Cells["sitesBox"].Value);
+
+                    //Make sure there is enough to make a new modification
+                    if(mass != 0 && name != "" && type != "" & sites != "")
+                    {
+                        //This is a bad way to add in multiple sites
+                        List<string> sitesList = sites.Split(',').ToList();
+                        List<ModificationSites> modSiteList = new List<ModificationSites>();
+                        foreach(string site in sitesList)
+                        {
+                            modSiteList.Add(SwitchSite(site));
+                        }
+
+                        //If sites returned None then something is wrong
+                        if(modSiteList[0] == ModificationSites.None) { sites = "None"; }
+
+                        //First add the modification with just one of the mods
+                        Modification addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0]);
+
+                        //Check to see if there are 2 mods
+                        if(modSiteList.Count == 2)
+                        {
+                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1]);
+                        }
+                        //Check to see if there are 3 mods
+                        else if (modSiteList.Count == 3)
+                        {
+                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2]);
+                        }
+                        //Check to see if there are 4 mods
+                        else if (modSiteList.Count == 4)
+                        {
+                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2] | modSiteList[3]);
+                        }
+
+                        //If it is static then make sure the symbol is cleared
+                        if(type == "Static") { symbol = ""; }
+
+                        //Add a modification line
+                        ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, trigger, target, both, addMod));
+
+                        //Make a note of which row to delete
+                        indexToDelete.Add(row.Index);
+                    }
+                }
+            }
+
+            //Remove the rows in the user mod grid
+            int totalRemoved = 0;
+            foreach(int rowIndex in indexToDelete)
+            {
+                userModGridView.Rows.Remove(userModGridView.Rows[rowIndex - totalRemoved]);
+                totalRemoved++;
+            }
+        }
+
+        private ModificationSites SwitchSite(string aa)
+        {
+            switch(aa)
+            {
+                case "K":
+                    return ModificationSites.K;
+                case "C":
+                    return ModificationSites.C;
+                case "S":
+                    return ModificationSites.S;
+                case "T":
+                    return ModificationSites.T;
+                case "Y":
+                    return ModificationSites.Y;
+                case "M":
+                    return ModificationSites.M;
+                case "NTerminus":
+                    return ModificationSites.NTerminus;
+                case "NPep":
+                    return ModificationSites.NPep;
+                case "PepC":
+                    return ModificationSites.PepC;
+                case "NProt":
+                    return ModificationSites.NProt;
+                case "ProtC":
+                    return ModificationSites.ProtC;
+                case "A":
+                    return ModificationSites.A;
+                case "R":
+                    return ModificationSites.R;
+                case "N":
+                    return ModificationSites.N;
+                case "D":
+                    return ModificationSites.D;
+                case "E":
+                    return ModificationSites.E;
+                case "Q":
+                    return ModificationSites.Q;
+                case "G":
+                    return ModificationSites.G;
+                case "H":
+                    return ModificationSites.H;
+                case "I":
+                    return ModificationSites.I;
+                case "P":
+                    return ModificationSites.P;
+                case "F":
+                    return ModificationSites.F;
+                case "W":
+                    return ModificationSites.W;
+                case "V":
+                    return ModificationSites.V;
+                default:
+                    return ModificationSites.None;
+            }
+        }
+
+        private bool CheckBoolValue(object value)
+        {
+            if(value == null)
+            {
+                return false;
+            }
+
+            return (bool) value;
+        }
+
+        private string CheckStringValue(object value)
+        {
+            if (value == null)
+            {
+                return "";
+            }
+
+            return (string)value;
+        }
+
+        private char CheckCharValue(object value)
+        {
+            if (value == null)
+            {
+                return ' ';
+            }
+
+            return (char)value;
+        }
+
+        private double CheckDoubValue(object value)
+        {
+            if (value == null)
+            {
+                return 0;
+            }
+
+            return double.Parse((string)value);
         }
 
         private void AddModifications(out Dictionary<Modification, string> staticMods, out Dictionary<Modification, char> dynMods)
@@ -411,16 +599,18 @@ namespace TomahaqCompanion
 
                 foreach(TargetPeptide target in targetList.Values)
                 {
-                    target.AddMS1XICPoint(spectrum, rt);
+                    target.AddMS1XICPoint(spectrum, rt, scanNumber);
                 }
             }
         }
 
-        private void ExtractData(ThermoRawFile rawFile, Dictionary<int, int> TriggerMS2toTargetMS2, Dictionary<int, int> TargetMS2toTargetMS3, SortedList<double, TargetPeptide> targetList, Dictionary<string, double> quantChannelDict)
+        private void ExtractData(ThermoRawFile rawFile, Dictionary<int, int> TriggerMS2toMS1, Dictionary<int, int> TriggerMS2toTargetMS2, Dictionary<int, int> TargetMS2toTargetMS3, SortedList<double, TargetPeptide> targetList, Dictionary<string, double> quantChannelDict)
         {
             //Cycle through the trigger MS2 scan numbers
             foreach(int scanNumber in TriggerMS2toTargetMS2.Keys)
             {
+                int ms1ScanNumber = TriggerMS2toMS1[scanNumber];
+
                 double rt = rawFile.GetRetentionTime(scanNumber);
                 double it = rawFile.GetInjectionTime(scanNumber);
                 double precursorMZ = rawFile.GetPrecursorMz(scanNumber);
@@ -437,14 +627,14 @@ namespace TomahaqCompanion
                         if(spectrum == null) { spectrum = rawFile.GetSpectrum(scanNumber); }
 
                         //Grab the trigger data for the Trigger MS2
-                        targetPeptide.AddTriggerData(scanNumber, spectrum, rt, it);
+                        targetPeptide.AddTriggerData(ms1ScanNumber, scanNumber, spectrum, rt, it);
 
                         //If we found a trigger peptide then see if we then targeted it
                         int targetScanNumber = 0;
                         if(TriggerMS2toTargetMS2.TryGetValue(scanNumber, out targetScanNumber))
                         {
                             //If we did an ms2 on the target peptides then get that data as well
-                            ExtractTargetData(targetPeptide, rawFile, targetScanNumber, TargetMS2toTargetMS3, quantChannelDict);
+                            ExtractTargetData(targetPeptide, rawFile, ms1ScanNumber, targetScanNumber, TargetMS2toTargetMS3, quantChannelDict);
                         }
                     }
                 }
@@ -460,7 +650,7 @@ namespace TomahaqCompanion
             return retList;
         }
 
-        private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile, int targetScanNumber, Dictionary<int, int> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
+        private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile,int ms1ScanNumber, int targetScanNumber, Dictionary<int, int> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
         {
             //Grab all of the data for the target and add that data
             double rt = rawFile.GetRetentionTime(targetScanNumber);
@@ -471,24 +661,24 @@ namespace TomahaqCompanion
             int ms3ScanNumber = 0;
             double ms3rt = 0;
             double ms3it = 0;
-            int numSPSIons = 0;
+            List<double> spsIons = new List<double>();
             ThermoSpectrum ms3spectrum = null;
             if (TargetMS2toTargetMS3.TryGetValue(targetScanNumber, out ms3ScanNumber))
             {
                 ms3rt = rawFile.GetRetentionTime(ms3ScanNumber);
                 ms3it = rawFile.GetInjectionTime(ms3ScanNumber);
                 ms3spectrum = rawFile.GetSpectrum(ms3ScanNumber);
-                numSPSIons = rawFile.getSPSMasses(ms3ScanNumber).Count;
+                spsIons = rawFile.getSPSMasses(ms3ScanNumber);
             }
 
             //Add the target data and if there was an MS3 add that data too
             if(ms3spectrum == null)
             {
-                targetPeptide.AddTargetData(targetScanNumber, spectrum, rt, it);
+                targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it);
             }
             else
             {
-                targetPeptide.AddTargetData(targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, numSPSIons, quantChannelDict);
+                targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, spsIons, quantChannelDict);
             }
         }
 
@@ -579,51 +769,67 @@ namespace TomahaqCompanion
             nameColumn.DataPropertyName = "Name";
             nameColumn.HeaderText = "Name";
             nameColumn.ReadOnly = true;
-            nameColumn.Width = 50;
+            nameColumn.Width = 60;
             modGridView.Columns.Add(nameColumn);
 
             DataGridViewTextBoxColumn massColumn = new DataGridViewTextBoxColumn();
             massColumn.DataPropertyName = "Mass";
             massColumn.HeaderText = "Mono Mass";
             massColumn.ReadOnly = true;
-            massColumn.Width = 80;
+            massColumn.Width = 75;
             modGridView.Columns.Add(massColumn);
 
             DataGridViewTextBoxColumn modTypeColumn = new DataGridViewTextBoxColumn();
             modTypeColumn.DataPropertyName = "Type";
             modTypeColumn.HeaderText = "Type";
             modTypeColumn.ReadOnly = true;
-            modTypeColumn.Width = 50;
+            modTypeColumn.Width = 70;
             modGridView.Columns.Add(modTypeColumn);
 
             DataGridViewTextBoxColumn modCharColumn = new DataGridViewTextBoxColumn();
             modCharColumn.DataPropertyName = "ModChar";
             modCharColumn.HeaderText = "Symbol";
             modCharColumn.ReadOnly = true;
-            modCharColumn.Width = 50;
+            modCharColumn.Width = 45;
             modGridView.Columns.Add(modCharColumn);
 
             DataGridViewTextBoxColumn modSitesColumn = new DataGridViewTextBoxColumn();
             modSitesColumn.DataPropertyName = "ModSites";
             modSitesColumn.HeaderText = "Sites";
             modSitesColumn.ReadOnly = true;
-            modSitesColumn.Width = 70;
+            modSitesColumn.Width = 60;
             modGridView.Columns.Add(modSitesColumn);
 
             //Populate modded proteins - build a list of possible modifications
-            Modification tmt10 = new Modification(229.162932, "TMT10", ModificationSites.K | ModificationSites.NTerminus);
-            Modification tmt0 = new Modification(224.152478, "TMT0", ModificationSites.K | ModificationSites.NTerminus);
-            Modification tmtSH = new Modification(235.17677, "TMTsh", ModificationSites.K | ModificationSites.NTerminus);
+            Modification tmt0 = new Modification(224.152478, "TMT0", ModificationSites.K | ModificationSites.NPep);
+            Modification tmt2 = new Modification(225.15833, "TMT2", ModificationSites.K | ModificationSites.NPep);
+            Modification tmt10 = new Modification(229.162932, "TMT10", ModificationSites.K | ModificationSites.NPep);
+            Modification tmtSH = new Modification(235.17677, "TMTsh", ModificationSites.K | ModificationSites.NPep);
+
             Modification cam = new Modification(57.02146, "CAM", ModificationSites.C);
+            Modification nem = new Modification(125.04767, "NEM", ModificationSites.C);
+
             Modification ox = new Modification(15.99491, "OX", ModificationSites.M);
             Modification phos = new Modification(79.96633, "Phos", ModificationSites.S | ModificationSites.T | ModificationSites.Y);
 
-            ModLines.Add(new ModificationLine("TMT0", Math.Round(tmt0.MonoisotopicMass, 5), "K,NTerm", "", "Static", false, true, false, tmt0));
-            ModLines.Add(new ModificationLine("TMT10", Math.Round(tmt10.MonoisotopicMass, 5), "K,NTerm", "", "Static", false, false, true, tmt10));
-            ModLines.Add(new ModificationLine("TMTsh", Math.Round(tmtSH.MonoisotopicMass, 5), "K,NTerm", "", "Static", false, false, false, tmtSH));
+            Modification ggTMT0 = new Modification(338.195378, "ggTMT0", ModificationSites.K);
+            Modification ggTMT2 = new Modification(339.20123, "ggTMT2", ModificationSites.K);
+            Modification ggTMT10 = new Modification(343.20583, "ggTMT10", ModificationSites.K);
+            Modification ggTMTsh = new Modification(349.21967, "ggTMTsh", ModificationSites.K);
+
+            ModLines.Add(new ModificationLine("TMT0", Math.Round(tmt0.MonoisotopicMass, 5), "K,NPep", "", "Static", false, true, false, tmt0));
+            ModLines.Add(new ModificationLine("TMT2", Math.Round(tmt2.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, false, tmt2));
+            ModLines.Add(new ModificationLine("TMT10", Math.Round(tmt10.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, true, tmt10));
+            ModLines.Add(new ModificationLine("TMTsh", Math.Round(tmtSH.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, false, tmtSH));
             ModLines.Add(new ModificationLine("CAM", Math.Round(cam.MonoisotopicMass, 5), "C", "", "Static", true, false, false, cam));
+            ModLines.Add(new ModificationLine("NEM", Math.Round(nem.MonoisotopicMass, 5), "C", "", "Static", false, false, false, nem));
             ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, false, false, ox));
             ModLines.Add(new ModificationLine("Phos", Math.Round(phos.MonoisotopicMass, 5), "S,T,Y", "#", "Dynamic", false, false, false, phos));
+            ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, false, ggTMT0));
+            ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, false, ggTMT2));
+            ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, false, ggTMT10));
+            ModLines.Add(new ModificationLine("ggTMTsh", Math.Round(ggTMTsh.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, false, ggTMTsh));
+
         }
 
         private void InitializeScanGrid()
@@ -634,6 +840,13 @@ namespace TomahaqCompanion
             ms2RTCol.ReadOnly = true;
             ms2RTCol.Width = 50;
             scanGridView.Columns.Add(ms2RTCol);
+
+            DataGridViewTextBoxColumn ms2TrigInt = new DataGridViewTextBoxColumn();
+            ms2TrigInt.DataPropertyName = "MS1TriggerIntensity";
+            ms2TrigInt.HeaderText = "Trigger Int (Log10)";
+            ms2TrigInt.ReadOnly = true;
+            ms2TrigInt.Width = 50;
+            scanGridView.Columns.Add(ms2TrigInt);
 
             DataGridViewTextBoxColumn ms2SNCol = new DataGridViewTextBoxColumn();
             ms2SNCol.DataPropertyName = "MS2ScanNumber";
@@ -757,16 +970,29 @@ namespace TomahaqCompanion
 
         private Dictionary<string, double> AddQuantitationChannels(Dictionary<Modification, string> staticMods)
         {
-            Modification targetMod = null;
+            //This will be the dictionary of the quantitative channels
+            Dictionary<string, double> retDict = null;
+
+            //Cycle through the modifications that are being used
             foreach (KeyValuePair<Modification, string> kvp in staticMods)
             {
+                //See if the modification is being used in the target peptide
                 if (kvp.Value == "Target")
                 {
-                    targetMod = kvp.Key;
+                    //We need to check to see if this is actually being used for quantiation
+                    //There is a change you can have a static mod that varies between the two peptides but is not being used for quantiation
+                    Dictionary<string, double> outDict = null;
+                    if(QuantChannelDict.TryGetValue(kvp.Key.Name, out outDict))
+                    {
+                        //If we are using a mod that has quantitative data then get it from the dictionary
+                        //This quant channel dictionary is manually curated
+                        retDict = QuantChannelDict[kvp.Key.Name];
+                    }
                 }
             }
 
-            return QuantChannelDict[targetMod.Name];
+            //Return the values
+            return retDict;
         }
 
         private Dictionary<string, Dictionary<string, double>> BiuldQuantificationDictionary()
@@ -799,9 +1025,52 @@ namespace TomahaqCompanion
             logBox.ScrollToCaret();
         }
 
+        private void UpdateTargetPlots()
+        {
+            if (TargetsDisplayed.Count != 0)
+            {
+                int index = 0;
+                if (targetGridView.CurrentCell != null)
+                {
+                    index = targetGridView.CurrentCell.RowIndex;
+                }
+
+                TargetPeptide target = TargetsDisplayed[index].Peptide;
+
+                if (Analysis)
+                {
+                    UpdatePlotsAnalysis(target);
+                }
+                else if (Priming)
+                {
+                    UpdatePlotsPriming(target);
+                }
+            }
+        }
+
         private void UpdatePlotsPriming(TargetPeptide target)
         {
-            
+            //Populate the scan Events Table
+            ScanEvents.Clear();
+            foreach (ScanEventLine scanEvent in target.ScanEventLines)
+            {
+                ScanEvents.Add(scanEvent);
+            }
+
+            UpdateMS1XICsPlot(target);
+
+            if (target.TriggerMS2s.Count == 0)
+            {
+                SpectrumPane1.CurveList.Clear();
+                spectrumGraphControl1.AxisChange();
+                spectrumGraphControl1.Refresh();
+
+                SpectrumPane2.CurveList.Clear();
+                spectrumGraphControl2.AxisChange();
+                spectrumGraphControl2.Refresh();
+
+            }
+
         }
 
         private void UpdatePlotsAnalysis(TargetPeptide target)
@@ -817,28 +1086,44 @@ namespace TomahaqCompanion
             }
 
             UpdateMS1XICsPlot(target);
-
-            if(target.TargetMS2s.Count > 0)
+            if(target.TargetMS2s.Count == 0)
             {
-                MS2Event ms2Event = target.TargetMS2s.ElementAt(0);
-                UpdateTargetMS2Plot(ms2Event);
+                SpectrumPane1.CurveList.Clear();
+                spectrumGraphControl1.AxisChange();
+                spectrumGraphControl1.Refresh();
 
-                if (ms2Event.MS3 != null)
-                {
-                    UpdateTargetMS3Plot(ms2Event.MS3);
-                }
+                SpectrumPane2.CurveList.Clear();
+                spectrumGraphControl2.AxisChange();
+                spectrumGraphControl2.Refresh();
+
             }
         }
 
         private void UpdateMS1XICsPlot(TargetPeptide target)
         {
             MS1Pane.CurveList.Clear();
+            MS1Pane.Title.Text = "Precursor Ion XIC for " + target.PeptideString;
 
             LineItem triggerXIC = MS1Pane.AddCurve("Trigger XIC", target.TriggerMS1XicPoints, Color.Red, SymbolType.None);
             triggerXIC.Line.Width = 2.0F;
 
             LineItem targetXIC = MS1Pane.AddCurve("Target XIC", target.TargetMS1XicPoints, Color.Blue, SymbolType.None);
             targetXIC.Line.Width = 2.0F;
+
+            LineItem triggerPoints = MS1Pane.AddCurve("Trigger MS2s", target.TriggerMS2Points, Color.Red, SymbolType.Circle);
+            triggerPoints.Line.IsVisible = false;
+            triggerPoints.Symbol.Border.Width = 2.0F;
+            triggerPoints.Symbol.Size = 10.0F;
+
+            LineItem targetMS2Points = MS1Pane.AddCurve("Trigger MS2s", target.TargetMS2Points, Color.Blue, SymbolType.Circle);
+            targetMS2Points.Line.IsVisible = false;
+            targetMS2Points.Symbol.Border.Width = 2.0F;
+            targetMS2Points.Symbol.Size = 10.0F;
+
+            LineItem targetMS3Points = MS1Pane.AddCurve("Trigger MS2s", target.TargetMS3Points, Color.Teal, SymbolType.Circle);
+            targetMS3Points.Line.IsVisible = false;
+            targetMS3Points.Symbol.Border.Width = 2.0F;
+            targetMS3Points.Symbol.Size = 10.0F;
 
             MS1Pane.Legend.FontSpec.Size = 20f;
 
@@ -849,9 +1134,20 @@ namespace TomahaqCompanion
         private void UpdateTargetMS2Plot(MS2Event ms2)
         {
             SpectrumPane1.CurveList.Clear();
-
             SpectrumPane1.Title.Text = "Target MS2 Spectrum";
             SpectrumPane1.AddStick("Target Spectrum", ms2.AllPeaks, Color.Black);
+
+            LineItem spsStars = SpectrumPane1.AddCurve("SPS Ions", ms2.SPSPeaks, Color.Red, SymbolType.Star);
+            spsStars.Symbol.Fill.Color = Color.Red;
+            spsStars.Line.IsVisible = false;
+            spsStars.Symbol.Border.Width = 2.0F;
+            spsStars.Symbol.Size = 10.0F;
+
+            LineItem matchedStars = SpectrumPane1.AddCurve("Matched Fragments", ms2.MatchedPeaks, Color.Blue, SymbolType.Star);
+            matchedStars.Symbol.Fill.Color = Color.Blue;
+            matchedStars.Line.IsVisible = false;
+            matchedStars.Symbol.Border.Width = 2.0F;
+            matchedStars.Symbol.Size = 10.0F;
 
             spectrumGraphControl1.AxisChange();
             spectrumGraphControl1.Refresh();
@@ -860,8 +1156,7 @@ namespace TomahaqCompanion
         private void UpdateTargetMS3Plot(MS3Event ms3)
         {
             SpectrumPane2.CurveList.Clear();
-
-            SpectrumPane2.Title.Text = "Reporter Ion Intensity (Signal to Noise)";
+            SpectrumPane2.Title.Text = "Target MS3 Reporter Ion S/N";
             SpectrumPane2.XAxis.Title.Text = "Reporter Ion";
             SpectrumPane2.YAxis.Title.Text = "Signal to Noise";
             SpectrumPane2.AddBar("QuantData", ms3.QuantPeaks, Color.Blue);
@@ -870,6 +1165,92 @@ namespace TomahaqCompanion
             
             spectrumGraphControl2.AxisChange();
             spectrumGraphControl2.Refresh();
+        }
+
+        private void UpdateTriggerMS2Plots(MS2Event ms2)
+        {
+            int index = 0;
+            if (targetGridView.CurrentCell != null)
+            {
+                index = targetGridView.CurrentCell.RowIndex;
+            }
+
+            TargetPeptide target = TargetsDisplayed[index].Peptide;
+
+            SpectrumPane1.CurveList.Clear();
+            SpectrumPane1.Title.Text = "Target MS2 Spectrum";
+            SpectrumPane1.AddStick("Target Spectrum", ms2.AllPeaks, Color.Black);
+
+            LineItem spsStars = SpectrumPane1.AddCurve("SPS Ions", ms2.SPSPeaks, Color.Red, SymbolType.Star);
+            spsStars.Symbol.Fill.Color = Color.Red;
+            spsStars.Line.IsVisible = false;
+            spsStars.Symbol.Border.Width = 2.0F;
+            spsStars.Symbol.Size = 10.0F;
+
+            LineItem matchedStars = SpectrumPane1.AddCurve("Matched Fragments", ms2.MatchedPeaks, Color.Blue, SymbolType.Star);
+            matchedStars.Symbol.Fill.Color = Color.Blue;
+            matchedStars.Line.IsVisible = false;
+            matchedStars.Symbol.Border.Width = 2.0F;
+            matchedStars.Symbol.Size = 10.0F;
+
+            spectrumGraphControl1.AxisChange();
+            spectrumGraphControl1.Refresh();
+
+            //Update the composite Spectrum
+            SpectrumPane2.CurveList.Clear();
+            SpectrumPane2.Title.Text = "Composite Trigger MS2 Spectrum";
+            SpectrumPane2.AddStick("Averaged Spectrum", target.TriggerCompositeMS2Points, Color.Black);
+
+            spectrumGraphControl2.AxisChange();
+            spectrumGraphControl2.Refresh();
+        }
+
+        private void sortTargetsMZ_Click(object sender, EventArgs e)
+        {
+            //Create a list that will be used to sort the peptides based on the trigger mz
+            SortedList<double, TargetPeptideLine> sortedPeptideLines = new SortedList<double, TargetPeptideLine>();
+            foreach (TargetPeptideLine pepLine in TargetsDisplayed)
+            {
+                TargetPeptideLine outPepLine = null;
+                double currentMZ = pepLine.TriggerMZ;
+                while (sortedPeptideLines.TryGetValue(currentMZ, out outPepLine))
+                {
+                    currentMZ += 0.01;
+                }
+
+                sortedPeptideLines.Add(currentMZ, pepLine);
+            }
+
+            //Add the targets back into what is being displayed
+            TargetsDisplayed.Clear();
+            foreach (TargetPeptideLine pepLine in sortedPeptideLines.Values)
+            {
+                TargetsDisplayed.Add(pepLine);
+            }
+        }
+
+        private void sortTargetsRT_Click(object sender, EventArgs e)
+        {
+            //Create a list that will be used to sort the peptides based on the max rt
+            SortedList<double, TargetPeptideLine> sortedPeptideLines = new SortedList<double, TargetPeptideLine>();
+            foreach (TargetPeptideLine pepLine in TargetsDisplayed)
+            {
+                TargetPeptideLine outPepLine = null;
+                double currentRT = pepLine.Peptide.MaxRetentionTime;
+                while (sortedPeptideLines.TryGetValue(currentRT, out outPepLine))
+                {
+                    currentRT += 0.01;
+                }
+
+                sortedPeptideLines.Add(currentRT, pepLine);
+            }
+
+            //Add the targets back into what is being displayed
+            TargetsDisplayed.Clear();
+            foreach (TargetPeptideLine pepLine in sortedPeptideLines.Values)
+            {
+                TargetsDisplayed.Add(pepLine);
+            }
         }
 
         private void scanGridView_SelectionChanged(object sender, EventArgs e)
@@ -883,37 +1264,42 @@ namespace TomahaqCompanion
                 }
 
                 MS2Event ms2Event = ScanEvents[index].ScanEvent;
-                UpdateTargetMS2Plot(ms2Event);
 
-                if (ms2Event.MS3 != null)
+                if(Analysis)
                 {
-                    UpdateTargetMS3Plot(ms2Event.MS3);
+                    UpdateTargetMS2Plot(ms2Event);
+                    if (ms2Event.MS3 != null)
+                    {
+                        UpdateTargetMS3Plot(ms2Event.MS3);
+                    }
                 }
-
+                else if (Priming)
+                {
+                    UpdateTriggerMS2Plots(ms2Event);
+                }
             }
         }
 
         private void targetGridView_SelectionChanged(object sender, EventArgs e)
         {
-            if (Targets.Count != 0)
+            UpdateTargetPlots();
+        }
+
+        private void targetSearchBox_TextChanged(object sender, EventArgs e)
+        {
+            string text = targetSearchBox.Text;
+
+            TargetsDisplayed.Clear();
+
+            foreach (TargetPeptideLine pepLine in Targets)
             {
-                int index = 0;
-                if (targetGridView.CurrentCell != null)
+                if (pepLine.PeptideString.Contains(text))
                 {
-                    index = targetGridView.CurrentCell.RowIndex;
-                }
-
-                TargetPeptide target = Targets[index].Peptide;
-
-                if(Analysis)
-                {
-                    UpdatePlotsAnalysis(target);
-                }
-                else if (Priming)
-                {
-                    UpdatePlotsPriming(target);
+                    TargetsDisplayed.Add(pepLine);
                 }
             }
+
+            UpdateTargetPlots();
         }
 
         private string BuildMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
@@ -1012,29 +1398,7 @@ namespace TomahaqCompanion
             return file;
         }
 
-        #region Unused Code
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void analysisTab_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void addMS1TargetMassList_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label10_Click(object sender, EventArgs e)
-        {
-
-        }
-        #endregion
-
-
+        #region IO Code
         private void rawFileBrowser_Click(object sender, EventArgs e)
         {
             if (rawFileFDB.ShowDialog() == DialogResult.OK)
@@ -1059,17 +1423,83 @@ namespace TomahaqCompanion
             }
         }
 
-        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-
-        }
-
         private void primingRunBrowse_Click(object sender, EventArgs e)
         {
             if (primingRawOFDia.ShowDialog() == DialogResult.OK)
             {
                 primingRawBox.Text = primingRawOFDia.FileName;
             }
+        }
+
+        #endregion
+
+        #region Unused Code
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void analysisTab_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void addMS1TargetMassList_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void openFileDialog1_FileOk(object sender, EventArgs e)
+        {
+        }
+
+        #endregion
+
+        private void ms1GraphControl_MouseClick(object sender, MouseEventArgs e)
+        {
+            object nearestObject;
+            int index;
+            ms1GraphControl.GraphPane.FindNearestObject(new PointF(e.X, e.Y), this.CreateGraphics(), out nearestObject, out index);
+
+            if (nearestObject != null && nearestObject.GetType() == typeof(LineItem))
+            {
+                LineItem lineitem = (LineItem)nearestObject;
+                double xVal = lineitem[index].X;
+
+                if (targetGridView.CurrentCell != null)
+                {
+                    index = targetGridView.CurrentCell.RowIndex;
+                }
+
+                TargetPeptide newTarget = TargetsDisplayed[index].Peptide;
+
+                SortedList<double, ScanEventLine> sortedScanEvents = FindNearestScanEventRT(xVal);
+
+                ScanEvents.Clear();
+                foreach (ScanEventLine sel in sortedScanEvents.Values)
+                {
+                    ScanEvents.Add(sel);
+                }
+            }
+        }
+
+        private SortedList<double, ScanEventLine> FindNearestScanEventRT(double rt)
+        {
+            SortedList<double, ScanEventLine> sortedSEL = new SortedList<double, ScanEventLine>();
+
+            foreach(ScanEventLine sel in ScanEvents)
+            {
+                double l_distance = Math.Abs(sel.ScanEvent.RetentionTime - rt);
+
+                sortedSEL.Add(l_distance, sel);
+            }
+
+            return sortedSEL;
         }
     }
 }
