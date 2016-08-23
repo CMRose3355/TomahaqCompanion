@@ -214,29 +214,28 @@ namespace TomahaqCompanion
                     foreach(Fragment frag in TargetFrags)
                     {
                         double fragMZ = frag.ToMz(i);
+                        double distanceFromPrec = fragMZ - TargetMZ;
 
                         if(fragMZ>400 && fragMZ<2000 && frag.Number >= 2 && (fragMZ > precExclusionMax || fragMZ < precExclusionMin))
                         {
                             double outDoub = 0;
-                            if (!mzsToAdd.TryGetValue(fragMZ, out outDoub))
+                            if (!mzsToAdd.TryGetValue(distanceFromPrec, out outDoub))
                             {
-                                mzsToAdd.Add(fragMZ, fragMZ);
+                                mzsToAdd.Add(distanceFromPrec, fragMZ);
+                                TargetSPSFrags[i].Add(frag.ToString(), 100);
                             }
-
-                            TargetSPSFrags[i].Add(frag.ToString(),100);
                         }
                     }
                 }
 
-                List<double> mzsDescending = mzsToAdd.Values.Reverse().ToList();
-                if(mzsDescending.Count < numSPSIons)
+                if(mzsToAdd.Count < numSPSIons)
                 {
-                    numSPSIons = mzsDescending.Count;
+                    numSPSIons = mzsToAdd.Count;
                 }
 
                 for(int i = 0;i<numSPSIons;i++)
                 {
-                    TargetSPSIons.Add(mzsDescending[i]);
+                    TargetSPSIons.Add(mzsToAdd.ElementAt(i).Value);
                 }
             }
         }
@@ -499,27 +498,30 @@ namespace TomahaqCompanion
                 {
                     foreach(KeyValuePair<string, double> kvp2 in kvp.Value)
                     {
-                        Fragment targetFrag = indexTargetFrags[kvp2.Key];
+                        Fragment targetFrag = null;
 
-                        double mz = targetFrag.ToMz(kvp.Key);
-                        double intensity = kvp2.Value;
-
-                        MzRange fragrange = new MzRange(mz, new Tolerance(ToleranceUnit.PPM, 10));
-
-                        bool fragAdded = false;
-                        foreach (KeyValuePair<double, double> kvp3 in TriggerCompositeSpectrum)
+                        if(indexTargetFrags.TryGetValue(kvp2.Key, out targetFrag))
                         {
-                            if (fragrange.Contains(kvp3.Key))
+                            double mz = targetFrag.ToMz(kvp.Key);
+                            double intensity = kvp2.Value;
+
+                            MzRange fragrange = new MzRange(mz, new Tolerance(ToleranceUnit.PPM, 10));
+
+                            bool fragAdded = false;
+                            foreach (KeyValuePair<double, double> kvp3 in TriggerCompositeSpectrum)
                             {
-                                TriggerCompositeSpectrum[kvp3.Key] += kvp3.Value;
-                                fragAdded = true;
-                                break;
+                                if (fragrange.Contains(kvp3.Key))
+                                {
+                                    TriggerCompositeSpectrum[kvp3.Key] += kvp3.Value;
+                                    fragAdded = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!fragAdded)
-                        {
-                            TriggerCompositeSpectrum.Add(mz, intensity);
+                            if (!fragAdded)
+                            {
+                                TriggerCompositeSpectrum.Add(mz, intensity);
+                            }
                         }
                     }
                 }
@@ -537,7 +539,18 @@ namespace TomahaqCompanion
             SortedList<double, double> spectrumByInt = new SortedList<double, double>();
             foreach(KeyValuePair<double, double> kvp in TriggerCompositeSpectrum)
             {
-                spectrumByInt.Add(kvp.Value, kvp.Key);
+                //dummy variable for the output
+                double addDoub = 0;
+
+                //This will be the double we will increment slowly so we don't add the same thing twice
+                double testDoub = kvp.Value;
+                while(spectrumByInt.TryGetValue(testDoub, out addDoub))
+                {
+                    testDoub += 0.01;
+                }
+
+                //Add the value
+                spectrumByInt.Add(testDoub, kvp.Key);
             }
 
             if(spectrumByInt.Count < numSPSIons)

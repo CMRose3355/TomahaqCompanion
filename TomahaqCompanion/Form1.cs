@@ -96,8 +96,8 @@ namespace TomahaqCompanion
 
         private void createMethod_Click_1(object sender, EventArgs e)
         {
-            try
-            {
+            //try
+            //{
                 Priming = true;
                 Analysis = false;
 
@@ -186,11 +186,11 @@ namespace TomahaqCompanion
                     UpdateLog("Cannot Create New Method Because No Template Was Provided");
                 }
                 
-            }
-            catch (Exception exp)
-            {
-                UpdateLog("Error! " + exp.Message);
-            }
+            //}
+            //catch (Exception exp)
+            //{
+            //   UpdateLog("Error! " + exp.Message);
+            //}
         }
 
         private void analyzeRun_Click(object sender, EventArgs e)
@@ -326,7 +326,7 @@ namespace TomahaqCompanion
                         if(type == "Static") { symbol = ""; }
 
                         //Add a modification line
-                        ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, trigger, target, both, addMod));
+                        ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, both, trigger, target, addMod));
 
                         //Make a note of which row to delete
                         indexToDelete.Add(row.Index);
@@ -1027,16 +1027,21 @@ namespace TomahaqCompanion
 
         private void UpdateTargetPlots()
         {
+            //Check to make sure there are targets being displayed in the GUI
             if (TargetsDisplayed.Count != 0)
             {
+                //We need to get the index of the target that is selected in the GUI
                 int index = 0;
                 if (targetGridView.CurrentCell != null)
                 {
                     index = targetGridView.CurrentCell.RowIndex;
                 }
 
+                //With the index we can get the target from the displayed list of targets
                 TargetPeptide target = TargetsDisplayed[index].Peptide;
 
+                //We will plot different things depending on wether this is analysis or a priming run
+                //This is determined when either of the buttons is clicked - it should be the first thing in each method
                 if (Analysis)
                 {
                     UpdatePlotsAnalysis(target);
@@ -1057,8 +1062,11 @@ namespace TomahaqCompanion
                 ScanEvents.Add(scanEvent);
             }
 
+            //This will plot the MS1 XIC for the trigger peptide
             UpdateMS1XICsPlot(target);
 
+            //We want the other two plots clear. These will be filled in when the program finishes because
+            //the selection change will be called for the ScanDataGridView object
             if (target.TriggerMS2s.Count == 0)
             {
                 SpectrumPane1.CurveList.Clear();
@@ -1079,13 +1087,20 @@ namespace TomahaqCompanion
             ScanEvents.Clear();
             foreach (ScanEventLine scanEvent in target.ScanEventLines)
             {
+                //For right now I am only including scans where an MS3 was performed
+                //This could be something that we could change in the future or make it
+                //so that people can choose to see scans w/o an MS3
                 if(scanEvent.ScanEvent.MS3 != null)
                 {
                     ScanEvents.Add(scanEvent);
                 }
             }
 
+            //This will update the XIC plots for the trigger and the target peptides
             UpdateMS1XICsPlot(target);
+
+            //If there were not any target MS2s then clear the plots to make sure the plots
+            //from the last peptide do not stay up. 
             if(target.TargetMS2s.Count == 0)
             {
                 SpectrumPane1.CurveList.Clear();
