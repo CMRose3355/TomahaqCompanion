@@ -21,32 +21,29 @@ namespace TomahaqCompanion
         public string ModSites { get; set; }
         public string ModChar { get; set; }
         public string Type { get; set; }
-        public bool Both { get; set; }
         public bool Trigger { get; set; }
         public bool Target { get; set; }
         public Modification Modification { get; set; }
 
 
-        public ModificationLine(string name, double mass, string modSites, string modChar, string type, bool both, bool trigger, bool target)
+        public ModificationLine(string name, double mass, string modSites, string modChar, string type, bool trigger, bool target)
         {
             Name = name;
             Mass = mass;
             ModSites = modSites;
             ModChar = modChar;
             Type = type;
-            Both = both;
             Trigger = trigger;
             Target = target;
         }
 
-        public ModificationLine(string name, double mass, string modSites, string modChar, string type, bool both, bool trigger, bool target, Modification mod)
+        public ModificationLine(string name, double mass, string modSites, string modChar, string type, bool trigger, bool target, Modification mod)
         {
             Name = name;
             Mass = mass;
             ModSites = modSites;
             ModChar = modChar;
             Type = type;
-            Both = both;
             Modification = mod;
             Trigger = trigger;
             Target = target;
