@@ -52,6 +52,14 @@
             this.addUserModifications = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
             this.userModGridView = new System.Windows.Forms.DataGridView();
+            this.triggerCB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.targetCB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.bothCB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.nameBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.massBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.typeCombo = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.symbolBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sitesBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label6 = new System.Windows.Forms.Label();
             this.modGridView = new System.Windows.Forms.DataGridView();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -80,13 +88,6 @@
             this.rawFileFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawOFDia = new System.Windows.Forms.OpenFileDialog();
-            this.triggerCB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.targetCB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.nameBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.massBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.typeCombo = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.symbolBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sitesBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.targetGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.scanGridView)).BeginInit();
             this.tabControl.SuspendLayout();
@@ -250,7 +251,6 @@
             // 
             this.groupBox4.Controls.Add(this.label8);
             this.groupBox4.Controls.Add(this.primingTargetList);
-            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(10, 102);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(958, 58);
@@ -261,7 +261,6 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.Location = new System.Drawing.Point(17, 26);
             this.label8.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label8.Name = "label8";
@@ -286,7 +285,6 @@
             this.groupBox5.Controls.Add(this.analyzeRun);
             this.groupBox5.Controls.Add(this.rawFileBox);
             this.groupBox5.Controls.Add(this.label3);
-            this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox5.Location = new System.Drawing.Point(10, 458);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(958, 100);
@@ -296,7 +294,6 @@
             // 
             // rawFileBrowser
             // 
-            this.rawFileBrowser.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rawFileBrowser.Location = new System.Drawing.Point(857, 32);
             this.rawFileBrowser.Name = "rawFileBrowser";
             this.rawFileBrowser.Size = new System.Drawing.Size(90, 23);
@@ -327,7 +324,6 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.Location = new System.Drawing.Point(17, 21);
             this.label3.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label3.Name = "label3";
@@ -348,10 +344,9 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label11.Location = new System.Drawing.Point(974, 385);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(112, 13);
+            this.label11.Size = new System.Drawing.Size(94, 13);
             this.label11.TabIndex = 74;
             this.label11.Text = "User Modifications";
             // 
@@ -361,6 +356,7 @@
             this.userModGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.triggerCB,
             this.targetCB,
+            this.bothCB,
             this.nameBox,
             this.massBox,
             this.typeCombo,
@@ -371,13 +367,67 @@
             this.userModGridView.Size = new System.Drawing.Size(507, 149);
             this.userModGridView.TabIndex = 73;
             // 
+            // triggerCB
+            // 
+            this.triggerCB.HeaderText = "Trigger";
+            this.triggerCB.Name = "triggerCB";
+            this.triggerCB.Width = 50;
+            // 
+            // targetCB
+            // 
+            this.targetCB.HeaderText = "Target";
+            this.targetCB.Name = "targetCB";
+            this.targetCB.Width = 50;
+            // 
+            // bothCB
+            // 
+            this.bothCB.HeaderText = "Both";
+            this.bothCB.Name = "bothCB";
+            this.bothCB.Width = 50;
+            // 
+            // nameBox
+            // 
+            this.nameBox.HeaderText = "Name";
+            this.nameBox.Name = "nameBox";
+            this.nameBox.Width = 60;
+            // 
+            // massBox
+            // 
+            this.massBox.HeaderText = "Mono Mass";
+            this.massBox.Name = "massBox";
+            this.massBox.Width = 75;
+            // 
+            // typeCombo
+            // 
+            this.typeCombo.HeaderText = "Type";
+            this.typeCombo.Items.AddRange(new object[] {
+            "Static",
+            "Dynamic"});
+            this.typeCombo.Name = "typeCombo";
+            this.typeCombo.Width = 70;
+            // 
+            // symbolBox
+            // 
+            this.symbolBox.HeaderText = "Symbol";
+            this.symbolBox.Name = "symbolBox";
+            this.symbolBox.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.symbolBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.symbolBox.Width = 45;
+            // 
+            // sitesBox
+            // 
+            this.sitesBox.HeaderText = "Sites";
+            this.sitesBox.Name = "sitesBox";
+            this.sitesBox.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.sitesBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.sitesBox.Width = 60;
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.Location = new System.Drawing.Point(974, 5);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(82, 13);
+            this.label6.Size = new System.Drawing.Size(69, 13);
             this.label6.TabIndex = 72;
             this.label6.Text = "Modifications";
             // 
@@ -399,7 +449,6 @@
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.templateBox);
             this.groupBox3.Controls.Add(this.createMethod);
-            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(10, 168);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(958, 284);
@@ -409,7 +458,6 @@
             // 
             // primingRunBrowse
             // 
-            this.primingRunBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.primingRunBrowse.Location = new System.Drawing.Point(862, 80);
             this.primingRunBrowse.Name = "primingRunBrowse";
             this.primingRunBrowse.Size = new System.Drawing.Size(85, 23);
@@ -421,7 +469,6 @@
             // label100
             // 
             this.label100.AutoSize = true;
-            this.label100.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label100.Location = new System.Drawing.Point(17, 68);
             this.label100.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label100.Name = "label100";
@@ -440,7 +487,6 @@
             // 
             // templateMethodBrowse
             // 
-            this.templateMethodBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.templateMethodBrowse.Location = new System.Drawing.Point(862, 36);
             this.templateMethodBrowse.Name = "templateMethodBrowse";
             this.templateMethodBrowse.Size = new System.Drawing.Size(85, 23);
@@ -456,7 +502,6 @@
             this.groupBox1.Controls.Add(this.addMS1TargetMassList);
             this.groupBox1.Controls.Add(this.addMS2IsolationOffset);
             this.groupBox1.Controls.Add(this.addMS2TriggerMassList);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(20, 110);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(398, 165);
@@ -526,7 +571,6 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(17, 24);
             this.label4.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label4.Name = "label4";
@@ -558,7 +602,6 @@
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.targetBoxBrowse);
             this.groupBox2.Controls.Add(this.targetTextBox);
-            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(10, 14);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(958, 82);
@@ -569,7 +612,6 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(17, 25);
             this.label1.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label1.Name = "label1";
@@ -580,7 +622,6 @@
             // 
             // targetBoxBrowse
             // 
-            this.targetBoxBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.targetBoxBrowse.Location = new System.Drawing.Point(862, 42);
             this.targetBoxBrowse.Name = "targetBoxBrowse";
             this.targetBoxBrowse.Size = new System.Drawing.Size(85, 23);
@@ -659,55 +700,6 @@
             // 
             this.primingRawOFDia.FileName = "openFileDialog1";
             this.primingRawOFDia.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
-            // 
-            // triggerCB
-            // 
-            this.triggerCB.HeaderText = "Trigger";
-            this.triggerCB.Name = "triggerCB";
-            this.triggerCB.Width = 60;
-            // 
-            // targetCB
-            // 
-            this.targetCB.HeaderText = "Target";
-            this.targetCB.Name = "targetCB";
-            this.targetCB.Width = 60;
-            // 
-            // nameBox
-            // 
-            this.nameBox.HeaderText = "Name";
-            this.nameBox.Name = "nameBox";
-            this.nameBox.Width = 60;
-            // 
-            // massBox
-            // 
-            this.massBox.HeaderText = "Mono Mass";
-            this.massBox.Name = "massBox";
-            this.massBox.Width = 90;
-            // 
-            // typeCombo
-            // 
-            this.typeCombo.HeaderText = "Type";
-            this.typeCombo.Items.AddRange(new object[] {
-            "Static",
-            "Dynamic"});
-            this.typeCombo.Name = "typeCombo";
-            this.typeCombo.Width = 70;
-            // 
-            // symbolBox
-            // 
-            this.symbolBox.HeaderText = "Symbol";
-            this.symbolBox.Name = "symbolBox";
-            this.symbolBox.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.symbolBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.symbolBox.Width = 45;
-            // 
-            // sitesBox
-            // 
-            this.sitesBox.HeaderText = "Sites";
-            this.sitesBox.Name = "sitesBox";
-            this.sitesBox.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.sitesBox.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.sitesBox.Width = 60;
             // 
             // TomahaqCompanionForm
             // 
@@ -796,6 +788,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.DataGridViewCheckBoxColumn triggerCB;
         private System.Windows.Forms.DataGridViewCheckBoxColumn targetCB;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn bothCB;
         private System.Windows.Forms.DataGridViewTextBoxColumn nameBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn massBox;
         private System.Windows.Forms.DataGridViewComboBoxColumn typeCombo;

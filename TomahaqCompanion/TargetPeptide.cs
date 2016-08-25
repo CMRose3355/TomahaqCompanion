@@ -34,8 +34,7 @@ namespace TomahaqCompanion
         public SortedList<double, double> TriggerMS1xic {get; set;}
         public SortedList<double, double> TargetMS1xic { get; set; }
 
-        public SortedList<double, ThermoMzPeak> TriggerCompositeSpectrum { get; set; }
-        public SortedList<double, ThermoMzPeak> TargetCompositeSpectrum { get; set; }
+        public SortedList<double, double> TriggerCompositeSpectrum { get; set; }
 
         public SortedDictionary<int, double> MS1toTriggerInt { get; set; }
 
@@ -56,10 +55,7 @@ namespace TomahaqCompanion
         public List<double> TriggerIons { get; set; }
         public List<double> TargetSPSIons { get; set; }
 
-        public Dictionary<double,int> TriggerIonsWithCharge { get; set; }
-        public Dictionary<double,int> TargetSPSIonsWithCharge { get; set; }
-
-        private Dictionary<string, Dictionary<int, Modification>> DynModDict { get; set; }
+        private Dictionary<int, Modification> DynModDict { get; set; }
 
         public List<ScanEventLine> ScanEventLines { get; set; }
 
@@ -68,10 +64,9 @@ namespace TomahaqCompanion
         public PointPairList TriggerMS2Points { get; set; }
         public PointPairList TargetMS2Points { get; set; }
         public PointPairList TargetMS3Points { get; set; }
-        public PointPairList TargetCompositeMS2Points { get; set; }
+        public PointPairList TriggerCompositeMS2Points { get; set; }
 
-
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons)
+        public TargetPeptide(string peptideString, int charge, Dictionary<Modification, string> staticMods, Dictionary<Modification, char> dynMods, List<double> targetSPSIons, List<double> triggerFragIons)
         {
             //Save the original peptide string
             PeptideString = peptideString;
@@ -80,21 +75,21 @@ namespace TomahaqCompanion
             TriggerIons = triggerFragIons;
 
             //Build the dynamic modification dictionary and return the stripped string
-            string strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
+            string strippedPepString = BuildDynamicModDict(peptideString, dynMods);
 
             //Create the target and the trigger peptides
             Trigger = new Peptide(strippedPepString);
             Target = new Peptide(strippedPepString);
 
             //Add the modifications to the peptide
-            Trigger = AddModifications(Trigger, modificationDict["Static"], "Trigger");
-            Target = AddModifications(Target, modificationDict["Static"], "Target");
+            Trigger = AddModifications(Trigger, staticMods, "Trigger");
+            Target = AddModifications(Target, staticMods, "Target");
 
             TriggerMZ = Trigger.ToMz(Charge);
             TargetMZ = Target.ToMz(Charge);
 
             //Calculte the mass shift for the peptide
-            MassShift = (Target.MonoisotopicMass - Trigger.MonoisotopicMass) / Charge;
+            MassShift = Math.Abs(Trigger.MonoisotopicMass - Target.MonoisotopicMass) / Charge;
 
             //Populate the fragments
             TriggerFrags = PopulateFragments(Trigger, "Trigger");
@@ -114,7 +109,7 @@ namespace TomahaqCompanion
             TriggerMS2Points = new PointPairList();
             TargetMS2Points = new PointPairList();
             TargetMS3Points = new PointPairList();
-            TargetCompositeMS2Points = new PointPairList();
+            TriggerCompositeMS2Points = new PointPairList();
 
             MS1toTriggerInt = new SortedDictionary<int, double>();
 
@@ -122,11 +117,7 @@ namespace TomahaqCompanion
 
             TargetMS2sByTriggerInt = new SortedDictionary<double, MS2Event>();
 
-            TriggerCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
-            TargetCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
-
-            TriggerIonsWithCharge = new Dictionary<double, int>();
-            TargetSPSIonsWithCharge = new Dictionary<double, int>();
+            TriggerCompositeSpectrum = new SortedList<double, double>();
 
             TargetSPSFrags = new Dictionary<int, Dictionary<string,double>>();
             for(int i = 1; i<10; i++)
@@ -201,7 +192,7 @@ namespace TomahaqCompanion
             }
         }
 
-        private void PopulateTargetSPSIons(int numSPSIons)
+        public void PopulateTargetSPSIons(int numSPSIons)
         {
             if (TargetSPSIons.Count > 0)
             {
@@ -209,37 +200,28 @@ namespace TomahaqCompanion
             }
             else
             {
+                double precExclusionMin = TargetMZ - 70;
+                double precExclusionMax = TargetMZ + 10;
+
                 //Determine the maximum charge
                 int maxCharge = Charge - 1;
                 if (maxCharge > 2) { maxCharge = 2; }
 
                 SortedList<double, double> mzsToAdd = new SortedList<double, double>();
-                SortedDictionary<double, Dictionary<double, int>> mzsToAddWithCharge = new SortedDictionary<double, Dictionary<double, int>>();
-                
                 //Add in the fragment ions
                 for (int i = 1; i <= maxCharge; i++)
                 {
-                    //Cycle through each fragment ions in the target fragments
                     foreach(Fragment frag in TargetFrags)
                     {
-                        //Calculate the fragment charge and the distance from the precursor
                         double fragMZ = frag.ToMz(i);
                         double distanceFromPrec = fragMZ - TargetMZ;
 
-                        //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
-                        double fragMZMin = TargetMZ - 70;
-                        double fragMZMax = TargetMZ + 5;
-
-                        if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
+                        if(fragMZ>400 && fragMZ<2000 && frag.Number >= 2 && (fragMZ > precExclusionMax || fragMZ < precExclusionMin))
                         {
-                            //check if there is another entry with the same distance from the precursor
                             double outDoub = 0;
                             if (!mzsToAdd.TryGetValue(distanceFromPrec, out outDoub))
                             {
                                 mzsToAdd.Add(distanceFromPrec, fragMZ);
-                                mzsToAddWithCharge.Add(distanceFromPrec, new Dictionary<double, int>());
-                                mzsToAddWithCharge[distanceFromPrec].Add(fragMZ, i);
-
                                 TargetSPSFrags[i].Add(frag.ToString(), 100);
                             }
                         }
@@ -254,12 +236,11 @@ namespace TomahaqCompanion
                 for(int i = 0;i<numSPSIons;i++)
                 {
                     TargetSPSIons.Add(mzsToAdd.ElementAt(i).Value);
-                    TargetSPSIonsWithCharge.Add(mzsToAddWithCharge.ElementAt(i).Value.ElementAt(0).Key, mzsToAddWithCharge.ElementAt(i).Value.ElementAt(0).Value);
                 }
             }
         }
 
-        private void PopulateTriggerIons(int numIons)
+        public void PopulateTriggerIons()
         {
             if (TriggerIons.Count > 0)
             {
@@ -271,136 +252,77 @@ namespace TomahaqCompanion
                 int maxCharge = Charge - 1;
                 if (maxCharge > 2) { maxCharge = 2; }
 
-                SortedList<double, double> mzsToAdd = new SortedList<double, double>();
-                SortedDictionary<double, Dictionary<double, int>> mzsToAddWithCharge = new SortedDictionary<double, Dictionary<double, int>>();
-
                 //Add in the fragment ions
                 for (int i = 1; i <= maxCharge; i++)
                 {
-                    //Cycle through each fragment ions in the target fragments
                     foreach (Fragment frag in TriggerFrags)
                     {
-                        //Calculate the fragment charge and the distance from the precursor
-                        double fragMZ = frag.ToMz(i);
-                        double distanceFromPrec = fragMZ - TriggerMZ;
-
-                        //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
-                        double fragMZMin = TriggerMZ - 70;
-                        double fragMZMax = TriggerMZ + 5;
-
-                        if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
-                        {
-                            //check if there is another entry with the same distance from the precursor
-                            double outDoub = 0;
-                            if (!mzsToAdd.TryGetValue(distanceFromPrec, out outDoub))
-                            {
-                                mzsToAdd.Add(distanceFromPrec, fragMZ);
-                                mzsToAddWithCharge.Add(distanceFromPrec, new Dictionary<double, int>());
-                                mzsToAddWithCharge[distanceFromPrec].Add(fragMZ, i);
-                            }
-                        }
+                        TriggerIons.Add(frag.ToMz(i));
                     }
-                }
-
-                if (mzsToAdd.Count < numIons)
-                {
-                    numIons = mzsToAdd.Count;
-                }
-
-                for (int i = 0; i < numIons; i++)
-                {
-                    TriggerIons.Add(mzsToAdd.ElementAt(i).Value);
-                    TriggerIonsWithCharge.Add(mzsToAddWithCharge.ElementAt(i).Value.ElementAt(0).Key, mzsToAddWithCharge.ElementAt(i).Value.ElementAt(0).Value);
                 }
             }
         }
 
-        public void PopulateTriggerAndTargetIons(int numIons)
-        {
-            PopulateTriggerIons(numIons);
-            PopulateTargetSPSIons(numIons);
-        }
-
-        private string BuildDynamicModDict(string peptideString, Dictionary<string, Dictionary<Modification, string>> allDynMods)
+        private string BuildDynamicModDict(string peptideString, Dictionary<Modification, char> dynMods)
         {
             //This will be the dictionary that will tell us where to place the modifications
-            DynModDict = new Dictionary<string, Dictionary<int, Modification>>();
-            DynModDict.Add("Trigger", new Dictionary<int, Modification>());
-            DynModDict.Add("Target", new Dictionary<int, Modification>());
+            DynModDict = new Dictionary<int, Modification>();
 
             //Kepp track of the total modifications
             int totalMods = 0;
 
-            //Cycle through each peptide and set the appropriate modifications
-            foreach (KeyValuePair<string, Dictionary<Modification, string>> kvp in allDynMods)
+            //Cycle through the string to see if there is a dynamic modification
+            for (int i = 0; i < peptideString.Length; i++)
             {
-                string peptideType = kvp.Key; //Trigger or target
-
-                Dictionary<Modification, string> dynMods = kvp.Value;
-                Dictionary<Modification, char> dynModsChar = new Dictionary<Modification, char>();
-                foreach(KeyValuePair<Modification, string> modPair in dynMods)
+                //If there is a dynamic modification then save its location to a dictionary
+                if (dynMods.Values.Contains(peptideString.ElementAt(i)))
                 {
-                    dynModsChar.Add(modPair.Key, modPair.Value.ElementAt(0));
-                }
+                    //Increment and save the index
+                    totalMods++;
+                    int addIndexToMod = i - totalMods + 1;
 
-                //Cycle through the string to see if there is a dynamic modification
-                for (int i = 0; i < peptideString.Length; i++)
-                {
-                    //If there is a dynamic modification then save its location to a dictionary
-                    if (dynModsChar.Values.Contains(peptideString.ElementAt(i)))
+                    //Get the actual modification -- this is a bit clunky, but there shouldn't be too many modifications to cycle through
+                    Modification addMod = null;
+                    foreach(KeyValuePair<Modification, char> kvp in dynMods)
                     {
-                        //Increment and save the index
-                        totalMods++;
-                        int addIndexToMod = i - totalMods + 1;
-
-                        //Get the actual modification -- this is a bit clunky, but there shouldn't be too many modifications to cycle through
-                        Modification addMod = null;
-                        foreach (KeyValuePair<Modification, char> kvp2 in dynModsChar)
+                        //Grab the modification you will be using
+                        if(kvp.Value == peptideString.ElementAt(i))
                         {
-                            //Grab the modification you will be using
-                            if (kvp2.Value == peptideString.ElementAt(i))
-                            {
-                                addMod = kvp2.Key;
-                            }
+                            addMod = kvp.Key;
                         }
-
-                        //Add the modification with the correct index
-                        DynModDict[peptideType].Add(addIndexToMod, addMod);
                     }
+
+                    //Add the modification with the correct index
+                    DynModDict.Add(addIndexToMod, addMod);
                 }
             }
-            
+
             //Save the stripped peptide which will be used to make the peptides
             string strippedPeptideString = peptideString;
 
             //Remove each of the dynamic modification chars from the string so that we can make a peptide
-            //This will go through twice...but that shouldn't be a big deal
-            foreach (KeyValuePair<string, Dictionary<Modification, string>> kvp in allDynMods)
+            foreach (char mod in dynMods.Values)
             {
-                //This isn't used here
-                string peptideType = kvp.Key; //Trigger or target
-
-                Dictionary<Modification, string> dynMods = kvp.Value;
-                foreach (string mod in dynMods.Values)
-                {
-                    strippedPeptideString = strippedPeptideString.Replace(mod, "");
-                }
+                strippedPeptideString = strippedPeptideString.Replace(mod.ToString(), "");
             }
 
             //Return the stripped peptide sequence. 
             return strippedPeptideString;
         }
 
-        private Peptide AddModifications(Peptide peptide, Dictionary<string, Dictionary<Modification, string>> allStaticMods, string type)
+        private Peptide AddModifications(Peptide peptide, Dictionary<Modification, string> staticMods, string type)
         {
             //Cycle through the static mods and only add the static mod to either a trigger or target peptide.
-            foreach(KeyValuePair<Modification, string> kvp in allStaticMods[type])
+            foreach(KeyValuePair<Modification, string> kvp in staticMods)
             {
-                peptide.SetModification(kvp.Key);
+                if(kvp.Value == type)
+                {
+                    peptide.SetModification(kvp.Key);
+                }
             }
 
             //Cycle through the dynamic mods and add them to both of the peptides. 
-            foreach(KeyValuePair<int, Modification> kvp in DynModDict[type])
+            foreach(KeyValuePair<int, Modification> kvp in DynModDict)
             {
                 peptide.SetModification(kvp.Value, kvp.Key);
             }
@@ -423,8 +345,8 @@ namespace TomahaqCompanion
             }
 
             //Ensure Lysine residues for any Y ions of target peptides
-            //if (type == "Target")
-            //{
+            if (type == "Target")
+            {
                 foreach(Fragment frag in candidateFrags)
                 {
                     if(frag.GetSequence().Contains("K") || frag.Type == FragmentTypes.b)
@@ -432,11 +354,11 @@ namespace TomahaqCompanion
                         retFrags.Add(frag);
                     }
                 }
-            //}
-            //else
-            //{
-            //    retFrags = candidateFrags;
-            //}
+            }
+            else
+            {
+                retFrags = candidateFrags;
+            }
 
             return retFrags;
         }
@@ -554,101 +476,51 @@ namespace TomahaqCompanion
 
         private void AverageScanEventsLines(List<ScanEventLine> scanEventLines, int topN)
         {
-            //Determine if you have less scan event lines than top N
             if (scanEventLines.Count < topN)
             {
                 topN = scanEventLines.Count;
             }
 
-            //Index the target fragments for easier lookup later
             Dictionary<string, Fragment> indexTargetFrags = new Dictionary<string, Fragment>();
             foreach(Fragment frag in TargetFrags)
             {
                 indexTargetFrags.Add(frag.ToString(), frag);
             }
+            
 
-            //Index the trigger fragments for easier lookup later
-            Dictionary<string, Fragment> indexTriggerFrag = new Dictionary<string, Fragment>();
-            foreach (Fragment frag in TriggerFrags)
-            {
-                indexTriggerFrag.Add(frag.ToString(), frag);
-            }
 
-            //Make the objects that will hold the trigger and the target spectrum
-            TriggerCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
-            TargetCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
-
-            //Average the spectrum
+            TriggerCompositeSpectrum = new SortedList<double, double>();
             for (int i = 0; i < topN; i++)
             {
-                //Get the scan event line that you are going to average
                 ScanEventLine sel = scanEventLines[i];
                 
-                //Cycle through the matched fragment dictionary
                 foreach(KeyValuePair<int, Dictionary<string, double>> kvp in sel.ScanEvent.MatchedFragDict)
                 {
-                    //The current charge
-                    int charge = kvp.Key;
-
-                    //We are now looking at a single charge state
                     foreach(KeyValuePair<string, double> kvp2 in kvp.Value)
                     {
-                        //The fragment from matched spectrum
-                        string fragName = kvp2.Key;
                         Fragment targetFrag = null;
 
-                        //We will see if this fragment exsists within the target fragment list...it should
-                        if(indexTargetFrags.TryGetValue(fragName, out targetFrag))
+                        if(indexTargetFrags.TryGetValue(kvp2.Key, out targetFrag))
                         {
-                            //We want to use the same list for the trigger and target fragments so calculate both m/z values here
-                            double triggerMZ = indexTriggerFrag[fragName].ToMz(charge);
-                            double targetMZ = targetFrag.ToMz(charge);
-
-                            //The same intensity will be used for each
+                            double mz = targetFrag.ToMz(kvp.Key);
                             double intensity = kvp2.Value;
 
-                            //Calculate a narrow mass range to look for the peak
-                            MzRange targetRange = new MzRange(targetMZ, new Tolerance(ToleranceUnit.PPM, 10));
-                            MzRange triggerRange = new MzRange(triggerMZ, new Tolerance(ToleranceUnit.PPM, 10));
+                            MzRange fragrange = new MzRange(mz, new Tolerance(ToleranceUnit.PPM, 10));
 
-                            //Deal with the target first to try and see if you can add the peak
-                            bool targetAdded = false;
-                            foreach (KeyValuePair<double, ThermoMzPeak> kvp3 in TargetCompositeSpectrum)
+                            bool fragAdded = false;
+                            foreach (KeyValuePair<double, double> kvp3 in TriggerCompositeSpectrum)
                             {
-                                double testMZ = kvp3.Key;
-                                ThermoMzPeak testPeak = kvp3.Value;
-
-                                if (targetRange.Contains(testMZ))
+                                if (fragrange.Contains(kvp3.Key))
                                 {
-                                    TargetCompositeSpectrum[testMZ].Intensity += testPeak.Intensity;
-                                    targetAdded = true;
+                                    TriggerCompositeSpectrum[kvp3.Key] += kvp3.Value;
+                                    fragAdded = true;
                                     break;
                                 }
                             }
 
-                            if (!targetAdded)
+                            if (!fragAdded)
                             {
-                                TargetCompositeSpectrum.Add(targetMZ, new ThermoMzPeak(targetMZ, intensity, charge: charge));
-                            }
-
-                            //Then deal with the trigger peptide
-                            bool triggerAdded = false;
-                            foreach (KeyValuePair<double, ThermoMzPeak> kvp3 in TriggerCompositeSpectrum)
-                            {
-                                double testMZ = kvp3.Key;
-                                ThermoMzPeak testPeak = kvp3.Value;
-
-                                if (triggerRange.Contains(testMZ))
-                                {
-                                    TriggerCompositeSpectrum[testMZ].Intensity += testPeak.Intensity;
-                                    triggerAdded = true;
-                                    break;
-                                }
-                            }
-
-                            if (!triggerAdded)
-                            {
-                                TriggerCompositeSpectrum.Add(triggerMZ, new ThermoMzPeak(triggerMZ, intensity, charge: charge));
+                                TriggerCompositeSpectrum.Add(mz, intensity);
                             }
                         }
                     }
@@ -656,92 +528,46 @@ namespace TomahaqCompanion
 
             }
 
-            foreach(KeyValuePair<double, ThermoMzPeak> kvp in TargetCompositeSpectrum)
+            foreach(KeyValuePair<double, double> kvp in TriggerCompositeSpectrum)
             {
-                ThermoMzPeak peak = kvp.Value;
-                TargetCompositeMS2Points.Add(peak.MZ, peak.Intensity);
+                TriggerCompositeMS2Points.Add(kvp.Key, kvp.Value);
             }
         }
 
-        public void UpdateTargetIons(int numIons)
+        public void UpdateTargetSPSIons(int numSPSIons)
         {
-
-            //This will go through the composite spectrum and choose the topN most intense ions
-            List<double> targetSPSIons = new List<double>();
-            Dictionary<double, int> targetSPSIonsWithCharge = new Dictionary<double, int>();
-            GetTopNIons(TargetMZ, TargetCompositeSpectrum, numIons, out targetSPSIons, out targetSPSIonsWithCharge);
-
-            TargetSPSIons = targetSPSIons;
-            TargetSPSIonsWithCharge = targetSPSIonsWithCharge;
-
-            //This will go through the composite spectrum and choose the topN most intense ions
-            List<double> triggerSPSIons = new List<double>();
-            Dictionary<double, int> triggerSPSIonsWithCharge = new Dictionary<double, int>();
-            GetTopNIons(TriggerMZ, TriggerCompositeSpectrum, numIons, out triggerSPSIons, out triggerSPSIonsWithCharge);
-
-            TriggerIons = triggerSPSIons;
-            TriggerIonsWithCharge = triggerSPSIonsWithCharge;
-
-            //This is to update the trigger ions correspond to the target SPS ions
-            foreach (MS2Event ms2 in TriggerMS2s)
+            SortedList<double, double> spectrumByInt = new SortedList<double, double>();
+            foreach(KeyValuePair<double, double> kvp in TriggerCompositeSpectrum)
             {
-                ms2.PopulateMatchedSPSPeaks(triggerSPSIons);
-            }
-        }
-
-        private void GetTopNIons(double precMZ, SortedList<double, ThermoMzPeak> compositeSpectrum, int numIons, out List<double> mzValues, out Dictionary<double, int> mzValuesWithCharge)
-        {
-            mzValues = new List<double>();
-            mzValuesWithCharge = new Dictionary<double, int>();
-
-            SortedList<double, ThermoMzPeak> spectrumByInt = new SortedList<double, ThermoMzPeak>();
-            foreach (KeyValuePair<double, ThermoMzPeak> kvp in compositeSpectrum)
-            {
-                //Clarification
-                double mz = kvp.Key;
-                ThermoMzPeak peak = kvp.Value;
-
                 //dummy variable for the output
-                ThermoMzPeak outPeak = null;
+                double addDoub = 0;
+
                 //This will be the double we will increment slowly so we don't add the same thing twice
-                double testDoub = peak.Intensity;
-                while (spectrumByInt.TryGetValue(testDoub, out outPeak))
+                double testDoub = kvp.Value;
+                while(spectrumByInt.TryGetValue(testDoub, out addDoub))
                 {
                     testDoub += 0.01;
                 }
 
                 //Add the value
-                spectrumByInt.Add(testDoub, peak);
+                spectrumByInt.Add(testDoub, kvp.Key);
             }
 
-            if (spectrumByInt.Count < numIons)
+            if(spectrumByInt.Count < numSPSIons)
             {
-                numIons = spectrumByInt.Count;
+                numSPSIons = spectrumByInt.Count;
             }
 
-            //Reverse the list base on the intensity so that we have the peaks most to least intense
-            List<ThermoMzPeak> spsIonPeaks = spectrumByInt.Values.Reverse().ToList();
-
-            int index = 0;
-            int numIonsAdded = 0;
-            while(numIonsAdded < numIons && index < spsIonPeaks.Count)
+            TargetSPSIons.Clear();
+            List<double> spsIonMZs = spectrumByInt.Values.Reverse().ToList();
+            for (int i = 0;i<numSPSIons;i++)
             {
-                ThermoMzPeak peak = spsIonPeaks[index];
-                double peakMZ = peak.MZ;
-                int peakCharge = peak.Charge;
+                TargetSPSIons.Add(spsIonMZs[i]);
+            }
 
-                double peakMZMin = precMZ - 70;
-                double peakMZMax = precMZ + 5;
-
-                //if(peakMZ > 400 && peakMZ < 2000 && (peakMZ < peakMZMin || peakMZ > peakMZMax))
-                if (peakMZ < peakMZMin || peakMZ > peakMZMax)
-                {
-                    mzValues.Add(peakMZ);
-                    mzValuesWithCharge.Add(peakMZ, peakCharge);
-                    numIonsAdded++;
-                }
-                
-                index++;
+            foreach(MS2Event ms2 in TriggerMS2s)
+            {
+                ms2.PopulateMatchedSPSPeaks(TargetSPSIons);
             }
         }
 

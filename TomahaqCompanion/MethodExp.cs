@@ -83,12 +83,6 @@ namespace TomahaqCompanion
             bool above = false;
             int msnLevel = 3 - 1;
 
-            MassListFilter = new MethodMassList(treeIndex, type, msnLevel, above);
-
-            foreach (KeyValuePair<double,int> mzAndZ in mzAndzDict)
-            {
-                MassListFilter.AddMassListRecord(mzAndZ.Key, mzAndZ.Value);
-            }
         }
 
         public void AddMS2TriggerList(int treeIndex, List<double> mzList)
@@ -111,13 +105,6 @@ namespace TomahaqCompanion
             string type = "TargetedMassTrigger";
             bool above = false;
             int msnLevel = 2 - 1;
-
-            MassListFilter = new MethodMassList(treeIndex, type, msnLevel, above);
-
-            foreach (KeyValuePair<double, int> mzAndZ in mzAndzDict)
-            {
-                MassListFilter.AddMassListRecord(mzAndZ.Key, mzAndZ.Value);
-            }
         }
 
         public void ChangeScanParams(int treeIndex, double isolationOffset)
