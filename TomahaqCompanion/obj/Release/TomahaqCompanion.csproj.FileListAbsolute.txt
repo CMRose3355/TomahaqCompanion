@@ -106,3 +106,7 @@ C:\Users\Orbitrap_Lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\R
 C:\Users\Orbitrap_Lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.TomahaqCompanionForm.resources
 C:\Users\Orbitrap_Lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.Properties.Resources.resources
 C:\Users\Orbitrap_Lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csproj.GenerateResource.Cache
+C:\Users\thom100\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.exe.manifest
+C:\Users\thom100\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.application
+C:\Users\thom100\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.exe.manifest
+C:\Users\thom100\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.application

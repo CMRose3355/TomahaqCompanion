@@ -72,6 +72,7 @@ namespace TomahaqCompanion
             InitializePrimingRunGraphs();
         }
 
+        //These are the main buttons that perform functions within the program
         private void primingTargetList_Click(object sender, EventArgs e)
         {
             //Import the modifications
@@ -286,227 +287,51 @@ namespace TomahaqCompanion
             }
         }
 
-        private List<TargetPeptide> ChooseBestChargeState(List<TargetPeptide> targets)
+        //Below are the methods and functions that are called from the buttons above
+        private Dictionary<string, Dictionary<string, double>> BiuldQuantificationDictionary()
         {
-            //This will be a list of unique peptides that will be returned with the best charge state
-            List<TargetPeptide> retList = new List<TargetPeptide>();
+            Dictionary<string, Dictionary<string, double>> retDict = new Dictionary<string, Dictionary<string, double>>();
 
-            //This is a temporary dictionary that will help to organize the peptides based on the peptide string 
-            //This string should be the same for all peptides. 
-            Dictionary<string, List<TargetPeptide>> tempDict = new Dictionary<string, List<TargetPeptide>>();
+            retDict.Add("TMT10", new Dictionary<string, double>());
+            //retDict.Add("TMT6", new Dictionary<string, double>());
+            //retDict.Add("iTRAQ4", new Dictionary<string, double>());
+            //retDict.Add("iTRAQ8", new Dictionary<string, double>());
 
-            //Cycle through the peptides and index them based on the string
-            foreach(TargetPeptide target in targets)
-            {
-                //First check to see if the the is already in the dictionary
-                List<TargetPeptide> outList = null;
-                if(tempDict.TryGetValue(target.PeptideString, out outList))
-                {
-                    //If it is already on the list add the target peptide to the list
-                    tempDict[target.PeptideString].Add(target);
-                }
-                else
-                {
-                    //If it is not in the dictionary then make a new list, add the target, then add that list to the dict
-                    List<TargetPeptide> addList = new List<TargetPeptide>();
-                    addList.Add(target);
-                    tempDict.Add(target.PeptideString, addList);
-                }
-            }
+            retDict["TMT10"].Add("126", 126.127725);
+            retDict["TMT10"].Add("127n", 127.124760);
+            retDict["TMT10"].Add("127c", 127.131079);
+            retDict["TMT10"].Add("128n", 128.128114);
+            retDict["TMT10"].Add("128c", 128.134433);
+            retDict["TMT10"].Add("129n", 129.131468);
+            retDict["TMT10"].Add("129c", 129.137787);
+            retDict["TMT10"].Add("130n", 130.134822);
+            retDict["TMT10"].Add("130c", 130.141141);
+            retDict["TMT10"].Add("131", 131.138176);
 
-            //With the peptides indexed based on string we can now iterate through all of the entries and choose the best
-            //peptide for each peptide
-            foreach(List<TargetPeptide> targetList in tempDict.Values)
-            {
-                //This is the best target 
-                TargetPeptide bestTarget = null;
-
-                //We will determin the best target based on the intensity of the trigger peptide
-                foreach(TargetPeptide target in targetList)
-                {
-                    if (bestTarget == null || target.MaxIntensity > bestTarget.MaxIntensity)
-                    {
-                        bestTarget = target;
-                    }
-                }
-
-                //Add the best peptide to the list that will be returned. 
-                retList.Add(bestTarget);
-            }
-
-            //Return the list. 
-            return retList;
+            return retDict;
         }
 
-        private void addUserModifications_Click(object sender, EventArgs e)
+        private Dictionary<string, double> AddQuantitationChannels(Dictionary<Modification, string> staticMods)
         {
-            //Save the indexes for the rows that will be deleted
-            List<int> indexToDelete = new List<int>();
+            //This will be the dictionary of the quantitative channels
+            Dictionary<string, double> retDict = null;
 
-            //Cycle through the rows
-            foreach (DataGridViewRow row in userModGridView.Rows)
+            //Cycle through the modifications that are being used
+            foreach (KeyValuePair<Modification, string> kvp in staticMods)
             {
-                //If it is a new row then we don't want to do anything
-                if (!row.IsNewRow)
+                //We need to check to see if this is actually being used for quantiation
+                //There is a change you can have a static mod that varies between the two peptides but is not being used for quantiation
+                Dictionary<string, double> outDict = null;
+                if (QuantChannelDict.TryGetValue(kvp.Key.Name, out outDict))
                 {
-                    //Check the values entered by the user
-                    bool trigger = CheckBoolValue(row.Cells["triggerCB"].Value);
-                    bool target = CheckBoolValue(row.Cells["targetCB"].Value);
-                    string name = CheckStringValue(row.Cells["nameBox"].Value);
-                    double mass = CheckDoubValue(row.Cells["massBox"].Value);
-                    string type = CheckStringValue(row.Cells["typeCombo"].Value);
-                    string symbol = CheckStringValue(row.Cells["symbolBox"].Value);
-                    string sites = CheckStringValue(row.Cells["sitesBox"].Value);
-
-                    //Make sure there is enough to make a new modification
-                    if (mass != 0 && name != "" && type != "" & sites != "")
-                    {
-                        //This is a bad way to add in multiple sites
-                        List<string> sitesList = sites.Split(',').ToList();
-                        List<ModificationSites> modSiteList = new List<ModificationSites>();
-                        foreach (string site in sitesList)
-                        {
-                            modSiteList.Add(SwitchSite(site));
-                        }
-
-                        //If sites returned None then something is wrong
-                        if (modSiteList[0] == ModificationSites.None) { sites = "None"; }
-
-                        //First add the modification with just one of the mods
-                        Modification addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0]);
-
-                        //Check to see if there are 2 mods
-                        if (modSiteList.Count == 2)
-                        {
-                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1]);
-                        }
-                        //Check to see if there are 3 mods
-                        else if (modSiteList.Count == 3)
-                        {
-                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2]);
-                        }
-                        //Check to see if there are 4 mods
-                        else if (modSiteList.Count == 4)
-                        {
-                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2] | modSiteList[3]);
-                        }
-
-                        //If it is static then make sure the symbol is cleared
-                        if (type == "Static") { symbol = ""; }
-
-                        //Add a modification line
-                        ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, trigger, target, addMod));
-
-                        //Make a note of which row to delete
-                        indexToDelete.Add(row.Index);
-                    }
+                    //If we are using a mod that has quantitative data then get it from the dictionary
+                    //This quant channel dictionary is manually curated
+                    retDict = QuantChannelDict[kvp.Key.Name];
                 }
             }
 
-            //Remove the rows in the user mod grid
-            int totalRemoved = 0;
-            foreach (int rowIndex in indexToDelete)
-            {
-                userModGridView.Rows.Remove(userModGridView.Rows[rowIndex - totalRemoved]);
-                totalRemoved++;
-            }
-        }
-
-        private ModificationSites SwitchSite(string aa)
-        {
-            switch (aa)
-            {
-                case "K":
-                    return ModificationSites.K;
-                case "C":
-                    return ModificationSites.C;
-                case "S":
-                    return ModificationSites.S;
-                case "T":
-                    return ModificationSites.T;
-                case "Y":
-                    return ModificationSites.Y;
-                case "M":
-                    return ModificationSites.M;
-                case "NTerminus":
-                    return ModificationSites.NTerminus;
-                case "NPep":
-                    return ModificationSites.NPep;
-                case "PepC":
-                    return ModificationSites.PepC;
-                case "NProt":
-                    return ModificationSites.NProt;
-                case "ProtC":
-                    return ModificationSites.ProtC;
-                case "A":
-                    return ModificationSites.A;
-                case "R":
-                    return ModificationSites.R;
-                case "N":
-                    return ModificationSites.N;
-                case "D":
-                    return ModificationSites.D;
-                case "E":
-                    return ModificationSites.E;
-                case "Q":
-                    return ModificationSites.Q;
-                case "G":
-                    return ModificationSites.G;
-                case "H":
-                    return ModificationSites.H;
-                case "I":
-                    return ModificationSites.I;
-                case "P":
-                    return ModificationSites.P;
-                case "F":
-                    return ModificationSites.F;
-                case "W":
-                    return ModificationSites.W;
-                case "V":
-                    return ModificationSites.V;
-                default:
-                    return ModificationSites.None;
-            }
-        }
-
-        private bool CheckBoolValue(object value)
-        {
-            if (value == null)
-            {
-                return false;
-            }
-
-            return (bool)value;
-        }
-
-        private string CheckStringValue(object value)
-        {
-            if (value == null)
-            {
-                return "";
-            }
-
-            return (string)value;
-        }
-
-        private char CheckCharValue(object value)
-        {
-            if (value == null)
-            {
-                return ' ';
-            }
-
-            return (char)value;
-        }
-
-        private double CheckDoubValue(object value)
-        {
-            if (value == null)
-            {
-                return 0;
-            }
-
-            return double.Parse((string)value);
+            //Return the values
+            return retDict;
         }
 
         private Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> BuildModificationDictionary()
@@ -626,13 +451,13 @@ namespace TomahaqCompanion
             int lastSpectrumNumber = rawFile.LastSpectrumNumber;
 
             //Cycle through the raw file
-            for(int i = 1; i<= lastSpectrumNumber; i++)
+            for (int i = 1; i <= lastSpectrumNumber; i++)
             {
                 //I am just querying the msn order of the scan, I think this is faster than getting the whole scan each time
                 int msnOrder = rawFile.GetMsnOrder(i);
 
                 //If it is an MS1 then just add the number to a list
-                if(msnOrder == 1)
+                if (msnOrder == 1)
                 {
                     ms1List.Add(i);
                 }
@@ -648,12 +473,12 @@ namespace TomahaqCompanion
                     int parentOrder = rawFile.GetMsnOrder(parentScanNumber);
 
                     //If the parent order is 2 then this is a target ms2 and the parent is the trigger
-                    if(parentOrder == 2)
+                    if (parentOrder == 2)
                     {
                         TriggerMS2toTargetMS2.Add(parentScanNumber, i);
                     }
                     //If the parent order is 1 then this is a trigger ms2 and the parent is an MS1
-                    else if(parentOrder == 1)
+                    else if (parentOrder == 1)
                     {
                         TriggerMS2toMS1.Add(i, parentScanNumber);
                     }
@@ -665,12 +490,12 @@ namespace TomahaqCompanion
 
         private void ExtractMS1XIC(ThermoRawFile rawFile, List<int> ms1Scans, SortedList<double, TargetPeptide> targetList)
         {
-            foreach(int scanNumber in ms1Scans)
+            foreach (int scanNumber in ms1Scans)
             {
                 ThermoSpectrum spectrum = rawFile.GetSpectrum(scanNumber);
                 double rt = rawFile.GetRetentionTime(scanNumber);
 
-                foreach(TargetPeptide target in targetList.Values)
+                foreach (TargetPeptide target in targetList.Values)
                 {
                     target.AddMS1XICPoint(spectrum, rt, scanNumber);
                 }
@@ -701,20 +526,20 @@ namespace TomahaqCompanion
                 ThermoSpectrum spectrum = null;
 
                 //Look through each target to find a match --This should be a binary search TODO: Binary Search
-                foreach(TargetPeptide targetPeptide in targetList.Values)
+                foreach (TargetPeptide targetPeptide in targetList.Values)
                 {
                     //If we pass this step then we triggered. We will extract all the data here
-                    if(precursorRange.Contains(targetPeptide.TriggerMZ))
+                    if (precursorRange.Contains(targetPeptide.TriggerMZ))
                     {
                         //If this is the first hit them get the spectrum
-                        if(spectrum == null) { spectrum = rawFile.GetSpectrum(scanNumber); }
+                        if (spectrum == null) { spectrum = rawFile.GetSpectrum(scanNumber); }
 
                         //Grab the trigger data for the Trigger MS2
                         targetPeptide.AddTriggerData(ms1ScanNumber, scanNumber, spectrum, rt, it);
 
                         //If we found a trigger peptide then see if we then targeted it
                         int targetScanNumber = 0;
-                        if(TriggerMS2toTargetMS2.TryGetValue(scanNumber, out targetScanNumber))
+                        if (TriggerMS2toTargetMS2.TryGetValue(scanNumber, out targetScanNumber))
                         {
                             //If we did an ms2 on the target peptides then get that data as well
                             ExtractTargetData(targetPeptide, rawFile, ms1ScanNumber, targetScanNumber, TargetMS2toTargetMS3, quantChannelDict);
@@ -724,16 +549,7 @@ namespace TomahaqCompanion
             }
         }
 
-        private List<TargetPeptide> SearchPeptides(double precursorMZ, SortedList<double, TargetPeptide> targetList)
-        {
-            List<TargetPeptide> retList = new List<TargetPeptide>();
-
-
-
-            return retList;
-        }
-
-        private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile,int ms1ScanNumber, int targetScanNumber, Dictionary<int, int> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
+        private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile, int ms1ScanNumber, int targetScanNumber, Dictionary<int, int> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
         {
             //Grab all of the data for the target and add that data
             double rt = rawFile.GetRetentionTime(targetScanNumber);
@@ -755,7 +571,7 @@ namespace TomahaqCompanion
             }
 
             //Add the target data and if there was an MS3 add that data too
-            if(ms3spectrum == null)
+            if (ms3spectrum == null)
             {
                 targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it);
             }
@@ -764,6 +580,163 @@ namespace TomahaqCompanion
                 targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, spsIons, quantChannelDict);
             }
         }
+
+        private List<TargetPeptide> ChooseBestChargeState(List<TargetPeptide> targets)
+        {
+            //This will be a list of unique peptides that will be returned with the best charge state
+            List<TargetPeptide> retList = new List<TargetPeptide>();
+
+            //This is a temporary dictionary that will help to organize the peptides based on the peptide string 
+            //This string should be the same for all peptides. 
+            Dictionary<string, List<TargetPeptide>> tempDict = new Dictionary<string, List<TargetPeptide>>();
+
+            //Cycle through the peptides and index them based on the string
+            foreach(TargetPeptide target in targets)
+            {
+                //First check to see if the the is already in the dictionary
+                List<TargetPeptide> outList = null;
+                if(tempDict.TryGetValue(target.PeptideString, out outList))
+                {
+                    //If it is already on the list add the target peptide to the list
+                    tempDict[target.PeptideString].Add(target);
+                }
+                else
+                {
+                    //If it is not in the dictionary then make a new list, add the target, then add that list to the dict
+                    List<TargetPeptide> addList = new List<TargetPeptide>();
+                    addList.Add(target);
+                    tempDict.Add(target.PeptideString, addList);
+                }
+            }
+
+            //With the peptides indexed based on string we can now iterate through all of the entries and choose the best
+            //peptide for each peptide
+            foreach(List<TargetPeptide> targetList in tempDict.Values)
+            {
+                //This is the best target 
+                TargetPeptide bestTarget = null;
+
+                //We will determin the best target based on the intensity of the trigger peptide
+                foreach(TargetPeptide target in targetList)
+                {
+                    if (bestTarget == null || target.MaxIntensity > bestTarget.MaxIntensity)
+                    {
+                        bestTarget = target;
+                    }
+                }
+
+                //Add the best peptide to the list that will be returned. 
+                retList.Add(bestTarget);
+            }
+
+            //Return the list. 
+            return retList;
+        }
+
+        private string BuildMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
+        {
+            //Only change the parameters the user wants to
+            bool addMS1TargetedMass = ms1Target;
+            bool addMS2TriggerMass = ms2Trigger;
+            bool addMS2IsoOffset = ms2Offset;
+            bool addMS3TargetedMass = ms3target;
+
+            //Save the xml for future use
+            string file = inputFile.Replace(".csv","_method.xml");
+
+            //Set up the serializer
+            XmlSerializer serializer = new XmlSerializer(typeof(MethodModifications));
+
+            //Set up the class that will hold all of the instructions
+            MethodModifications methodMods = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+
+            //First we will make sure we have enough trees for all of the peptides
+            int modCount = 1;
+            int experimentIndex = 0;
+            for(int i = 1;i<targetList.Count;i++)
+            {
+                int sourceNodeForCopy = modCount - 1;
+                MethodExp addExp = new MethodExp(experimentIndex);
+                addExp.CopyAndPasteScanNode(sourceNodeForCopy);
+
+                MethodMod addMod = new MethodMod(modCount, addExp);
+                methodMods.Modification.Add(addMod);
+
+                modCount++;
+            }
+
+            //Next, we will change all of the trees to include all of the attributes of the peptides
+            int treeIndex = 0;
+            foreach (TargetPeptide target in targetList)
+            {
+                if(addMS2IsoOffset)
+                {
+                    //Add in the MS2 isolation offset
+                    MethodExp addExp = new MethodExp(experimentIndex);
+                    addExp.ChangeScanParams(treeIndex, target.MassShift);
+
+                    MethodMod addMod = new MethodMod(modCount, addExp);
+                    methodMods.Modification.Add(addMod);
+
+                    modCount++;
+                }
+                
+                if(addMS1TargetedMass)
+                {
+                    //Add in the MS1 inclusion list, and MS2 isolation offset
+                    MethodExp addExp0 = new MethodExp(experimentIndex);
+                    addExp0.AddMS1InclusionSingle(treeIndex, target.TriggerMZ, target.Charge);
+
+                    MethodMod addMod0 = new MethodMod(modCount, addExp0);
+                    methodMods.Modification.Add(addMod0);
+
+                    modCount++;
+                }
+
+                if (addMS2TriggerMass)
+                {
+                    //Add the MS2 trigger mass List
+                    MethodExp addExp1 = new MethodExp(experimentIndex);
+                    addExp1.AddMS2TriggerList(treeIndex, target.TriggerIonsWithCharge);
+
+                    MethodMod addMod1 = new MethodMod(modCount, addExp1);
+                    methodMods.Modification.Add(addMod1);
+
+                    modCount++;
+                }
+                
+                if(addMS3TargetedMass)
+                {
+                    //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
+                    MethodExp addExp2 = new MethodExp(experimentIndex);
+                    addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIonsWithCharge);
+
+                    MethodMod addMod2 = new MethodMod(modCount, addExp2);
+                    methodMods.Modification.Add(addMod2);
+
+                    modCount++;
+                }
+                
+                treeIndex++;
+            }
+
+            //Write the XML
+            using (TextWriter writer = new StreamWriter(file))
+            {
+                serializer.Serialize(writer, methodMods);
+            }
+
+            return file;
+        }
+
+        private void UpdateLog(string message)
+        {
+            logBox.AppendText(string.Format("[{0}]\t{1}\n", DateTime.Now.ToLongTimeString(), message));
+            logBox.SelectionStart = logBox.Text.Length;
+            logBox.ScrollToCaret();
+        }
+
+        #region Init and Update Plotting and Grids
 
         private void InitializePrimingRunGraphs()
         {
@@ -901,7 +874,7 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("NEM", Math.Round(nem.MonoisotopicMass, 5), "C", "", "Static", false, false, nem));
             ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, true, ox));
             ModLines.Add(new ModificationLine("Phos", Math.Round(phos.MonoisotopicMass, 5), "S,T,Y", "#", "Dynamic", false, false, phos));
-            ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false,  ggTMT0));
+            ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, ggTMT0));
             ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, ggTMT2));
             ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, ggTMT10));
             ModLines.Add(new ModificationLine("ggTMTsh", Math.Round(ggTMTsh.MonoisotopicMass, 5), "K", "#", "Dynamic", false, false, ggTMTsh));
@@ -1042,59 +1015,6 @@ namespace TomahaqCompanion
             sumSNCol.Width = 75;
             scanGridView.Columns.Add(sumSNCol);
 
-        }
-
-        private Dictionary<string, double> AddQuantitationChannels(Dictionary<Modification, string> staticMods)
-        {
-            //This will be the dictionary of the quantitative channels
-            Dictionary<string, double> retDict = null;
-
-            //Cycle through the modifications that are being used
-            foreach (KeyValuePair<Modification, string> kvp in staticMods)
-            {
-                //We need to check to see if this is actually being used for quantiation
-                //There is a change you can have a static mod that varies between the two peptides but is not being used for quantiation
-                Dictionary<string, double> outDict = null;
-                if(QuantChannelDict.TryGetValue(kvp.Key.Name, out outDict))
-                {
-                    //If we are using a mod that has quantitative data then get it from the dictionary
-                    //This quant channel dictionary is manually curated
-                    retDict = QuantChannelDict[kvp.Key.Name];
-                }
-            }
-
-            //Return the values
-            return retDict;
-        }
-
-        private Dictionary<string, Dictionary<string, double>> BiuldQuantificationDictionary()
-        {
-            Dictionary<string, Dictionary<string, double>> retDict = new Dictionary<string, Dictionary<string, double>>();
-
-            retDict.Add("TMT10", new Dictionary<string, double>());
-            //retDict.Add("TMT6", new Dictionary<string, double>());
-            //retDict.Add("iTRAQ4", new Dictionary<string, double>());
-            //retDict.Add("iTRAQ8", new Dictionary<string, double>());
-
-            retDict["TMT10"].Add("126", 126.127725);
-            retDict["TMT10"].Add("127n", 127.124760);
-            retDict["TMT10"].Add("127c", 127.131079);
-            retDict["TMT10"].Add("128n", 128.128114);
-            retDict["TMT10"].Add("128c", 128.134433);
-            retDict["TMT10"].Add("129n", 129.131468);
-            retDict["TMT10"].Add("129c", 129.137787);
-            retDict["TMT10"].Add("130n", 130.134822);
-            retDict["TMT10"].Add("130c", 130.141141);
-            retDict["TMT10"].Add("131", 131.138176);
-
-            return retDict;
-        }
-
-        private void UpdateLog(string message)
-        {
-            logBox.AppendText(string.Format("[{0}]\t{1}\n", DateTime.Now.ToLongTimeString(), message));
-            logBox.SelectionStart = logBox.Text.Length;
-            logBox.ScrollToCaret();
         }
 
         private void UpdateTargetPlots()
@@ -1292,6 +1212,83 @@ namespace TomahaqCompanion
             spectrumGraphControl2.Refresh();
         }
 
+        #endregion
+
+        #region User Interactions
+        private void addUserModifications_Click(object sender, EventArgs e)
+        {
+            //Save the indexes for the rows that will be deleted
+            List<int> indexToDelete = new List<int>();
+
+            //Cycle through the rows
+            foreach (DataGridViewRow row in userModGridView.Rows)
+            {
+                //If it is a new row then we don't want to do anything
+                if (!row.IsNewRow)
+                {
+                    //Check the values entered by the user
+                    bool trigger = CheckBoolValue(row.Cells["triggerCB"].Value);
+                    bool target = CheckBoolValue(row.Cells["targetCB"].Value);
+                    string name = CheckStringValue(row.Cells["nameBox"].Value);
+                    double mass = CheckDoubValue(row.Cells["massBox"].Value);
+                    string type = CheckStringValue(row.Cells["typeCombo"].Value);
+                    string symbol = CheckStringValue(row.Cells["symbolBox"].Value);
+                    string sites = CheckStringValue(row.Cells["sitesBox"].Value);
+
+                    //Make sure there is enough to make a new modification
+                    if (mass != 0 && name != "" && type != "" & sites != "")
+                    {
+                        //This is a bad way to add in multiple sites
+                        List<string> sitesList = sites.Split(',').ToList();
+                        List<ModificationSites> modSiteList = new List<ModificationSites>();
+                        foreach (string site in sitesList)
+                        {
+                            modSiteList.Add(SwitchSite(site));
+                        }
+
+                        //If sites returned None then something is wrong
+                        if (modSiteList[0] == ModificationSites.None) { sites = "None"; }
+
+                        //First add the modification with just one of the mods
+                        Modification addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0]);
+
+                        //Check to see if there are 2 mods
+                        if (modSiteList.Count == 2)
+                        {
+                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1]);
+                        }
+                        //Check to see if there are 3 mods
+                        else if (modSiteList.Count == 3)
+                        {
+                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2]);
+                        }
+                        //Check to see if there are 4 mods
+                        else if (modSiteList.Count == 4)
+                        {
+                            addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2] | modSiteList[3]);
+                        }
+
+                        //If it is static then make sure the symbol is cleared
+                        if (type == "Static") { symbol = ""; }
+
+                        //Add a modification line
+                        ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, trigger, target, addMod));
+
+                        //Make a note of which row to delete
+                        indexToDelete.Add(row.Index);
+                    }
+                }
+            }
+
+            //Remove the rows in the user mod grid
+            int totalRemoved = 0;
+            foreach (int rowIndex in indexToDelete)
+            {
+                userModGridView.Rows.Remove(userModGridView.Rows[rowIndex - totalRemoved]);
+                totalRemoved++;
+            }
+        }
+
         private void sortTargetsMZ_Click(object sender, EventArgs e)
         {
             //Create a list that will be used to sort the peptides based on the trigger mz
@@ -1388,104 +1385,149 @@ namespace TomahaqCompanion
 
             UpdateTargetPlots();
         }
-
-        private string BuildMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
+        
+        private void ms1GraphControl_MouseClick(object sender, MouseEventArgs e)
         {
-            //Only change the parameters the user wants to
-            bool addMS1TargetedMass = ms1Target;
-            bool addMS2TriggerMass = ms2Trigger;
-            bool addMS2IsoOffset = ms2Offset;
-            bool addMS3TargetedMass = ms3target;
+            object nearestObject;
+            int index;
+            ms1GraphControl.GraphPane.FindNearestObject(new PointF(e.X, e.Y), this.CreateGraphics(), out nearestObject, out index);
 
-            //Save the xml for future use
-            string file = inputFile.Replace(".csv","_method.xml");
-
-            //Set up the serializer
-            XmlSerializer serializer = new XmlSerializer(typeof(MethodModifications));
-
-            //Set up the class that will hold all of the instructions
-            MethodModifications methodMods = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
-
-            //First we will make sure we have enough trees for all of the peptides
-            int modCount = 1;
-            int experimentIndex = 0;
-            for(int i = 1;i<targetList.Count;i++)
+            if (nearestObject != null && nearestObject.GetType() == typeof(LineItem))
             {
-                int sourceNodeForCopy = modCount - 1;
-                MethodExp addExp = new MethodExp(experimentIndex);
-                addExp.CopyAndPasteScanNode(sourceNodeForCopy);
+                LineItem lineitem = (LineItem)nearestObject;
+                double xVal = lineitem[index].X;
 
-                MethodMod addMod = new MethodMod(modCount, addExp);
-                methodMods.Modification.Add(addMod);
+                if (targetGridView.CurrentCell != null)
+                {
+                    index = targetGridView.CurrentCell.RowIndex;
+                }
 
-                modCount++;
+                TargetPeptide newTarget = TargetsDisplayed[index].Peptide;
+
+                SortedList<double, ScanEventLine> sortedScanEvents = FindNearestScanEventRT(xVal);
+
+                ScanEvents.Clear();
+                foreach (ScanEventLine sel in sortedScanEvents.Values)
+                {
+                    ScanEvents.Add(sel);
+                }
             }
-
-            //Next, we will change all of the trees to include all of the attributes of the peptides
-            int treeIndex = 0;
-            foreach (TargetPeptide target in targetList)
-            {
-                if(addMS2IsoOffset)
-                {
-                    //Add in the MS2 isolation offset
-                    MethodExp addExp = new MethodExp(experimentIndex);
-                    addExp.ChangeScanParams(treeIndex, target.MassShift);
-
-                    MethodMod addMod = new MethodMod(modCount, addExp);
-                    methodMods.Modification.Add(addMod);
-
-                    modCount++;
-                }
-                
-                if(addMS1TargetedMass)
-                {
-                    //Add in the MS1 inclusion list, and MS2 isolation offset
-                    MethodExp addExp0 = new MethodExp(experimentIndex);
-                    addExp0.AddMS1InclusionSingle(treeIndex, target.TriggerMZ, target.Charge);
-
-                    MethodMod addMod0 = new MethodMod(modCount, addExp0);
-                    methodMods.Modification.Add(addMod0);
-
-                    modCount++;
-                }
-
-                if (addMS2TriggerMass)
-                {
-                    //Add the MS2 trigger mass List
-                    MethodExp addExp1 = new MethodExp(experimentIndex);
-                    addExp1.AddMS2TriggerList(treeIndex, target.TriggerIonsWithCharge);
-
-                    MethodMod addMod1 = new MethodMod(modCount, addExp1);
-                    methodMods.Modification.Add(addMod1);
-
-                    modCount++;
-                }
-                
-                if(addMS3TargetedMass)
-                {
-                    //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
-                    MethodExp addExp2 = new MethodExp(experimentIndex);
-                    addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIonsWithCharge);
-
-                    MethodMod addMod2 = new MethodMod(modCount, addExp2);
-                    methodMods.Modification.Add(addMod2);
-
-                    modCount++;
-                }
-                
-                treeIndex++;
-            }
-
-            //Write the XML
-            using (TextWriter writer = new StreamWriter(file))
-            {
-                serializer.Serialize(writer, methodMods);
-            }
-
-            return file;
         }
 
-        #region IO Code
+        private SortedList<double, ScanEventLine> FindNearestScanEventRT(double rt)
+        {
+            SortedList<double, ScanEventLine> sortedSEL = new SortedList<double, ScanEventLine>();
+
+            foreach(ScanEventLine sel in ScanEvents)
+            {
+                double l_distance = Math.Abs(sel.ScanEvent.RetentionTime - rt);
+
+                sortedSEL.Add(l_distance, sel);
+            }
+
+            return sortedSEL;
+        }
+        #endregion
+
+        #region IO and Input Validation Code
+
+        private ModificationSites SwitchSite(string aa)
+        {
+            switch (aa)
+            {
+                case "K":
+                    return ModificationSites.K;
+                case "C":
+                    return ModificationSites.C;
+                case "S":
+                    return ModificationSites.S;
+                case "T":
+                    return ModificationSites.T;
+                case "Y":
+                    return ModificationSites.Y;
+                case "M":
+                    return ModificationSites.M;
+                case "NTerminus":
+                    return ModificationSites.NTerminus;
+                case "NPep":
+                    return ModificationSites.NPep;
+                case "PepC":
+                    return ModificationSites.PepC;
+                case "NProt":
+                    return ModificationSites.NProt;
+                case "ProtC":
+                    return ModificationSites.ProtC;
+                case "A":
+                    return ModificationSites.A;
+                case "R":
+                    return ModificationSites.R;
+                case "N":
+                    return ModificationSites.N;
+                case "D":
+                    return ModificationSites.D;
+                case "E":
+                    return ModificationSites.E;
+                case "Q":
+                    return ModificationSites.Q;
+                case "G":
+                    return ModificationSites.G;
+                case "H":
+                    return ModificationSites.H;
+                case "I":
+                    return ModificationSites.I;
+                case "P":
+                    return ModificationSites.P;
+                case "F":
+                    return ModificationSites.F;
+                case "W":
+                    return ModificationSites.W;
+                case "V":
+                    return ModificationSites.V;
+                default:
+                    return ModificationSites.None;
+            }
+        }
+
+        private bool CheckBoolValue(object value)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+
+            return (bool)value;
+        }
+
+        private string CheckStringValue(object value)
+        {
+            if (value == null)
+            {
+                return "";
+            }
+
+            return (string)value;
+        }
+
+        private char CheckCharValue(object value)
+        {
+            if (value == null)
+            {
+                return ' ';
+            }
+
+            return (char)value;
+        }
+
+        private double CheckDoubValue(object value)
+        {
+            if (value == null)
+            {
+                return 0;
+            }
+
+            return double.Parse((string)value);
+        }
+
         private void rawFileBrowser_Click(object sender, EventArgs e)
         {
             if (rawFileFDB.ShowDialog() == DialogResult.OK)
@@ -1521,6 +1563,15 @@ namespace TomahaqCompanion
         #endregion
 
         #region Unused Code
+        private List<TargetPeptide> SearchPeptides(double precursorMZ, SortedList<double, TargetPeptide> targetList)
+        {
+            List<TargetPeptide> retList = new List<TargetPeptide>();
+
+
+
+            return retList;
+        }
+
         private void AddModifications(out Dictionary<Modification, string> staticMods, out Dictionary<Modification, char> dynMods)
         {
             dynMods = new Dictionary<Modification, char>();
@@ -1591,46 +1642,5 @@ namespace TomahaqCompanion
 
         #endregion
 
-        private void ms1GraphControl_MouseClick(object sender, MouseEventArgs e)
-        {
-            object nearestObject;
-            int index;
-            ms1GraphControl.GraphPane.FindNearestObject(new PointF(e.X, e.Y), this.CreateGraphics(), out nearestObject, out index);
-
-            if (nearestObject != null && nearestObject.GetType() == typeof(LineItem))
-            {
-                LineItem lineitem = (LineItem)nearestObject;
-                double xVal = lineitem[index].X;
-
-                if (targetGridView.CurrentCell != null)
-                {
-                    index = targetGridView.CurrentCell.RowIndex;
-                }
-
-                TargetPeptide newTarget = TargetsDisplayed[index].Peptide;
-
-                SortedList<double, ScanEventLine> sortedScanEvents = FindNearestScanEventRT(xVal);
-
-                ScanEvents.Clear();
-                foreach (ScanEventLine sel in sortedScanEvents.Values)
-                {
-                    ScanEvents.Add(sel);
-                }
-            }
-        }
-
-        private SortedList<double, ScanEventLine> FindNearestScanEventRT(double rt)
-        {
-            SortedList<double, ScanEventLine> sortedSEL = new SortedList<double, ScanEventLine>();
-
-            foreach(ScanEventLine sel in ScanEvents)
-            {
-                double l_distance = Math.Abs(sel.ScanEvent.RetentionTime - rt);
-
-                sortedSEL.Add(l_distance, sel);
-            }
-
-            return sortedSEL;
-        }
     }
 }
