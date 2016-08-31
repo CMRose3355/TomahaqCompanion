@@ -118,7 +118,7 @@ namespace TomahaqCompanion
                 //Determine the quantification channels
                 //Here we just want to look at the target peptides that are static modifications
                 UpdateLog("Determining Quantification Channels");
-                Dictionary<string, double> quantChannelDict = AddQuantitationChannels(modificationDict["Static"]["Target"]);
+                QuantChannelsInUse = AddQuantitationChannels(modificationDict["Static"]["Target"]);
 
                 //Import the Peptides
                 UpdateLog("Importing Target Peptides");
@@ -146,7 +146,7 @@ namespace TomahaqCompanion
 
                     //Populate the trigger ms2 data
                     UpdateLog("Extracting MS/MS Data");
-                    ExtractData(rawFile, TriggerMS2toMS1, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, quantChannelDict);
+                    ExtractData(rawFile, TriggerMS2toMS1, TriggerMS2toTargetMS2, TargetMS2toTargetMS3, targetList, QuantChannelsInUse);
 
                     UpdateLog("Closing Raw File");
                     rawFile.Dispose();
@@ -232,7 +232,7 @@ namespace TomahaqCompanion
                 //Determine the quantification channels
                 //Here we just want to look at the target peptides that are static modifications
                 UpdateLog("Determining Quantification Channels");
-                Dictionary<string, double> quantChannelDict = AddQuantitationChannels(modificationDict["Static"]["Target"]);
+                QuantChannelsInUse = AddQuantitationChannels(modificationDict["Static"]["Target"]);
 
                 //Import the Peptides
                 UpdateLog("Importing Target Peptides");
