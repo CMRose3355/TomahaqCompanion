@@ -63,15 +63,31 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="API-2.0">
+      <HintPath>..\..\Instruments\IAPI\iapi-master\lib\API-2.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Fusion.API-1.0">
+      <HintPath>..\..\Oracle\bin\Debug\Fusion.API-1.0.dll</HintPath>
+    </Reference>
     <Reference Include="LumenWorks.Framework.IO, Version=3.9.1.0, Culture=neutral, PublicKeyToken=5ad3ea2f85776344, processorArchitecture=MSIL">
       <HintPath>..\packages\LumenWorksCsvReader.3.9.1\lib\net20\LumenWorks.Framework.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MethodChanger, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\meth-modifications-master\xmlmethodchanger\bin\Debug\MethodChanger.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="Spectrum-1.0">
+      <HintPath>..\..\Instruments\IAPI\iapi-master\lib\Spectrum-1.0.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -81,26 +97,24 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Thermo.TNG.Factory">
+      <HintPath>..\..\Oracle\bin\Debug\Thermo.TNG.Factory.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
       <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TomahaqCompanion.cs">
+    <Compile Include="TomahaqCompanionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TomahaqCompanion.Designer.cs">
-      <DependentUpon>TomahaqCompanion.cs</DependentUpon>
+    <Compile Include="TomahaqCompanionForm.Designer.cs">
+      <DependentUpon>TomahaqCompanionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MethodCopyAppendSN.cs" />
-    <Compile Include="MethodExp.cs" />
-    <Compile Include="MethodMassList.cs" />
-    <Compile Include="MassListRecord.cs" />
-    <Compile Include="MethodMod.cs" />
     <Compile Include="MethodModifications.cs" />
-    <Compile Include="MethodScanParams.cs" />
-    <Compile Include="MethodSN.cs" />
     <Compile Include="ModificationLine.cs" />
     <Compile Include="MS2Event.cs" />
     <Compile Include="MS3Event.cs" />
@@ -109,8 +123,8 @@
     <Compile Include="ScanEventLine.cs" />
     <Compile Include="TargetPeptide.cs" />
     <Compile Include="TargetPeptideLine.cs" />
-    <EmbeddedResource Include="TomahaqCompanion.resx">
-      <DependentUpon>TomahaqCompanion.cs</DependentUpon>
+    <EmbeddedResource Include="TomahaqCompanionForm.resx">
+      <DependentUpon>TomahaqCompanionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -141,20 +155,6 @@
     <Content Include="License-LGPL.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CSMSL\CSMSL\CSMSL.csproj">
-      <Project>{3c8c9f05-9c19-4251-95fa-05d7edc8cae6}</Project>
-      <Name>CSMSL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CSMSL\CSMSL\IO\Thermo\Thermo.csproj">
-      <Project>{24dc85ff-e97b-4140-9614-77dd8fddd32f}</Project>
-      <Name>Thermo</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\meth-modifications\xmlmethodchanger\XmlMethodChanger.lib\XmlMethodChanger.lib.csproj">
-      <Project>{e820aef9-f002-4dc3-9bb6-38669b1803d3}</Project>
-      <Name>XmlMethodChanger.lib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
@@ -165,6 +165,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CSMSL\CSMSL\CSMSL.csproj">
+      <Project>{3c8c9f05-9c19-4251-95fa-05d7edc8cae6}</Project>
+      <Name>CSMSL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\CSMSL\CSMSL\IO\Thermo\Thermo.csproj">
+      <Project>{24dc85ff-e97b-4140-9614-77dd8fddd32f}</Project>
+      <Name>Thermo</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

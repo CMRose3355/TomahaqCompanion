@@ -10,6 +10,7 @@ namespace TomahaqCompanion
     public class ScanEventLine
     {
         public MS2Event ScanEvent { get; set; }
+        public bool Include { get; set; }
         public string MS1TriggerIntensity { get; set; }
         public string MS2RetentionTime { get; set; }
         public string MS2ScanNumber { get; set; }
@@ -18,6 +19,7 @@ namespace TomahaqCompanion
         public string MS3InjectionTime { get; set; }
         public string MS3SPSIons { get; set; }
         public string MS3SumSN { get; set; }
+        public string MS3IsoSpec { get; set; }
         public string MS3Quant1 { get; set; }
         public string MS3Quant2 { get; set; }
         public string MS3Quant3 { get; set; }
@@ -36,6 +38,8 @@ namespace TomahaqCompanion
             MS2ScanNumber = ms2ScanEvent.ScanNumber.ToString();
             MS2InjectionTime = Math.Round(ms2ScanEvent.InjectionTime,1).ToString();
             MS1TriggerIntensity = Math.Round(Math.Log10(ms2ScanEvent.MS1Intensity), 2).ToString();
+            MS3IsoSpec = Math.Round(ms2ScanEvent.IsolationSpecificity, 2).ToString();
+            Include = true;
 
             if (ms2ScanEvent.MS3 != null)
             {
@@ -80,6 +84,13 @@ namespace TomahaqCompanion
                 MS3Quant9 = "";
                 MS3Quant10 = "";
             }
+        }
+
+        public override string ToString()
+        {
+            return MS1TriggerIntensity + "," + MS2RetentionTime + "," + MS2ScanNumber + "," + MS3ScanNumber + "," + MS2InjectionTime + "," + MS3InjectionTime + "," +
+                MS3SPSIons + "," + MS3SumSN + "," + MS3IsoSpec + "," + MS3Quant1 + "," + MS3Quant2 + "," + MS3Quant3 + "," + MS3Quant4 + "," + MS3Quant5 + "," + MS3Quant6 + 
+                "," + MS3Quant7 + "," + MS3Quant8 + "," + MS3Quant9 + "," + MS3Quant10;
         }
     }
 }

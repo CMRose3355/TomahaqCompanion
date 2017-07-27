@@ -24,6 +24,9 @@ namespace TomahaqCompanion
 
         public double MaxIntensity { get; set; }
         public double MaxRetentionTime { get; set; }
+        public double StartRetentionTime { get; set; }
+        public double EndRetentionTime { get; set; }
+        public double RTWindow { get; set; }
 
         public double TriggerMZ { get; set; }
         public double TargetMZ { get; set; }
@@ -62,6 +65,7 @@ namespace TomahaqCompanion
         private Dictionary<string, Dictionary<int, Modification>> DynModDict { get; set; }
 
         public List<ScanEventLine> ScanEventLines { get; set; }
+        public List<ScanEventLine> SelectedScanEventLines { get; set; }
 
         public PointPairList TriggerMS1XicPoints { get; set; }
         public PointPairList TargetMS1XicPoints { get; set; }
@@ -71,13 +75,16 @@ namespace TomahaqCompanion
         public PointPairList TargetCompositeMS2Points { get; set; }
 
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons)
+        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime)
         {
             //Save the original peptide string
             PeptideString = peptideString;
             Charge = charge;
             TargetSPSIons = targetSPSIons;
             TriggerIons = triggerFragIons;
+
+            StartRetentionTime = startTime;
+            EndRetentionTime = endTime;
 
             //Build the dynamic modification dictionary and return the stripped string
             string strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
@@ -108,6 +115,7 @@ namespace TomahaqCompanion
             TargetMS3s = new List<MS3Event>();
 
             ScanEventLines = new List<ScanEventLine>();
+            SelectedScanEventLines = new List<ScanEventLine>();
 
             TriggerMS1XicPoints = new PointPairList();
             TargetMS1XicPoints = new PointPairList();
@@ -128,11 +136,7 @@ namespace TomahaqCompanion
             TriggerIonsWithCharge = new Dictionary<double, int>();
             TargetSPSIonsWithCharge = new Dictionary<double, int>();
 
-            TargetSPSFrags = new Dictionary<int, Dictionary<string,double>>();
-            for(int i = 1; i<10; i++)
-            {
-                TargetSPSFrags.Add(i, new Dictionary<string, double>());
-            }
+            InitializeTargetSPSFrags();
         }
 
         public void AddMS1XICPoint(ThermoSpectrum spectrum, double rt, int scanNumber)
@@ -145,6 +149,11 @@ namespace TomahaqCompanion
 
             if(triggerPeak != null)
             {
+                if(triggerPeak.Intensity > MaxIntensity)
+                {
+                    MaxIntensity = triggerPeak.Intensity;
+                }
+
                 TriggerMS1xic.Add(rt, triggerPeak.Intensity);
                 MS1toTriggerInt.Add(scanNumber, triggerPeak.Intensity);
             }
@@ -160,9 +169,21 @@ namespace TomahaqCompanion
             List<ThermoMzPeak> peaks = null;
             if(spectrum.TryGetPeaks(0,2000, out peaks))
             {
-                double triggerMS1Int = MS1toTriggerInt[ms1ScanNumber];
+                double triggerMS1Int = 0;
+                if(!MS1toTriggerInt.TryGetValue(ms1ScanNumber, out triggerMS1Int))
+                {
+                    triggerMS1Int = 0;
+                }
+
                 MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerMS1Int);
                 TriggerMS2s.Add(ms2Event);
+
+                MS2Event outEvent = null; 
+                while(TriggerMS2sByInt.TryGetValue(triggerMS1Int, out outEvent))
+                {
+                    triggerMS1Int++;
+                }
+
                 TriggerMS2sByInt.Add(triggerMS1Int, ms2Event);
             }
         }
@@ -188,6 +209,13 @@ namespace TomahaqCompanion
                 double triggerInt = MS1toTriggerInt[ms1ScanNumber];
                 MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt);
                 TargetMS2s.Add(ms2Event);
+
+                MS2Event outEvent = null;
+                while(TargetMS2sByTriggerInt.TryGetValue(triggerInt, out outEvent))
+                {
+                    triggerInt += 0.0000001;
+                }
+
                 TargetMS2sByTriggerInt.Add(triggerInt, ms2Event);
 
                 //If we have an MS3 then we will add the MS3 event to the MS2 event
@@ -197,18 +225,76 @@ namespace TomahaqCompanion
                     MS3Event ms3Event = new MS3Event(ms3scanNumber, ms3rt, ms3spectrum, peaks, ms3it, quantChannelDict, spsIons);
                     ms2Event.AddMS3Event(ms3Event);
                     TargetMS3s.Add(ms3Event);
+
+                    //Calculate Isolation Specificity
+                    double isoSpec = CalculateIsolationSpecificity(spectrum, spsIons);
+                    ms2Event.IsolationSpecificity = isoSpec;
                 }
             }
         }
 
-        private void PopulateTargetSPSIons(int numSPSIons)
+        private double CalculateIsolationSpecificity(ThermoSpectrum targetMS2Spectrum, List<double> spsIons)
         {
-            if (TargetSPSIons.Count > 0)
+            double isoSpec = 0;
+
+            double isoQ = 0.86;
+            double isoWidth = 3;
+            double totalPeakInt = 0;
+            double matchedPeakInt = 0;
+
+            spsIons.Sort();
+
+            double firstMZ = spsIons.ElementAt(0);
+
+            foreach(double mz in spsIons)
+            {
+                double spsWidth = isoWidth;
+
+                if(mz != firstMZ)
+                {
+                    spsWidth = isoWidth / ((firstMZ * isoQ) / mz);
+                }
+
+                double minMZ = mz - spsWidth;
+                double maxMZ = mz + spsWidth;
+
+                MzRange totalRange = new MzRange(minMZ, maxMZ);
+                MzRange matchRange = new MzRange(mz, new Tolerance(ToleranceUnit.PPM, 15));
+
+                ThermoMzPeak matchedIon = GetTallestPeak(matchRange, targetMS2Spectrum); //TODO: Figure out why we get null for a matched ion...it is selected so there must be something there. 
+
+                if(matchedIon != null)
+                {
+                    matchedPeakInt += matchedIon.SignalToNoise;
+
+                    List<ThermoMzPeak> totalPeaks = null;
+                    if (targetMS2Spectrum.TryGetPeaks(totalRange, out totalPeaks))
+                    {
+                        foreach (ThermoMzPeak peak in totalPeaks)
+                        {
+                            totalPeakInt += peak.SignalToNoise;
+                        }
+                    }
+                }
+            }
+
+            isoSpec = matchedPeakInt / totalPeakInt;
+
+            return isoSpec;
+        }
+
+        private void PopulateTargetSPSIons(int numSPSIons, bool force = false)
+        {
+            if (TargetSPSIons.Count > 0 && !force)
             {
                 return;
             }
             else
             {
+                TargetSPSIons = new List<double>();
+                TargetSPSIonsWithCharge = new Dictionary<double, int>();
+                InitializeTargetSPSFrags();
+
                 //Determine the maximum charge
                 int maxCharge = Charge - 1;
                 if (maxCharge > 2) { maxCharge = 2; }
@@ -259,14 +345,17 @@ namespace TomahaqCompanion
             }
         }
 
-        private void PopulateTriggerIons(int numIons)
+        private void PopulateTriggerIons(int numIons, bool force = false)
         {
-            if (TriggerIons.Count > 0)
+            if (TriggerIons.Count > 0 && !force)
             {
                 return;
             }
             else
             {
+                TriggerIons = new List<double>();
+                TriggerIonsWithCharge = new Dictionary<double, int>();
+
                 //Determine the maximum charge
                 int maxCharge = Charge - 1;
                 if (maxCharge > 2) { maxCharge = 2; }
@@ -315,10 +404,10 @@ namespace TomahaqCompanion
             }
         }
 
-        public void PopulateTriggerAndTargetIons(int numIons)
+        public void PopulateTriggerAndTargetIons(int numIons, bool force = false)
         {
-            PopulateTriggerIons(numIons);
-            PopulateTargetSPSIons(numIons);
+            PopulateTriggerIons(numIons, force);
+            PopulateTargetSPSIons(numIons, force);
         }
 
         private string BuildDynamicModDict(string peptideString, Dictionary<string, Dictionary<Modification, string>> allDynMods)
@@ -328,8 +417,6 @@ namespace TomahaqCompanion
             DynModDict.Add("Trigger", new Dictionary<int, Modification>());
             DynModDict.Add("Target", new Dictionary<int, Modification>());
 
-            //Kepp track of the total modifications
-            int totalMods = 0;
 
             //Cycle through each peptide and set the appropriate modifications
             foreach (KeyValuePair<string, Dictionary<Modification, string>> kvp in allDynMods)
@@ -342,6 +429,9 @@ namespace TomahaqCompanion
                 {
                     dynModsChar.Add(modPair.Key, modPair.Value.ElementAt(0));
                 }
+
+                //Kepp track of the total modifications
+                int totalMods = 0;
 
                 //Cycle through the string to see if there is a dynamic modification
                 for (int i = 0; i < peptideString.Length; i++)
@@ -414,9 +504,41 @@ namespace TomahaqCompanion
             List<Fragment> candidateFrags = new List<Fragment>();
             List<Fragment> frags = peptide.Fragment(FragmentTypes.b | FragmentTypes.y).ToList();
 
-            foreach (Fragment frag in frags)
+            //TODO: Add phospho neutral loss fragments. 
+            double phosphoNL = 97.9766;
+            List<Fragment> allFrags = new List<Fragment>();
+            foreach(Fragment frag in frags)
             {
-                if(frag.Number > 1)
+                allFrags.Add(frag);
+
+                if(frag.Parent.Sequence != frag.Parent.SequenceWithModifications)
+                {
+                    List<IMass> modMasses = frag.GetModifications().ToList();
+                    foreach (IMass mod in modMasses)
+                    {
+                        string modStr = mod.ToString();
+                        if (mod.ToString().Equals("Phos"))
+                        {
+                            FragmentTypes localFragType = frag.Type;
+                            if (frag.Type == FragmentTypes.b)
+                            {
+                                localFragType = FragmentTypes.bNeuLoss;
+                            }
+                            else if (frag.Type == FragmentTypes.y)
+                            {
+                                localFragType = FragmentTypes.yNeuLoss;
+                            }
+
+                            Fragment nLFrag = new Fragment(localFragType, frag.Number, frag.MonoisotopicMass - phosphoNL, frag.Parent);
+                            allFrags.Add(nLFrag);
+                        }
+                    }
+                }          
+            }
+
+            foreach (Fragment frag in allFrags)
+            {
+                if(Math.Abs(frag.Number) > 1)
                 {
                     candidateFrags.Add(frag);
                 }
@@ -427,7 +549,7 @@ namespace TomahaqCompanion
             //{
                 foreach(Fragment frag in candidateFrags)
                 {
-                    if(frag.GetSequence().Contains("K") || frag.Type == FragmentTypes.b)
+                    if(frag.GetSequence().Contains("K") || frag.Type == FragmentTypes.b || frag.Type == FragmentTypes.bNeuLoss)
                     {
                         retFrags.Add(frag);
                     }
@@ -528,8 +650,16 @@ namespace TomahaqCompanion
             }
 
             //Set the max intensity and the max retention time for use later
-            MaxIntensity = maxIntensity;
-            MaxRetentionTime = maxTime;
+            //MaxIntensity = maxIntensity; TODO: Change this as it was setting the max intensity back to 0
+            MaxRetentionTime = maxTime; //TODO: Change this
+
+            //Only change the retention times if we found the peptide within the run
+            //TODO: Change this so that it can be a user option
+            if(MaxRetentionTime > 0 && StartRetentionTime == -1)
+            {
+                StartRetentionTime = maxTime - (RTWindow / 2);
+                EndRetentionTime = maxTime + (RTWindow / 2);
+            }
 
             //Add the points to mark when the trigger ms2 scans were performed
             TriggerMS2Points = new PointPairList();
@@ -552,7 +682,7 @@ namespace TomahaqCompanion
             AverageScanEventsLines(ScanEventLines, 5);
         }
 
-        private void AverageScanEventsLines(List<ScanEventLine> scanEventLines, int topN)
+        public void AverageScanEventsLines(List<ScanEventLine> scanEventLines, int topN)
         {
             //Determine if you have less scan event lines than top N
             if (scanEventLines.Count < topN)
@@ -577,6 +707,7 @@ namespace TomahaqCompanion
             //Make the objects that will hold the trigger and the target spectrum
             TriggerCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
             TargetCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
+            TargetCompositeMS2Points = new PointPairList();
 
             //Average the spectrum
             for (int i = 0; i < topN; i++)
@@ -585,16 +716,16 @@ namespace TomahaqCompanion
                 ScanEventLine sel = scanEventLines[i];
                 
                 //Cycle through the matched fragment dictionary
-                foreach(KeyValuePair<int, Dictionary<string, double>> kvp in sel.ScanEvent.MatchedFragDict)
+                foreach(KeyValuePair<int, Dictionary<Fragment, double>> kvp in sel.ScanEvent.MatchedFragDict)
                 {
                     //The current charge
                     int charge = kvp.Key;
 
                     //We are now looking at a single charge state
-                    foreach(KeyValuePair<string, double> kvp2 in kvp.Value)
+                    foreach(KeyValuePair<Fragment, double> kvp2 in kvp.Value)
                     {
                         //The fragment from matched spectrum
-                        string fragName = kvp2.Key;
+                        string fragName = kvp2.Key.ToString();
                         Fragment targetFrag = null;
 
                         //We will see if this fragment exsists within the target fragment list...it should
@@ -663,7 +794,7 @@ namespace TomahaqCompanion
             }
         }
 
-        public void UpdateTargetIons(int numIons)
+        public void UpdateTargetIons(int numIons, bool spsEdited = false)
         {
 
             //This will go through the composite spectrum and choose the topN most intense ions
@@ -685,7 +816,7 @@ namespace TomahaqCompanion
             //This is to update the trigger ions correspond to the target SPS ions
             foreach (MS2Event ms2 in TriggerMS2s)
             {
-                ms2.PopulateMatchedSPSPeaks(triggerSPSIons);
+                ms2.PopulateMatchedSPSPeaks(triggerSPSIons, spsEdited:spsEdited);
             }
         }
 
@@ -762,6 +893,15 @@ namespace TomahaqCompanion
             }
 
             return retPeak;
+        }
+
+        private void InitializeTargetSPSFrags()
+        {
+            TargetSPSFrags = new Dictionary<int, Dictionary<string, double>>();
+            for (int i = 1; i < 10; i++)
+            {
+                TargetSPSFrags.Add(i, new Dictionary<string, double>());
+            }
         }
     }
 }

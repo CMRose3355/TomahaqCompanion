@@ -25,7 +25,9 @@ namespace TomahaqCompanion
 
         public double MS1Intensity { get; set; }
 
-        public Dictionary<int, Dictionary<string, double>> MatchedFragDict { get; set; }
+        public double IsolationSpecificity { get; set; }
+
+        public Dictionary<int, Dictionary<Fragment, double>> MatchedFragDict { get; set; }
 
         public PointPairList AllPeaks { get; set; }
         public PointPairList MatchedPeaks { get; set; }
@@ -48,7 +50,7 @@ namespace TomahaqCompanion
                 AllPeaks.Add(peak.MZ, peak.Intensity);
             }
 
-            MatchedFragDict = new Dictionary<int, Dictionary<string, double>>();
+            MatchedFragDict = new Dictionary<int, Dictionary<Fragment, double>>();
         }
 
         public void AddMS3Event(MS3Event ms3Event)
@@ -67,7 +69,7 @@ namespace TomahaqCompanion
             for (int charge = 1; charge <= maxCharge; charge++)
             {
                 //Add an entry in the 
-                MatchedFragDict.Add(charge, new Dictionary<string, double>());
+                MatchedFragDict.Add(charge, new Dictionary<Fragment, double>());
 
                 //Calculate the mz for each fragment and see if there is a peak in the spectrum around it
                 foreach (Fragment frag in fragments)
@@ -82,7 +84,7 @@ namespace TomahaqCompanion
                     if(point != null && point.X >400 && point.X <2000)
                     {
                         MatchedPeaks.Add(point);
-                        MatchedFragDict[charge].Add(frag.ToString(), point.Y);
+                        MatchedFragDict[charge].Add(frag, point.Y);
                     }
                 }
             }
@@ -95,8 +97,14 @@ namespace TomahaqCompanion
             }
         }
 
-        public void PopulateMatchedSPSPeaks(List<double> mzs)
+        public void PopulateMatchedSPSPeaks(List<double> mzs, bool spsEdited = false)
         {
+            PointPairList currentPeaks = new PointPairList();
+            foreach(PointPair pair in SPSPeaks)
+            {
+                currentPeaks.Add(pair);
+            }
+
             //Cycle through the SPS ions to mark them in the spectrum
             foreach (double spsMZ in mzs)
             {
@@ -107,7 +115,7 @@ namespace TomahaqCompanion
 
                 //Search the spectrum and return the peak that is the tallest
                 PointPair point = SearchSpectrum(minMZ, maxMZ, AllPeaks);
-                if (point != null)
+                if (point != null && !SPSPeaks.Contains(point) && (!spsEdited || (spsEdited && currentPeaks.Contains(point))))
                 {
                     SPSPeaks.Add(point);
                 }
