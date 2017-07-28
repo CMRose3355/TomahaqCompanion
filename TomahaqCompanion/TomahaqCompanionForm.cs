@@ -101,8 +101,8 @@ namespace TomahaqCompanion
 
         private void createMethod_Click_1(object sender, EventArgs e)
         {
-            //try
-            //{
+            try
+            {
                 Priming = true;
                 Analysis = false;
                 SPSIonsEdited = false;
@@ -223,11 +223,11 @@ namespace TomahaqCompanion
                 {
                     UpdateLog("Cannot Create New Method Because No Template Was Provided");
                 }
-            //}
-            //catch (Exception exp)
-            //{
-            //    UpdateLog("Error! " + exp.Message);
-            //}
+            }
+            catch (Exception exp)
+            {
+                UpdateLog("Error! " + exp.Message);
+            }
         }
 
         private void analyzeRun_Click(object sender, EventArgs e)
