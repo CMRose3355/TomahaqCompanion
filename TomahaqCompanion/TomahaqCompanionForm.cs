@@ -101,8 +101,8 @@ namespace TomahaqCompanion
 
         private void createMethod_Click_1(object sender, EventArgs e)
         {
-            try
-            {
+            //try
+            //{
                 Priming = true;
                 Analysis = false;
                 SPSIonsEdited = false;
@@ -223,11 +223,11 @@ namespace TomahaqCompanion
                 {
                     UpdateLog("Cannot Create New Method Because No Template Was Provided");
                 }
-            }
-            catch (Exception exp)
-            {
-                UpdateLog("Error! " + exp.Message);
-            }
+            //}
+            //catch (Exception exp)
+            //{
+            //    UpdateLog("Error! " + exp.Message);
+            //}
         }
 
         private void analyzeRun_Click(object sender, EventArgs e)
@@ -917,10 +917,13 @@ namespace TomahaqCompanion
             Modification ggTMT10 = new Modification(343.20583, "ggTMT10", ModificationSites.K);
             Modification ggTMTsh = new Modification(349.21967, "ggTMTsh", ModificationSites.K);
 
+            Modification C2N1 = new Modification(3.004, "C2N1", ModificationSites.G);
+            Modification C3N1 = new Modification(4.007, "C3N1", ModificationSites.A);
             Modification C5N1 = new Modification(6.0138, "C5N1", ModificationSites.V | ModificationSites.P);
             Modification C6N1 = new Modification(7.0171, "C6N1", ModificationSites.I | ModificationSites.L);
             Modification C9N1 = new Modification(10.0272, "C9N1", ModificationSites.Y | ModificationSites.F);
 
+            Modification tmt10OL = new Modification(229.162932, "TMT10OL", ModificationSites.S | ModificationSites.T | ModificationSites.Y | ModificationSites.H);
 
             ModLines.Add(new ModificationLine("TMT0", Math.Round(tmt0.MonoisotopicMass, 5), "K,NPep", "", "Static", true, false, tmt0));
             ModLines.Add(new ModificationLine("TMT2", Math.Round(tmt2.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmt2));
@@ -934,9 +937,13 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT2));
             ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
             ModLines.Add(new ModificationLine("ggTMTsh", Math.Round(ggTMTsh.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMTsh));
+            ModLines.Add(new ModificationLine("C2N1", Math.Round(C2N1.MonoisotopicMass, 5), "G", "^", "Dynamic", false, false, C2N1));
+            ModLines.Add(new ModificationLine("C3N1", Math.Round(C3N1.MonoisotopicMass, 5), "A", "#", "Dynamic", false, false, C3N1));
             ModLines.Add(new ModificationLine("C5N1", Math.Round(C5N1.MonoisotopicMass, 5), "V,P", "&", "Dynamic", false, false, C5N1));
             ModLines.Add(new ModificationLine("C6N1", Math.Round(C6N1.MonoisotopicMass, 5), "I,L", "@", "Dynamic", false, false, C6N1));
             ModLines.Add(new ModificationLine("C9N1", Math.Round(C9N1.MonoisotopicMass, 5), "F,Y", "^", "Dynamic", false, false, C9N1));
+            ModLines.Add(new ModificationLine("TMT10OL", Math.Round(tmt10OL.MonoisotopicMass, 5), "S,T,Y,H", "$", "Dynamic", false, false, tmt10OL));
+
             //ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
         }
 

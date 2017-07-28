@@ -193,10 +193,13 @@ namespace TomahaqCompanion
             List<ThermoMzPeak> peaks = null;
             if (spectrum.TryGetPeaks(0, 2000, out peaks))
             {
-                double triggerInt = MS1toTriggerInt[ms1ScanNumber];
-                MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt);
-                TargetMS2s.Add(ms2Event);
-                TargetMS2sByTriggerInt.Add(triggerInt, ms2Event);
+                double triggerInt = 0;
+                if (MS1toTriggerInt.TryGetValue(ms1ScanNumber, out triggerInt))
+                {
+                    MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt);
+                    TargetMS2s.Add(ms2Event);
+                    TargetMS2sByTriggerInt.Add(triggerInt, ms2Event);
+                }
             }
         }
 
@@ -425,19 +428,41 @@ namespace TomahaqCompanion
 
                 Dictionary<Modification, string> dynMods = kvp.Value;
                 Dictionary<Modification, char> dynModsChar = new Dictionary<Modification, char>();
+                List<char> modsChars = new List<char>();
                 foreach(KeyValuePair<Modification, string> modPair in dynMods)
                 {
                     dynModsChar.Add(modPair.Key, modPair.Value.ElementAt(0));
+                    modsChars.Add(modPair.Value.ElementAt(0));
+                }
+
+                string currentPeptideString = peptideString;
+                List<char> charToRemove = new List<char>();
+                for (int i = 0; i < peptideString.Length; i++)
+                {
+                    char currentChar = peptideString.ElementAt(i);
+                    if (!char.IsLetterOrDigit(currentChar))
+                    {
+                        if(!modsChars.Contains(currentChar) && !charToRemove.Contains(currentChar))
+                        {
+                            charToRemove.Add(currentChar);
+                        }
+                    }
+                }
+
+
+                foreach(char removeChar in charToRemove)
+                {
+                    currentPeptideString = currentPeptideString.Replace(removeChar.ToString(), "");
                 }
 
                 //Kepp track of the total modifications
                 int totalMods = 0;
 
                 //Cycle through the string to see if there is a dynamic modification
-                for (int i = 0; i < peptideString.Length; i++)
+                for (int i = 0; i < currentPeptideString.Length; i++)
                 {
                     //If there is a dynamic modification then save its location to a dictionary
-                    if (dynModsChar.Values.Contains(peptideString.ElementAt(i)))
+                    if (dynModsChar.Values.Contains(currentPeptideString.ElementAt(i)))
                     {
                         //Increment and save the index
                         totalMods++;
@@ -448,7 +473,7 @@ namespace TomahaqCompanion
                         foreach (KeyValuePair<Modification, char> kvp2 in dynModsChar)
                         {
                             //Grab the modification you will be using
-                            if (kvp2.Value == peptideString.ElementAt(i))
+                            if (kvp2.Value == currentPeptideString.ElementAt(i))
                             {
                                 addMod = kvp2.Key;
                             }
