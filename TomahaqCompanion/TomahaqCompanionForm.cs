@@ -217,7 +217,7 @@ namespace TomahaqCompanion
                 {
                     string templateMethod = templateBox.Text;
                     string outputMethod = targetFile.Replace(".csv", ".meth");
-                    MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+                    MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod); //xmlFile // "C:\\Users\\lumos\\Desktop\\TestFiles\\David\\PeptidesTC_1peptide_method_static.xml"
                 }
                 else
                 {

@@ -118,6 +118,8 @@ namespace TomahaqCompanion
 
             MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
 
+            mz = Math.Round(mz, 4);
+
             MassListFilter.MassList.AddMassListRecord(mz, z);
         }
 
@@ -128,6 +130,8 @@ namespace TomahaqCompanion
             int msnLevel = 1;
 
             MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
+
+            mz = Math.Round(mz, 4);
 
             MassListFilter.MassList.AddMassListRecord(mz, z, startTime, endTime);
         }
@@ -142,21 +146,25 @@ namespace TomahaqCompanion
 
             foreach (double mz in mzList)
             {
-                MassListFilter.MassList.AddMassListRecord(mz, 1);
+                double roundedMZ = Math.Round(mz, 4);
+
+                MassListFilter.MassList.AddMassListRecord(roundedMZ, 1);
             }
         }
 
         public void AddMS3InclusionList(int treeIndex, Dictionary<double, int> mzAndzDict)
         {
             string type = "TargetedMassInclusion";
-            bool above = false;
-            int msnLevel = 3 - 1;
+            bool above = true;
+            int msnLevel = 3;
 
             MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
 
             foreach (KeyValuePair<double, int> mzAndZ in mzAndzDict)
             {
-                MassListFilter.MassList.AddMassListRecord(mzAndZ.Key, mzAndZ.Value);
+                double roundedMZ = Math.Round(mzAndZ.Key, 4);
+
+                MassListFilter.MassList.AddMassListRecord(roundedMZ, mzAndZ.Value);
             }
         }
 
@@ -170,7 +178,9 @@ namespace TomahaqCompanion
 
             foreach (double mz in mzList)
             {
-                MassListFilter.MassList.AddMassListRecord(mz, 1);
+                double roundedMZ = Math.Round(mz, 4);
+
+                MassListFilter.MassList.AddMassListRecord(roundedMZ, 1);
             }
 
         }
@@ -185,7 +195,10 @@ namespace TomahaqCompanion
 
             foreach (KeyValuePair<double, int> mzAndZ in mzAndzDict)
             {
-                MassListFilter.MassList.AddMassListRecord(mzAndZ.Key, mzAndZ.Value);
+                double roundedMZ = Math.Round(mzAndZ.Key, 4);
+
+
+                MassListFilter.MassList.AddMassListRecord(roundedMZ, mzAndZ.Value);
             }
         }
 
