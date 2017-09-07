@@ -22,11 +22,14 @@ namespace TomahaqCompanion
 
         public double MassShift { get; set; }
 
+        Tolerance FragmentTol { get; set; }
+
         public double MaxIntensity { get; set; }
         public double MaxRetentionTime { get; set; }
         public double StartRetentionTime { get; set; }
         public double EndRetentionTime { get; set; }
         public double RTWindow { get; set; }
+        public double MethodEndTime { get; set; }
 
         public double TriggerMZ { get; set; }
         public double TargetMZ { get; set; }
@@ -75,13 +78,15 @@ namespace TomahaqCompanion
         public PointPairList TargetCompositeMS2Points { get; set; }
 
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime)
+        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol)
         {
             //Save the original peptide string
             PeptideString = peptideString;
             Charge = charge;
             TargetSPSIons = targetSPSIons;
             TriggerIons = triggerFragIons;
+
+            FragmentTol = fragTol;
 
             StartRetentionTime = startTime;
             EndRetentionTime = endTime;
@@ -175,7 +180,7 @@ namespace TomahaqCompanion
                     triggerMS1Int = 0;
                 }
 
-                MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerMS1Int);
+                MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerMS1Int, FragmentTol);
                 TriggerMS2s.Add(ms2Event);
 
                 MS2Event outEvent = null; 
@@ -196,8 +201,15 @@ namespace TomahaqCompanion
                 double triggerInt = 0;
                 if (MS1toTriggerInt.TryGetValue(ms1ScanNumber, out triggerInt))
                 {
-                    MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt);
+                    MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt, FragmentTol);
                     TargetMS2s.Add(ms2Event);
+
+                    MS2Event outEvent = null;
+                    while (TargetMS2sByTriggerInt.TryGetValue(triggerInt, out outEvent))
+                    {
+                        triggerInt += 1;
+                    }
+
                     TargetMS2sByTriggerInt.Add(triggerInt, ms2Event);
                 }
             }
@@ -210,13 +222,13 @@ namespace TomahaqCompanion
             if (spectrum.TryGetPeaks(0, 2000, out peaks))
             {
                 double triggerInt = MS1toTriggerInt[ms1ScanNumber];
-                MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt);
+                MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt, FragmentTol);
                 TargetMS2s.Add(ms2Event);
 
                 MS2Event outEvent = null;
                 while(TargetMS2sByTriggerInt.TryGetValue(triggerInt, out outEvent))
                 {
-                    triggerInt += 0.0000001;
+                    triggerInt += 1;
                 }
 
                 TargetMS2sByTriggerInt.Add(triggerInt, ms2Event);
@@ -262,7 +274,7 @@ namespace TomahaqCompanion
                 double maxMZ = mz + spsWidth;
 
                 MzRange totalRange = new MzRange(minMZ, maxMZ);
-                MzRange matchRange = new MzRange(mz, new Tolerance(ToleranceUnit.PPM, 15));
+                MzRange matchRange = new MzRange(mz, FragmentTol);
 
                 ThermoMzPeak matchedIon = GetTallestPeak(matchRange, targetMS2Spectrum); //TODO: Figure out why we get null for a matched ion...it is selected so there must be something there. 
 
@@ -653,7 +665,7 @@ namespace TomahaqCompanion
             }
         }
 
-        public void PopulatePrimingData()
+        public void PopulatePrimingData(double methodLength)
         {
             //Populate the XIC data for the Trigger peptides
             TriggerMS1XicPoints = new PointPairList();
@@ -677,13 +689,17 @@ namespace TomahaqCompanion
             //Set the max intensity and the max retention time for use later
             //MaxIntensity = maxIntensity; TODO: Change this as it was setting the max intensity back to 0
             MaxRetentionTime = maxTime; //TODO: Change this
+            MethodEndTime = methodLength;
 
             //Only change the retention times if we found the peptide within the run
             //TODO: Change this so that it can be a user option
-            if(MaxRetentionTime > 0 && StartRetentionTime == -1)
+            if (MaxRetentionTime > 0 && StartRetentionTime == -1)
             {
                 StartRetentionTime = maxTime - (RTWindow / 2);
                 EndRetentionTime = maxTime + (RTWindow / 2);
+
+                if(EndRetentionTime > MethodEndTime) { EndRetentionTime = MethodEndTime; }
+                if (StartRetentionTime < 0) { StartRetentionTime = 0; }
             }
 
             //Add the points to mark when the trigger ms2 scans were performed
@@ -719,14 +735,23 @@ namespace TomahaqCompanion
             Dictionary<string, Fragment> indexTargetFrags = new Dictionary<string, Fragment>();
             foreach(Fragment frag in TargetFrags)
             {
-                indexTargetFrags.Add(frag.ToString(), frag);
+                Fragment outFrag = null;
+                if(!indexTargetFrags.TryGetValue(frag.ToString(), out outFrag))
+                {
+                    indexTargetFrags.Add(frag.ToString(), frag);
+                }
+                    
             }
 
             //Index the trigger fragments for easier lookup later
             Dictionary<string, Fragment> indexTriggerFrag = new Dictionary<string, Fragment>();
             foreach (Fragment frag in TriggerFrags)
             {
-                indexTriggerFrag.Add(frag.ToString(), frag);
+                Fragment outFrag = null;
+                if (!indexTriggerFrag.TryGetValue(frag.ToString(), out outFrag))
+                {
+                    indexTriggerFrag.Add(frag.ToString(), frag);
+                }
             }
 
             //Make the objects that will hold the trigger and the target spectrum
@@ -764,8 +789,8 @@ namespace TomahaqCompanion
                             double intensity = kvp2.Value;
 
                             //Calculate a narrow mass range to look for the peak
-                            MzRange targetRange = new MzRange(targetMZ, new Tolerance(ToleranceUnit.PPM, 10));
-                            MzRange triggerRange = new MzRange(triggerMZ, new Tolerance(ToleranceUnit.PPM, 10));
+                            MzRange targetRange = new MzRange(targetMZ, FragmentTol);
+                            MzRange triggerRange = new MzRange(triggerMZ, FragmentTol);
 
                             //Deal with the target first to try and see if you can add the peak
                             bool targetAdded = false;

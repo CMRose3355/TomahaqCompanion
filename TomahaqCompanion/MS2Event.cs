@@ -23,6 +23,8 @@ namespace TomahaqCompanion
         public double RetentionTime { get; set; }
         public double InjectionTime { get; set; }
 
+        public Tolerance FragmentTol { get; set; }
+
         public double MS1Intensity { get; set; }
 
         public double IsolationSpecificity { get; set; }
@@ -33,13 +35,15 @@ namespace TomahaqCompanion
         public PointPairList MatchedPeaks { get; set; }
         public PointPairList SPSPeaks { get; set; }
 
-        public MS2Event(int scanNumber, double retentionTime, List<ThermoMzPeak> peaks, double injectionTime, double ms1Intensity)
+        public MS2Event(int scanNumber, double retentionTime, List<ThermoMzPeak> peaks, double injectionTime, double ms1Intensity, Tolerance fragTol)
         {
             ScanNumber = scanNumber;
             RetentionTime = retentionTime;
             InjectionTime = injectionTime;
 
             MS1Intensity = ms1Intensity;
+
+            FragmentTol = fragTol;
 
             AllPeaks = new PointPairList();
             MatchedPeaks = new PointPairList();
@@ -75,7 +79,7 @@ namespace TomahaqCompanion
                 foreach (Fragment frag in fragments)
                 {
                     //Calculate the range to look in
-                    MzRange fragRange = new MzRange(frag.ToMz(charge), new Tolerance(ToleranceUnit.PPM, 10));
+                    MzRange fragRange = new MzRange(frag.ToMz(charge), FragmentTol);
                     double minMZ = fragRange.Minimum;
                     double maxMZ = fragRange.Maximum;
 
@@ -83,8 +87,13 @@ namespace TomahaqCompanion
                     PointPair point = SearchSpectrum(minMZ, maxMZ, AllPeaks);
                     if(point != null && point.X >400 && point.X <2000)
                     {
-                        MatchedPeaks.Add(point);
-                        MatchedFragDict[charge].Add(frag, point.Y);
+                        double outDoub = 0;
+                        if(!MatchedFragDict[charge].TryGetValue(frag, out outDoub))
+                        {
+                            MatchedPeaks.Add(point);
+                            MatchedFragDict[charge].Add(frag, point.Y);
+                        }
+                       
                     }
                 }
             }
@@ -109,7 +118,7 @@ namespace TomahaqCompanion
             foreach (double spsMZ in mzs)
             {
                 //Calculate the range to look in
-                MzRange spsRange = new MzRange(spsMZ, new Tolerance(ToleranceUnit.PPM, 10));
+                MzRange spsRange = new MzRange(spsMZ, FragmentTol);
                 double minMZ = spsRange.Minimum;
                 double maxMZ = spsRange.Maximum;
 
@@ -130,7 +139,7 @@ namespace TomahaqCompanion
                 foreach(Fragment frag in kvp.Value)
                 {
                     //Calculate the range to look in
-                    MzRange spsRange = new MzRange(frag.ToMz(kvp.Key), new Tolerance(ToleranceUnit.PPM, 10));
+                    MzRange spsRange = new MzRange(frag.ToMz(kvp.Key), FragmentTol);
                     double minMZ = spsRange.Minimum;
                     double maxMZ = spsRange.Maximum;
 

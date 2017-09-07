@@ -62,6 +62,14 @@
             this.sitesBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.methodLengthBox = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.fragTolBox = new System.Windows.Forms.TextBox();
+            this.ppmRB = new System.Windows.Forms.RadioButton();
+            this.daRB = new System.Windows.Forms.RadioButton();
+            this.label9 = new System.Windows.Forms.Label();
+            this.rtWindowTextBox = new System.Windows.Forms.TextBox();
             this.primingRunBrowse = new System.Windows.Forms.Button();
             this.label100 = new System.Windows.Forms.Label();
             this.primingRawBox = new System.Windows.Forms.TextBox();
@@ -82,6 +90,8 @@
             this.analysisTab = new System.Windows.Forms.TabPage();
             this.targetSearchBox = new System.Windows.Forms.TextBox();
             this.paramTab = new System.Windows.Forms.TabPage();
+            this.xmlTextBox = new System.Windows.Forms.TextBox();
+            this.methodChangerAlone = new System.Windows.Forms.Button();
             this.targetOnlyFDB = new System.Windows.Forms.OpenFileDialog();
             this.templateMethodFDB = new System.Windows.Forms.OpenFileDialog();
             this.rawFileFDB = new System.Windows.Forms.OpenFileDialog();
@@ -91,8 +101,6 @@
             this.updateMethod = new System.Windows.Forms.Button();
             this.deselectAll = new System.Windows.Forms.Button();
             this.selectAll = new System.Windows.Forms.Button();
-            this.label9 = new System.Windows.Forms.Label();
-            this.rtWindowTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.targetGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.scanGridView)).BeginInit();
             this.tabControl.SuspendLayout();
@@ -105,6 +113,7 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.analysisTab.SuspendLayout();
+            this.paramTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // targetGridView
@@ -221,7 +230,7 @@
             // 
             this.logBox.Location = new System.Drawing.Point(6, 603);
             this.logBox.Name = "logBox";
-            this.logBox.Size = new System.Drawing.Size(1127, 58);
+            this.logBox.Size = new System.Drawing.Size(1105, 46);
             this.logBox.TabIndex = 57;
             this.logBox.Text = "";
             // 
@@ -449,6 +458,12 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label12);
+            this.groupBox3.Controls.Add(this.methodLengthBox);
+            this.groupBox3.Controls.Add(this.label10);
+            this.groupBox3.Controls.Add(this.fragTolBox);
+            this.groupBox3.Controls.Add(this.ppmRB);
+            this.groupBox3.Controls.Add(this.daRB);
             this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.rtWindowTextBox);
             this.groupBox3.Controls.Add(this.primingRunBrowse);
@@ -466,6 +481,95 @@
             this.groupBox3.TabIndex = 70;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Create TOMAHAQ Method";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(609, 117);
+            this.label12.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(104, 13);
+            this.label12.TabIndex = 85;
+            this.label12.Text = "Method Length (min)";
+            // 
+            // methodLengthBox
+            // 
+            this.methodLengthBox.AllowDrop = true;
+            this.methodLengthBox.Location = new System.Drawing.Point(593, 134);
+            this.methodLengthBox.Margin = new System.Windows.Forms.Padding(1);
+            this.methodLengthBox.Name = "methodLengthBox";
+            this.methodLengthBox.Size = new System.Drawing.Size(134, 20);
+            this.methodLengthBox.TabIndex = 84;
+            this.methodLengthBox.Text = "120";
+            this.methodLengthBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(425, 171);
+            this.label10.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(120, 13);
+            this.label10.TabIndex = 83;
+            this.label10.Text = "Fragment Ion Tolerance";
+            // 
+            // fragTolBox
+            // 
+            this.fragTolBox.AllowDrop = true;
+            this.fragTolBox.Location = new System.Drawing.Point(426, 191);
+            this.fragTolBox.Margin = new System.Windows.Forms.Padding(1);
+            this.fragTolBox.Name = "fragTolBox";
+            this.fragTolBox.Size = new System.Drawing.Size(134, 20);
+            this.fragTolBox.TabIndex = 82;
+            this.fragTolBox.Text = "10";
+            this.fragTolBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // ppmRB
+            // 
+            this.ppmRB.AutoSize = true;
+            this.ppmRB.Checked = true;
+            this.ppmRB.Location = new System.Drawing.Point(428, 215);
+            this.ppmRB.Name = "ppmRB";
+            this.ppmRB.Size = new System.Drawing.Size(51, 17);
+            this.ppmRB.TabIndex = 64;
+            this.ppmRB.TabStop = true;
+            this.ppmRB.Text = "PPM";
+            this.ppmRB.UseVisualStyleBackColor = true;
+            // 
+            // daRB
+            // 
+            this.daRB.AutoSize = true;
+            this.daRB.Location = new System.Drawing.Point(428, 238);
+            this.daRB.Name = "daRB";
+            this.daRB.Size = new System.Drawing.Size(42, 17);
+            this.daRB.TabIndex = 65;
+            this.daRB.TabStop = true;
+            this.daRB.Text = "DA";
+            this.daRB.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(425, 117);
+            this.label9.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(137, 13);
+            this.label9.TabIndex = 81;
+            this.label9.Text = "Targeting RT Window (min)";
+            // 
+            // rtWindowTextBox
+            // 
+            this.rtWindowTextBox.AllowDrop = true;
+            this.rtWindowTextBox.Location = new System.Drawing.Point(426, 134);
+            this.rtWindowTextBox.Margin = new System.Windows.Forms.Padding(1);
+            this.rtWindowTextBox.Name = "rtWindowTextBox";
+            this.rtWindowTextBox.Size = new System.Drawing.Size(134, 20);
+            this.rtWindowTextBox.TabIndex = 80;
+            this.rtWindowTextBox.Text = "20";
+            this.rtWindowTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // primingRunBrowse
             // 
@@ -691,6 +795,8 @@
             // 
             // paramTab
             // 
+            this.paramTab.Controls.Add(this.xmlTextBox);
+            this.paramTab.Controls.Add(this.methodChangerAlone);
             this.paramTab.Location = new System.Drawing.Point(4, 22);
             this.paramTab.Name = "paramTab";
             this.paramTab.Padding = new System.Windows.Forms.Padding(3);
@@ -698,6 +804,25 @@
             this.paramTab.TabIndex = 1;
             this.paramTab.Text = "Advanced Parameters";
             this.paramTab.UseVisualStyleBackColor = true;
+            // 
+            // xmlTextBox
+            // 
+            this.xmlTextBox.Location = new System.Drawing.Point(6, 15);
+            this.xmlTextBox.Name = "xmlTextBox";
+            this.xmlTextBox.Size = new System.Drawing.Size(828, 20);
+            this.xmlTextBox.TabIndex = 1;
+            this.xmlTextBox.Text = "C:\\Users\\lumos\\Desktop\\TestFiles\\SD\\TOMA_Trig_test_OTMS2_peptide+charge_method.xm" +
+    "l";
+            // 
+            // methodChangerAlone
+            // 
+            this.methodChangerAlone.Location = new System.Drawing.Point(840, 12);
+            this.methodChangerAlone.Name = "methodChangerAlone";
+            this.methodChangerAlone.Size = new System.Drawing.Size(151, 23);
+            this.methodChangerAlone.TabIndex = 0;
+            this.methodChangerAlone.Text = "Change Method";
+            this.methodChangerAlone.UseVisualStyleBackColor = true;
+            this.methodChangerAlone.Click += new System.EventHandler(this.methodChangerAlone_Click);
             // 
             // targetOnlyFDB
             // 
@@ -722,7 +847,7 @@
             // 
             // exportSELs
             // 
-            this.exportSELs.Location = new System.Drawing.Point(1344, 638);
+            this.exportSELs.Location = new System.Drawing.Point(1337, 622);
             this.exportSELs.Name = "exportSELs";
             this.exportSELs.Size = new System.Drawing.Size(160, 23);
             this.exportSELs.TabIndex = 60;
@@ -732,7 +857,7 @@
             // 
             // updateMethod
             // 
-            this.updateMethod.Location = new System.Drawing.Point(1344, 603);
+            this.updateMethod.Location = new System.Drawing.Point(1337, 599);
             this.updateMethod.Name = "updateMethod";
             this.updateMethod.Size = new System.Drawing.Size(160, 23);
             this.updateMethod.TabIndex = 61;
@@ -742,7 +867,7 @@
             // 
             // deselectAll
             // 
-            this.deselectAll.Location = new System.Drawing.Point(1152, 603);
+            this.deselectAll.Location = new System.Drawing.Point(1158, 599);
             this.deselectAll.Name = "deselectAll";
             this.deselectAll.Size = new System.Drawing.Size(160, 23);
             this.deselectAll.TabIndex = 62;
@@ -752,7 +877,7 @@
             // 
             // selectAll
             // 
-            this.selectAll.Location = new System.Drawing.Point(1152, 638);
+            this.selectAll.Location = new System.Drawing.Point(1158, 625);
             this.selectAll.Name = "selectAll";
             this.selectAll.Size = new System.Drawing.Size(160, 23);
             this.selectAll.TabIndex = 63;
@@ -760,34 +885,12 @@
             this.selectAll.UseVisualStyleBackColor = true;
             this.selectAll.Click += new System.EventHandler(this.selectAll_Click);
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(425, 117);
-            this.label9.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(137, 13);
-            this.label9.TabIndex = 81;
-            this.label9.Text = "Targeting RT Window (min)";
-            // 
-            // rtWindowTextBox
-            // 
-            this.rtWindowTextBox.AllowDrop = true;
-            this.rtWindowTextBox.Location = new System.Drawing.Point(426, 134);
-            this.rtWindowTextBox.Margin = new System.Windows.Forms.Padding(1);
-            this.rtWindowTextBox.Name = "rtWindowTextBox";
-            this.rtWindowTextBox.Size = new System.Drawing.Size(134, 20);
-            this.rtWindowTextBox.TabIndex = 80;
-            this.rtWindowTextBox.Text = "20";
-            this.rtWindowTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // TomahaqCompanionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1520, 666);
+            this.ClientSize = new System.Drawing.Size(1519, 668);
             this.Controls.Add(this.selectAll);
             this.Controls.Add(this.deselectAll);
             this.Controls.Add(this.updateMethod);
@@ -815,6 +918,8 @@
             this.groupBox2.PerformLayout();
             this.analysisTab.ResumeLayout(false);
             this.analysisTab.PerformLayout();
+            this.paramTab.ResumeLayout(false);
+            this.paramTab.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -885,6 +990,14 @@
         private System.Windows.Forms.Button selectAll;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox rtWindowTextBox;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox fragTolBox;
+        private System.Windows.Forms.RadioButton ppmRB;
+        private System.Windows.Forms.RadioButton daRB;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox methodLengthBox;
+        private System.Windows.Forms.TextBox xmlTextBox;
+        private System.Windows.Forms.Button methodChangerAlone;
     }
 }
 

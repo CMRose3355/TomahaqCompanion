@@ -42,6 +42,8 @@ namespace TomahaqCompanion
         private GraphPane SpectrumPane1;
         private GraphPane SpectrumPane2;
 
+        private Tolerance FragmentTol; 
+
         public TomahaqCompanionForm()
         {
             InitializeComponent();
@@ -107,6 +109,12 @@ namespace TomahaqCompanion
                 Analysis = false;
                 SPSIonsEdited = false;
 
+                FragmentTol = new Tolerance(ToleranceUnit.PPM, double.Parse(fragTolBox.Text));
+                if(daRB.Checked)
+                {
+                    FragmentTol = new Tolerance(ToleranceUnit.DA, double.Parse(fragTolBox.Text));
+                }
+
                 //Determine if a raw file was provided for the priming run
                 bool rawFileProvided = false;
                 if(primingRawBox.Text != "")
@@ -130,6 +138,7 @@ namespace TomahaqCompanion
                 bool chargeProvided = false;
                 SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, modificationDict, out chargeProvided);
 
+                double methodLength = double.Parse(methodLengthBox.Text);
                 //Iterate through the peptides, create ms1, ms2, and potentially ms3 lists
                 if (rawFileProvided)
                 {
@@ -137,11 +146,22 @@ namespace TomahaqCompanion
                     ThermoRawFile rawFile = new ThermoRawFile(primingRawBox.Text);
                     rawFile.Open();
 
+                    double actualMethodLength = rawFile.GetRetentionTime(rawFile.LastSpectrumNumber);
+                    actualMethodLength = Math.Round(actualMethodLength, 0);
+
+                    if(methodLength != actualMethodLength)
+                    {
+                        UpdateLog("Priming Run Method Length and User Input Method Length Do Not Match...Overriding User Input");
+                        methodLengthBox.Text = Math.Round(methodLength, 0).ToString();
+                        methodLength = actualMethodLength;
+                    }
+                    
+
                     //Build a map of the MS/MS scan events
                     UpdateLog("Mapping MS Scans");
                     Dictionary<int, int> TriggerMS2toMS1 = null;
-                    Dictionary<int, int> TriggerMS2toTargetMS2 = null;
-                    Dictionary<int, int> TargetMS2toTargetMS3 = null;
+                    Dictionary<int, List<int>> TriggerMS2toTargetMS2 = null;
+                    Dictionary<int, List<int>> TargetMS2toTargetMS3 = null;
                     List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
 
                     //Set the default values times for each target
@@ -171,7 +191,7 @@ namespace TomahaqCompanion
                     //If a raw file was provided then we will use that data for the target list
                     if (rawFileProvided)
                     {
-                        target.PopulatePrimingData();
+                        target.PopulatePrimingData(methodLength);
                         target.UpdateTargetIons(15);
                     }
 
@@ -217,7 +237,9 @@ namespace TomahaqCompanion
                 {
                     string templateMethod = templateBox.Text;
                     string outputMethod = targetFile.Replace(".csv", ".meth");
-                    MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod); //xmlFile // "C:\\Users\\lumos\\Desktop\\TestFiles\\David\\PeptidesTC_1peptide_method_static.xml"
+                    XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+
+                    UpdateLog("Writing method to " + outputMethod);
                 }
                 else
                 {
@@ -230,12 +252,27 @@ namespace TomahaqCompanion
             }
         }
 
+        private void methodChangerAlone_Click(object sender, EventArgs e)
+        {
+            string templateMethod = templateBox.Text;
+            string outputMethod = targetTextBox.Text.Replace(".csv", ".meth");
+            string xmlFile = xmlTextBox.Text;
+
+            XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+        }
+
         private void analyzeRun_Click(object sender, EventArgs e)
         {
             try
             {
                 Priming = false;
                 Analysis = true;
+
+                FragmentTol = new Tolerance(ToleranceUnit.PPM, double.Parse(fragTolBox.Text));
+                if (daRB.Checked)
+                {
+                    FragmentTol = new Tolerance(ToleranceUnit.DA, double.Parse(fragTolBox.Text));
+                }
 
                 //Import the modifications
                 UpdateLog("Importing Modifications");
@@ -261,8 +298,8 @@ namespace TomahaqCompanion
                 //Build a map of the MS/MS scan events
                 UpdateLog("Mapping MS Scans");
                 Dictionary<int, int> TriggerMS2toMS1 = null;
-                Dictionary<int, int> TriggerMS2toTargetMS2 = null;
-                Dictionary<int, int> TargetMS2toTargetMS3 = null;
+                Dictionary<int, List<int>> TriggerMS2toTargetMS2 = null;
+                Dictionary<int, List<int>> TargetMS2toTargetMS3 = null;
                 List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
 
                 //Extract MS1 Information
@@ -438,7 +475,7 @@ namespace TomahaqCompanion
                     //
                     for (int charge = minCharge; charge <= maxCharge;charge++)
                     {
-                        TargetPeptide target = new TargetPeptide(peptideString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime);
+                        TargetPeptide target = new TargetPeptide(peptideString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol);
 
                         TargetPeptide outPep = null;
                         double mz = target.Trigger.ToMz(charge);
@@ -474,12 +511,12 @@ namespace TomahaqCompanion
             return targetSPSIons;
         }
 
-        private List<int> MapMSDataScans(ThermoRawFile rawFile, out Dictionary<int, int> TriggerMS2toMS1, out Dictionary<int, int> TriggerMS2toTargetMS2, out Dictionary<int, int> TargetMS2toTargetMS3)
+        private List<int> MapMSDataScans(ThermoRawFile rawFile, out Dictionary<int, int> TriggerMS2toMS1, out Dictionary<int, List<int>> TriggerMS2toTargetMS2, out Dictionary<int, List<int>> TargetMS2toTargetMS3)
         {
             List<int> ms1List = new List<int>();
             TriggerMS2toMS1 = new Dictionary<int, int>();
-            TriggerMS2toTargetMS2 = new Dictionary<int, int>();
-            TargetMS2toTargetMS3 = new Dictionary<int, int>();
+            TriggerMS2toTargetMS2 = new Dictionary<int, List<int>>();
+            TargetMS2toTargetMS3 = new Dictionary<int, List<int>>();
 
             int lastSpectrumNumber = rawFile.LastSpectrumNumber;
 
@@ -497,7 +534,17 @@ namespace TomahaqCompanion
                 //If it is an MS3 then make the connection to the target MS2
                 else if (msnOrder == 3)
                 {
-                    TargetMS2toTargetMS3.Add(rawFile.GetParentSpectrumNumber(i), i);
+                    List<int> outList = null;
+                    if(TargetMS2toTargetMS3.TryGetValue(rawFile.GetParentSpectrumNumber(i), out outList))
+                    {
+                        outList.Add(i);
+                    }
+                    else
+                    {
+                        TargetMS2toTargetMS3.Add(rawFile.GetParentSpectrumNumber(i), new List<int>());
+                        TargetMS2toTargetMS3[rawFile.GetParentSpectrumNumber(i)].Add(i);
+                    }
+                    
                 }
                 //If it is an MS2 then it could be a trigger or target
                 else if (msnOrder == 2)
@@ -508,7 +555,17 @@ namespace TomahaqCompanion
                     //If the parent order is 2 then this is a target ms2 and the parent is the trigger
                     if (parentOrder == 2)
                     {
-                        TriggerMS2toTargetMS2.Add(parentScanNumber, i);
+
+                        List<int> outList = null;
+                        if (TriggerMS2toTargetMS2.TryGetValue(parentScanNumber, out outList))
+                        {
+                            outList.Add(i);
+                        }
+                        else
+                        {
+                            TriggerMS2toTargetMS2.Add(parentScanNumber, new List<int>());
+                            TriggerMS2toTargetMS2[parentScanNumber].Add(i);
+                        }
                     }
                     //If the parent order is 1 then this is a trigger ms2 and the parent is an MS1
                     else if (parentOrder == 1)
@@ -535,11 +592,17 @@ namespace TomahaqCompanion
             }
         }
 
-        private void ExtractData(ThermoRawFile rawFile, Dictionary<int, int> TriggerMS2toMS1, Dictionary<int, int> TriggerMS2toTargetMS2, Dictionary<int, int> TargetMS2toTargetMS3, SortedList<double, TargetPeptide> targetList, Dictionary<string, double> quantChannelDict)
+        private void ExtractData(ThermoRawFile rawFile, Dictionary<int, int> TriggerMS2toMS1, Dictionary<int, List<int>> TriggerMS2toTargetMS2, Dictionary<int, List<int>> TargetMS2toTargetMS3, SortedList<double, TargetPeptide> targetList, Dictionary<string, double> quantChannelDict)
         {
             //Cycle through the trigger MS2 scan numbers
             foreach (int scanNumber in TriggerMS2toMS1.Keys)
             {
+                Console.WriteLine(scanNumber);
+                if(scanNumber == 26118)
+                {
+                    int a = 0;
+                }
+
                 int ms1ScanNumber = TriggerMS2toMS1[scanNumber];
 
                 double rt = rawFile.GetRetentionTime(scanNumber);
@@ -571,7 +634,7 @@ namespace TomahaqCompanion
                         targetPeptide.AddTriggerData(ms1ScanNumber, scanNumber, spectrum, rt, it);
 
                         //If we found a trigger peptide then see if we then targeted it
-                        int targetScanNumber = 0;
+                        List<int> targetScanNumber = null;
                         if (TriggerMS2toTargetMS2.TryGetValue(scanNumber, out targetScanNumber))
                         {
                             //If we did an ms2 on the target peptides then get that data as well
@@ -579,38 +642,44 @@ namespace TomahaqCompanion
                         }
                     }
                 }
+
+                int b = 0;
             }
         }
 
-        private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile, int ms1ScanNumber, int targetScanNumber, Dictionary<int, int> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
+        private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile, int ms1ScanNumber, List<int> targetScanNumbers, Dictionary<int, List<int>> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
         {
-            //Grab all of the data for the target and add that data
-            double rt = rawFile.GetRetentionTime(targetScanNumber);
-            double it = rawFile.GetInjectionTime(targetScanNumber);
-            ThermoSpectrum spectrum = rawFile.GetSpectrum(targetScanNumber);
+            foreach(int targetScanNumber in targetScanNumbers)
+            {
+                //Grab all of the data for the target and add that data
+                double rt = rawFile.GetRetentionTime(targetScanNumber);
+                double it = rawFile.GetInjectionTime(targetScanNumber);
+                ThermoSpectrum spectrum = rawFile.GetSpectrum(targetScanNumber);
 
-            //If we found a target peptide then see if we did an MS3
-            int ms3ScanNumber = 0;
-            double ms3rt = 0;
-            double ms3it = 0;
-            List<double> spsIons = new List<double>();
-            ThermoSpectrum ms3spectrum = null;
-            if (TargetMS2toTargetMS3.TryGetValue(targetScanNumber, out ms3ScanNumber))
-            {
-                ms3rt = rawFile.GetRetentionTime(ms3ScanNumber);
-                ms3it = rawFile.GetInjectionTime(ms3ScanNumber);
-                ms3spectrum = rawFile.GetSpectrum(ms3ScanNumber);
-                spsIons = rawFile.GetSPSMasses(ms3ScanNumber); 
-            }
+                //If we found a target peptide then see if we did an MS3
+                List<int> ms3ScanNumbers = null;
+                if (TargetMS2toTargetMS3.TryGetValue(targetScanNumber, out ms3ScanNumbers))
+                {
+                    foreach(int ms3ScanNumber in ms3ScanNumbers)
+                    {
+                        double ms3rt = 0;
+                        double ms3it = 0;
+                        List<double> spsIons = new List<double>();
+                        ThermoSpectrum ms3spectrum = null;
 
-            //Add the target data and if there was an MS3 add that data too
-            if (ms3spectrum == null)
-            {
-                targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it);
-            }
-            else
-            {
-                targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, spsIons, quantChannelDict);
+                        ms3rt = rawFile.GetRetentionTime(ms3ScanNumber);
+                        ms3it = rawFile.GetInjectionTime(ms3ScanNumber);
+                        ms3spectrum = rawFile.GetSpectrum(ms3ScanNumber);
+                        spsIons = rawFile.GetSPSMasses(ms3ScanNumber);
+
+                        //Add the target data and if there was an MS3 add that data too
+                        targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, spsIons, quantChannelDict);
+                    }
+                }
+                else
+                {
+                    targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it);
+                }
             }
         }
 
@@ -911,6 +980,7 @@ namespace TomahaqCompanion
 
             Modification ox = new Modification(15.99491, "OX", ModificationSites.M);
             Modification phos = new Modification(79.96633, "Phos", ModificationSites.S | ModificationSites.T | ModificationSites.Y);
+            Modification acetyl = new Modification(42.01056, "Acetyl", ModificationSites.A | ModificationSites.M);
 
             Modification ggTMT0 = new Modification(338.195378, "ggTMT0", ModificationSites.K);
             Modification ggTMT2 = new Modification(339.20123, "ggTMT2", ModificationSites.K);
@@ -943,6 +1013,7 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("C6N1", Math.Round(C6N1.MonoisotopicMass, 5), "I,L", "@", "Dynamic", false, false, C6N1));
             ModLines.Add(new ModificationLine("C9N1", Math.Round(C9N1.MonoisotopicMass, 5), "F,Y", "^", "Dynamic", false, false, C9N1));
             ModLines.Add(new ModificationLine("TMT10OL", Math.Round(tmt10OL.MonoisotopicMass, 5), "S,T,Y,H", "$", "Dynamic", false, false, tmt10OL));
+            ModLines.Add(new ModificationLine("Acetyl", Math.Round(acetyl.MonoisotopicMass, 5), "A,M", "@", "Dynamic", false, false, acetyl));
 
             //ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
         }
@@ -1202,12 +1273,12 @@ namespace TomahaqCompanion
             triggerPoints.Symbol.Border.Width = 2.0F;
             triggerPoints.Symbol.Size = 10.0F;
 
-            LineItem targetMS2Points = MS1Pane.AddCurve("Trigger MS2s", target.TargetMS2Points, Color.Blue, SymbolType.Circle);
+            LineItem targetMS2Points = MS1Pane.AddCurve("Target MS2s", target.TargetMS2Points, Color.Blue, SymbolType.Circle);
             targetMS2Points.Line.IsVisible = false;
             targetMS2Points.Symbol.Border.Width = 2.0F;
             targetMS2Points.Symbol.Size = 10.0F;
 
-            LineItem targetMS3Points = MS1Pane.AddCurve("Trigger MS2s", target.TargetMS3Points, Color.Teal, SymbolType.Circle);
+            LineItem targetMS3Points = MS1Pane.AddCurve("Target MS3s", target.TargetMS3Points, Color.Teal, SymbolType.Circle);
             targetMS3Points.Line.IsVisible = false;
             targetMS3Points.Symbol.Border.Width = 2.0F;
             targetMS3Points.Symbol.Size = 10.0F;
@@ -1265,8 +1336,8 @@ namespace TomahaqCompanion
             TargetPeptide target = TargetsDisplayed[index].Peptide;
 
             SpectrumPane1.CurveList.Clear();
-            SpectrumPane1.Title.Text = "Target MS2 Spectrum";
-            SpectrumPane1.AddStick("Target Spectrum", ms2.AllPeaks, Color.Black);
+            SpectrumPane1.Title.Text = "Trigger MS2 Spectrum";
+            SpectrumPane1.AddStick("Trigger Spectrum", ms2.AllPeaks, Color.Black);
 
             LineItem spsStars = SpectrumPane1.AddCurve("SPS Ions", ms2.SPSPeaks, Color.Red, SymbolType.Star);
             spsStars.Symbol.Fill.Color = Color.Red;
