@@ -693,14 +693,7 @@ namespace TomahaqCompanion
 
             //Only change the retention times if we found the peptide within the run
             //TODO: Change this so that it can be a user option
-            if (MaxRetentionTime > 0 && StartRetentionTime == -1)
-            {
-                StartRetentionTime = maxTime - (RTWindow / 2);
-                EndRetentionTime = maxTime + (RTWindow / 2);
-
-                if(EndRetentionTime > MethodEndTime) { EndRetentionTime = MethodEndTime; }
-                if (StartRetentionTime < 0) { StartRetentionTime = 0; }
-            }
+            UpdateRTWindow(maxTime);
 
             //Add the points to mark when the trigger ms2 scans were performed
             TriggerMS2Points = new PointPairList();
@@ -723,10 +716,10 @@ namespace TomahaqCompanion
             AverageScanEventsLines(ScanEventLines, 5);
         }
 
-        public void AverageScanEventsLines(List<ScanEventLine> scanEventLines, int topN)
+        public void AverageScanEventsLines(List<ScanEventLine> scanEventLines, int topN, bool includeAll = false)
         {
             //Determine if you have less scan event lines than top N
-            if (scanEventLines.Count < topN)
+            if (scanEventLines.Count < topN || includeAll)
             {
                 topN = scanEventLines.Count;
             }
@@ -759,14 +752,18 @@ namespace TomahaqCompanion
             TargetCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
             TargetCompositeMS2Points = new PointPairList();
 
+            List<double> scanRTs = new List<double>();
+
             //Average the spectrum
             for (int i = 0; i < topN; i++)
             {
                 //Get the scan event line that you are going to average
                 ScanEventLine sel = scanEventLines[i];
-                
+
+                scanRTs.Add(double.Parse(sel.MS2RetentionTime));
+
                 //Cycle through the matched fragment dictionary
-                foreach(KeyValuePair<int, Dictionary<Fragment, double>> kvp in sel.ScanEvent.MatchedFragDict)
+                foreach (KeyValuePair<int, Dictionary<Fragment, double>> kvp in sel.ScanEvent.MatchedFragDict)
                 {
                     //The current charge
                     int charge = kvp.Key;
@@ -837,7 +834,12 @@ namespace TomahaqCompanion
 
             }
 
-            foreach(KeyValuePair<double, ThermoMzPeak> kvp in TargetCompositeSpectrum)
+            //Update the RT window based on the User input
+            double avgRT = scanRTs.Average();
+            UpdateRTWindow(avgRT, force:includeAll);
+
+
+            foreach (KeyValuePair<double, ThermoMzPeak> kvp in TargetCompositeSpectrum)
             {
                 ThermoMzPeak peak = kvp.Value;
                 TargetCompositeMS2Points.Add(peak.MZ, peak.Intensity);
@@ -951,6 +953,20 @@ namespace TomahaqCompanion
             for (int i = 1; i < 10; i++)
             {
                 TargetSPSFrags.Add(i, new Dictionary<string, double>());
+            }
+        }
+
+        private void UpdateRTWindow(double centerRT, bool force = false)
+        {
+            //Only change the retention times if we found the peptide within the run
+            //TODO: Change this so that it can be a user option
+            if ((MaxRetentionTime > 0 && StartRetentionTime == -1) || force) 
+            {
+                StartRetentionTime = centerRT - (RTWindow / 2);
+                EndRetentionTime = centerRT + (RTWindow / 2);
+
+                if (EndRetentionTime > MethodEndTime) { EndRetentionTime = MethodEndTime; }
+                if (StartRetentionTime < 0) { StartRetentionTime = 0; }
             }
         }
     }

@@ -41,6 +41,8 @@ namespace TomahaqCompanion
         private GraphPane MS1Pane;
         private GraphPane SpectrumPane1;
         private GraphPane SpectrumPane2;
+        private double MouseDownTime;
+        private double MouseUpTime;
 
         private Tolerance FragmentTol; 
 
@@ -51,6 +53,9 @@ namespace TomahaqCompanion
             //
             Analysis = false;
             Priming = false;
+
+            MouseDownTime = 0;
+            MouseUpTime = 0;
 
             //Initialize the Target Grid View
             Targets = new BindingList<TargetPeptideLine>();
@@ -1765,7 +1770,7 @@ namespace TomahaqCompanion
                     }
                 }
 
-                target.AverageScanEventsLines(target.SelectedScanEventLines,target.SelectedScanEventLines.Count);
+                target.AverageScanEventsLines(target.SelectedScanEventLines,target.SelectedScanEventLines.Count, includeAll:true);
                 target.UpdateTargetIons(15, spsEdited:SPSIonsEdited);
 
                 //target.PopulateTriggerAndTargetIons(20, force:true); //Is this necessary - if we are here there is a raw file
@@ -2063,5 +2068,80 @@ namespace TomahaqCompanion
             scanGridView.Refresh();
         }
 
+        private bool ms1GraphControl_MouseDownEvent(ZedGraphControl sender, MouseEventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Alt) != 0)
+            {
+                double X = 0;
+                double Y = 0;
+                PointF mousePt = new PointF(e.X, e.Y);
+                MS1Pane.ReverseTransform(mousePt, out X, out Y);
+
+                MouseDownTime = X;
+            }
+            return false;
+        }
+
+        private bool ms1GraphControl_MouseUpEvent(ZedGraphControl sender, MouseEventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Alt) != 0)
+            {
+                double X = 0;
+                double Y = 0;
+                PointF mousePt = new PointF(e.X, e.Y);
+                MS1Pane.ReverseTransform(mousePt, out X, out Y);
+
+                MouseUpTime = X;
+
+                HighlightPlot();
+
+                SelectScansRange();
+            }
+            return false;
+        }
+
+        private void HighlightPlot()
+        {
+            MS1Pane.GraphObjList.Clear();
+            BoxObj box = new BoxObj(MouseDownTime, MS1Pane.YAxis.Scale.Max, MouseUpTime - MouseDownTime, MS1Pane.YAxis.Scale.Max, Color.DeepSkyBlue, Color.White, Color.SkyBlue);
+            box.IsVisible = true;
+            box.Fill.Color = Color.Transparent;
+            box.Location.CoordinateFrame = CoordType.AxisXYScale;
+
+            box.ZOrder = ZOrder.E_BehindCurves;
+            ms1GraphControl.GraphPane.GraphObjList.Add(box);
+
+            ms1GraphControl.Refresh();
+        }
+
+        private void SelectScansRange()
+        {
+            double start = MouseDownTime;
+            double stop = MouseUpTime;
+
+            //We need to get the index of the target that is selected in the GUI
+            int index = 0;
+            if (targetGridView.CurrentCell != null)
+            {
+                index = targetGridView.CurrentCell.RowIndex;
+            }
+
+            //With the index we can get the target from the displayed list of targets
+            TargetPeptide target = TargetsDisplayed[index].Peptide;
+
+            foreach (ScanEventLine sel in target.ScanEventLines)
+            {
+                if (double.Parse(sel.MS2RetentionTime) >= start && double.Parse(sel.MS2RetentionTime) <= stop)
+                {
+                    sel.Include = true;
+                }
+                else
+                {
+                    sel.Include = false;
+                }
+            }
+
+            scanGridView.Refresh();
+        }
     }
 }
