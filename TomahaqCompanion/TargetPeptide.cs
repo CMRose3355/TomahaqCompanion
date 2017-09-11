@@ -859,12 +859,15 @@ namespace TomahaqCompanion
             }
 
             //Update the RT window based on the User input
-            double avgRT = scanRTs.Average();
-            UpdateRTWindow(avgRT, force:includeAll);
 
-            StartSelectionTime = scanRTs.Min() - 0.01;
-            EndSelectionTime = scanRTs.Max()  + 0.01;
+            if(scanRTs.Count > 0 )
+            {
+                double avgRT = scanRTs.Average();
+                UpdateRTWindow(avgRT, force: includeAll);
 
+                StartSelectionTime = scanRTs.Min() - 0.01;
+                EndSelectionTime = scanRTs.Max() + 0.01;
+            }
 
             foreach (KeyValuePair<double, ThermoMzPeak> kvp in TargetCompositeSpectrum)
             {
