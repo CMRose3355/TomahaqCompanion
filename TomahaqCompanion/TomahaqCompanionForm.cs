@@ -108,8 +108,8 @@ namespace TomahaqCompanion
 
         private void createMethod_Click_1(object sender, EventArgs e)
         {
-            try
-            {
+            //try
+            //{
                 Priming = true;
                 Analysis = false;
                 SPSIonsEdited = false;
@@ -250,11 +250,11 @@ namespace TomahaqCompanion
                 {
                     UpdateLog("Cannot Create New Method Because No Template Was Provided");
                 }
-            }
-            catch (Exception exp)
-            {
-                UpdateLog("Error! " + exp.Message);
-            }
+            //}
+            //catch (Exception exp)
+            //{
+            //    UpdateLog("Error! " + exp.Message);
+            //}
         }
 
         private void methodChangerAlone_Click(object sender, EventArgs e)
@@ -346,6 +346,12 @@ namespace TomahaqCompanion
                 UpdateLog("Error! " + exp.Message);
             }
         }
+
+        private void updateMethod_Click(object sender, EventArgs e)
+        {
+            updateInstrumentMethod();
+        }
+
 
         //Below are the methods and functions that are called from the buttons above
         private Dictionary<string, Dictionary<string, double>> BiuldQuantificationDictionary()
@@ -2024,14 +2030,7 @@ namespace TomahaqCompanion
         {
         }
 
-
-
         #endregion
-
-        private void updateMethod_Click(object sender, EventArgs e)
-        {
-            updateInstrumentMethod();
-        }
 
         private void deselectAll_Click(object sender, EventArgs e)
         {
