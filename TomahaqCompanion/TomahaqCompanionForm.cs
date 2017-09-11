@@ -216,14 +216,14 @@ namespace TomahaqCompanion
 
                 //Now we can populate the final
                 Targets.Clear();
-                TargetsDisplayed.Clear();
 
                 foreach (TargetPeptide target in targets)
                 {
                     //This is building the target line that will go into the GUI
                     Targets.Add(new TargetPeptideLine(target));
-                    TargetsDisplayed.Add(new TargetPeptideLine(target));
                 }
+
+                DisplayTargets();
 
                 printAllTomahaqData();
 
@@ -1008,6 +1008,7 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("NEM", Math.Round(nem.MonoisotopicMass, 5), "C", "", "Static", false, false, nem));
             ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, true, ox));
             ModLines.Add(new ModificationLine("Phos", Math.Round(phos.MonoisotopicMass, 5), "S,T,Y", "#", "Dynamic", false, false, phos));
+            ModLines.Add(new ModificationLine("Acetyl", Math.Round(acetyl.MonoisotopicMass, 5), "NPep", "@", "Dynamic", false, false, acetyl));
             ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT0));
             ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT2));
             ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
@@ -1018,7 +1019,7 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("C6N1", Math.Round(C6N1.MonoisotopicMass, 5), "I,L", "@", "Dynamic", false, false, C6N1));
             ModLines.Add(new ModificationLine("C9N1", Math.Round(C9N1.MonoisotopicMass, 5), "F,Y", "^", "Dynamic", false, false, C9N1));
             ModLines.Add(new ModificationLine("TMT10OL", Math.Round(tmt10OL.MonoisotopicMass, 5), "S,T,Y,H", "$", "Dynamic", false, false, tmt10OL));
-            ModLines.Add(new ModificationLine("Acetyl", Math.Round(acetyl.MonoisotopicMass, 5), "A,M", "@", "Dynamic", false, false, acetyl));
+           
 
             //ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
         }
@@ -1204,11 +1205,7 @@ namespace TomahaqCompanion
         private void UpdatePlotsPriming(TargetPeptide target)
         {
             //Populate the scan Events Table
-            ScanEvents.Clear();
-            foreach (ScanEventLine scanEvent in target.ScanEventLines)
-            {
-                ScanEvents.Add(scanEvent);
-            }
+            UpdateScanGridMembers(target);
 
             //This will plot the MS1 XIC for the trigger peptide
             UpdateMS1XICsPlot(target);
@@ -1232,17 +1229,7 @@ namespace TomahaqCompanion
         private void UpdatePlotsAnalysis(TargetPeptide target)
         {
             //Populate the scan Events Table
-            ScanEvents.Clear();
-            foreach (ScanEventLine scanEvent in target.ScanEventLines)
-            {
-                //For right now I am only including scans where an MS3 was performed
-                //This could be something that we could change in the future or make it
-                //so that people can choose to see scans w/o an MS3
-                if(scanEvent.ScanEvent.MS3 != null)
-                {
-                    ScanEvents.Add(scanEvent);
-                }
-            }
+            UpdateScanGridMembers(target);
 
             //This will update the XIC plots for the trigger and the target peptides
             UpdateMS1XICsPlot(target);
@@ -1289,6 +1276,8 @@ namespace TomahaqCompanion
             targetMS3Points.Symbol.Size = 10.0F;
 
             MS1Pane.Legend.FontSpec.Size = 20f;
+
+            HighlightPlot(target.StartSelectionTime, target.EndSelectionTime);
 
             ms1GraphControl.AxisChange();
             ms1GraphControl.Refresh();
@@ -1366,6 +1355,22 @@ namespace TomahaqCompanion
 
             spectrumGraphControl2.AxisChange();
             spectrumGraphControl2.Refresh();
+        }
+
+        private void UpdateScanGridMembers(TargetPeptide target)
+        {
+            //Populate the scan Events Table
+            ScanEvents.Clear();
+            foreach (ScanEventLine scanEvent in target.ScanEventLines)
+            {
+                //For right now I am only including scans where an MS3 was performed
+                //This could be something that we could change in the future or make it
+                //so that people can choose to see scans w/o an MS3
+                if ((Priming || (!Priming && scanEvent.ScanEvent.MS3 != null)) && (!displaySelected.Checked || (displaySelected.Checked && scanEvent.Include)))
+                {
+                    ScanEvents.Add(scanEvent);
+                }
+            }
         }
 
         #endregion
@@ -2084,6 +2089,7 @@ namespace TomahaqCompanion
 
         private bool ms1GraphControl_MouseUpEvent(ZedGraphControl sender, MouseEventArgs e)
         {
+
             if ((Control.ModifierKeys & Keys.Alt) != 0)
             {
                 double X = 0;
@@ -2093,20 +2099,29 @@ namespace TomahaqCompanion
 
                 MouseUpTime = X;
 
-                HighlightPlot();
+                if (MouseUpTime < MouseDownTime)
+                {
+                    double tempVar = MouseUpTime;
+                    MouseUpTime = MouseDownTime;
+                    MouseDownTime = tempVar;
+                }
+
+                HighlightPlot(MouseDownTime, MouseUpTime);
 
                 SelectScansRange();
             }
             return false;
         }
 
-        private void HighlightPlot()
+        private void HighlightPlot(double start, double stop)
         {
             MS1Pane.GraphObjList.Clear();
-            BoxObj box = new BoxObj(MouseDownTime, MS1Pane.YAxis.Scale.Max, MouseUpTime - MouseDownTime, MS1Pane.YAxis.Scale.Max, Color.DeepSkyBlue, Color.White, Color.SkyBlue);
+            BoxObj box = new BoxObj(start, 1000000000000000, stop - start, 1000000000000000, Color.DeepSkyBlue, Color.White, Color.SkyBlue);
             box.IsVisible = true;
             box.Fill.Color = Color.Transparent;
             box.Location.CoordinateFrame = CoordType.AxisXYScale;
+
+            box.IsClippedToChartRect = true;
 
             box.ZOrder = ZOrder.E_BehindCurves;
             ms1GraphControl.GraphPane.GraphObjList.Add(box);
@@ -2119,6 +2134,7 @@ namespace TomahaqCompanion
             double start = MouseDownTime;
             double stop = MouseUpTime;
 
+            
             //We need to get the index of the target that is selected in the GUI
             int index = 0;
             if (targetGridView.CurrentCell != null)
@@ -2128,6 +2144,9 @@ namespace TomahaqCompanion
 
             //With the index we can get the target from the displayed list of targets
             TargetPeptide target = TargetsDisplayed[index].Peptide;
+
+            target.StartSelectionTime = start;
+            target.EndSelectionTime = stop;
 
             foreach (ScanEventLine sel in target.ScanEventLines)
             {
@@ -2141,7 +2160,45 @@ namespace TomahaqCompanion
                 }
             }
 
+            UpdateScanGridMembers(target);
+
             scanGridView.Refresh();
+        }
+
+        private void displaySelected_CheckedChanged(object sender, EventArgs e)
+        {
+            //We need to get the index of the target that is selected in the GUI
+            int index = 0;
+            if (targetGridView.CurrentCell != null)
+            {
+                index = targetGridView.CurrentCell.RowIndex;
+            }
+
+            //With the index we can get the target from the displayed list of targets
+            TargetPeptide target = TargetsDisplayed[index].Peptide;
+
+            UpdateScanGridMembers(target);
+        }
+
+        private void DisplayTargets()
+        {
+            TargetsDisplayed.Clear();
+
+            foreach (TargetPeptideLine targetLine in Targets)
+            {
+                //This is building the target line that will go into the GUI
+                if(!displayTargetsWData.Checked || (displayTargetsWData.Checked && targetLine.Peptide.ScanEventLines.Count > 0))
+                {
+                    TargetsDisplayed.Add(targetLine);
+                }
+                
+            }
+
+        }
+
+        private void displayTargetsWData_CheckedChanged(object sender, EventArgs e)
+        {
+            DisplayTargets();
         }
     }
 }

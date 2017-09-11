@@ -88,6 +88,12 @@
             this.targetBoxBrowse = new System.Windows.Forms.Button();
             this.targetTextBox = new System.Windows.Forms.TextBox();
             this.analysisTab = new System.Windows.Forms.TabPage();
+            this.displayTargetsWData = new System.Windows.Forms.CheckBox();
+            this.displaySelected = new System.Windows.Forms.CheckBox();
+            this.selectAll = new System.Windows.Forms.Button();
+            this.deselectAll = new System.Windows.Forms.Button();
+            this.exportSELs = new System.Windows.Forms.Button();
+            this.updateMethod = new System.Windows.Forms.Button();
             this.targetSearchBox = new System.Windows.Forms.TextBox();
             this.paramTab = new System.Windows.Forms.TabPage();
             this.xmlTextBox = new System.Windows.Forms.TextBox();
@@ -97,10 +103,6 @@
             this.rawFileFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawOFDia = new System.Windows.Forms.OpenFileDialog();
-            this.exportSELs = new System.Windows.Forms.Button();
-            this.updateMethod = new System.Windows.Forms.Button();
-            this.deselectAll = new System.Windows.Forms.Button();
-            this.selectAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.targetGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.scanGridView)).BeginInit();
             this.tabControl.SuspendLayout();
@@ -119,15 +121,15 @@
             // targetGridView
             // 
             this.targetGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.targetGridView.Location = new System.Drawing.Point(4, 33);
+            this.targetGridView.Location = new System.Drawing.Point(3, 34);
             this.targetGridView.Name = "targetGridView";
-            this.targetGridView.Size = new System.Drawing.Size(441, 530);
+            this.targetGridView.Size = new System.Drawing.Size(441, 520);
             this.targetGridView.TabIndex = 0;
             this.targetGridView.SelectionChanged += new System.EventHandler(this.targetGridView_SelectionChanged);
             // 
             // sortTargetsMZ
             // 
-            this.sortTargetsMZ.Location = new System.Drawing.Point(289, 5);
+            this.sortTargetsMZ.Location = new System.Drawing.Point(6, 560);
             this.sortTargetsMZ.Name = "sortTargetsMZ";
             this.sortTargetsMZ.Size = new System.Drawing.Size(75, 23);
             this.sortTargetsMZ.TabIndex = 42;
@@ -137,7 +139,7 @@
             // 
             // sortTargetsRT
             // 
-            this.sortTargetsRT.Location = new System.Drawing.Point(370, 6);
+            this.sortTargetsRT.Location = new System.Drawing.Point(87, 560);
             this.sortTargetsRT.Name = "sortTargetsRT";
             this.sortTargetsRT.Size = new System.Drawing.Size(75, 23);
             this.sortTargetsRT.TabIndex = 41;
@@ -171,6 +173,8 @@
             this.ms1GraphControl.Size = new System.Drawing.Size(1038, 190);
             this.ms1GraphControl.TabIndex = 46;
             this.ms1GraphControl.UseExtendedPrintDialog = true;
+            this.ms1GraphControl.MouseDownEvent += new ZedGraph.ZedGraphControl.ZedMouseEventHandler(this.ms1GraphControl_MouseDownEvent);
+            this.ms1GraphControl.MouseUpEvent += new ZedGraph.ZedGraphControl.ZedMouseEventHandler(this.ms1GraphControl_MouseUpEvent);
             this.ms1GraphControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ms1GraphControl_MouseClick);
             // 
             // spectrumGraphControl1
@@ -185,7 +189,7 @@
             this.spectrumGraphControl1.ScrollMinX = 0D;
             this.spectrumGraphControl1.ScrollMinY = 0D;
             this.spectrumGraphControl1.ScrollMinY2 = 0D;
-            this.spectrumGraphControl1.Size = new System.Drawing.Size(523, 192);
+            this.spectrumGraphControl1.Size = new System.Drawing.Size(523, 179);
             this.spectrumGraphControl1.TabIndex = 47;
             this.spectrumGraphControl1.UseExtendedPrintDialog = true;
             this.spectrumGraphControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.spectrumGraphControl1_MouseClick);
@@ -203,23 +207,23 @@
             this.spectrumGraphControl2.ScrollMinX = 0D;
             this.spectrumGraphControl2.ScrollMinY = 0D;
             this.spectrumGraphControl2.ScrollMinY2 = 0D;
-            this.spectrumGraphControl2.Size = new System.Drawing.Size(506, 192);
+            this.spectrumGraphControl2.Size = new System.Drawing.Size(506, 179);
             this.spectrumGraphControl2.TabIndex = 49;
             this.spectrumGraphControl2.UseExtendedPrintDialog = true;
             // 
             // scanGridView
             // 
             this.scanGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.scanGridView.Location = new System.Drawing.Point(452, 417);
+            this.scanGridView.Location = new System.Drawing.Point(452, 401);
             this.scanGridView.Name = "scanGridView";
-            this.scanGridView.Size = new System.Drawing.Size(1039, 146);
+            this.scanGridView.Size = new System.Drawing.Size(1039, 153);
             this.scanGridView.TabIndex = 52;
             this.scanGridView.SelectionChanged += new System.EventHandler(this.scanGridView_SelectionChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(449, 401);
+            this.label5.Location = new System.Drawing.Point(449, 385);
             this.label5.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 13);
@@ -228,9 +232,9 @@
             // 
             // logBox
             // 
-            this.logBox.Location = new System.Drawing.Point(6, 603);
+            this.logBox.Location = new System.Drawing.Point(6, 623);
             this.logBox.Name = "logBox";
-            this.logBox.Size = new System.Drawing.Size(1105, 46);
+            this.logBox.Size = new System.Drawing.Size(1502, 39);
             this.logBox.TabIndex = 57;
             this.logBox.Text = "";
             // 
@@ -242,7 +246,7 @@
             this.tabControl.Location = new System.Drawing.Point(2, 2);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1506, 595);
+            this.tabControl.Size = new System.Drawing.Size(1506, 615);
             this.tabControl.TabIndex = 59;
             // 
             // methodTab
@@ -259,7 +263,7 @@
             this.methodTab.Controls.Add(this.groupBox2);
             this.methodTab.Location = new System.Drawing.Point(4, 22);
             this.methodTab.Name = "methodTab";
-            this.methodTab.Size = new System.Drawing.Size(1498, 569);
+            this.methodTab.Size = new System.Drawing.Size(1498, 589);
             this.methodTab.TabIndex = 3;
             this.methodTab.Text = "TOMAHAQ File Loader and Method Builder";
             this.methodTab.UseVisualStyleBackColor = true;
@@ -269,7 +273,7 @@
             this.groupBox4.Controls.Add(this.label8);
             this.groupBox4.Controls.Add(this.primingTargetList);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox4.Location = new System.Drawing.Point(10, 102);
+            this.groupBox4.Location = new System.Drawing.Point(10, 111);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(958, 58);
             this.groupBox4.TabIndex = 76;
@@ -305,7 +309,7 @@
             this.groupBox5.Controls.Add(this.rawFileBox);
             this.groupBox5.Controls.Add(this.label3);
             this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox5.Location = new System.Drawing.Point(10, 458);
+            this.groupBox5.Location = new System.Drawing.Point(10, 481);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(958, 100);
             this.groupBox5.TabIndex = 78;
@@ -355,7 +359,7 @@
             // 
             // addUserModifications
             // 
-            this.addUserModifications.Location = new System.Drawing.Point(1364, 379);
+            this.addUserModifications.Location = new System.Drawing.Point(1364, 402);
             this.addUserModifications.Name = "addUserModifications";
             this.addUserModifications.Size = new System.Drawing.Size(120, 23);
             this.addUserModifications.TabIndex = 65;
@@ -368,14 +372,14 @@
             this.modGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.modGridView.Location = new System.Drawing.Point(977, 21);
             this.modGridView.Name = "modGridView";
-            this.modGridView.Size = new System.Drawing.Size(507, 346);
+            this.modGridView.Size = new System.Drawing.Size(507, 375);
             this.modGridView.TabIndex = 71;
             // 
             // label11
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(974, 385);
+            this.label11.Location = new System.Drawing.Point(974, 408);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(112, 13);
             this.label11.TabIndex = 74;
@@ -392,7 +396,7 @@
             this.typeCombo,
             this.symbolBox,
             this.sitesBox});
-            this.userModGridView.Location = new System.Drawing.Point(977, 409);
+            this.userModGridView.Location = new System.Drawing.Point(977, 432);
             this.userModGridView.Name = "userModGridView";
             this.userModGridView.Size = new System.Drawing.Size(507, 149);
             this.userModGridView.TabIndex = 73;
@@ -475,7 +479,7 @@
             this.groupBox3.Controls.Add(this.templateBox);
             this.groupBox3.Controls.Add(this.createMethod);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(10, 168);
+            this.groupBox3.Location = new System.Drawing.Point(10, 186);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(958, 284);
             this.groupBox3.TabIndex = 70;
@@ -764,6 +768,12 @@
             // 
             // analysisTab
             // 
+            this.analysisTab.Controls.Add(this.displayTargetsWData);
+            this.analysisTab.Controls.Add(this.displaySelected);
+            this.analysisTab.Controls.Add(this.selectAll);
+            this.analysisTab.Controls.Add(this.deselectAll);
+            this.analysisTab.Controls.Add(this.exportSELs);
+            this.analysisTab.Controls.Add(this.updateMethod);
             this.analysisTab.Controls.Add(this.targetSearchBox);
             this.analysisTab.Controls.Add(this.spectrumGraphControl2);
             this.analysisTab.Controls.Add(this.label5);
@@ -777,11 +787,73 @@
             this.analysisTab.Location = new System.Drawing.Point(4, 22);
             this.analysisTab.Name = "analysisTab";
             this.analysisTab.Padding = new System.Windows.Forms.Padding(3);
-            this.analysisTab.Size = new System.Drawing.Size(1498, 569);
+            this.analysisTab.Size = new System.Drawing.Size(1498, 589);
             this.analysisTab.TabIndex = 0;
             this.analysisTab.Text = "Data Analysis";
             this.analysisTab.UseVisualStyleBackColor = true;
             this.analysisTab.Click += new System.EventHandler(this.analysisTab_Click);
+            // 
+            // displayTargetsWData
+            // 
+            this.displayTargetsWData.AutoSize = true;
+            this.displayTargetsWData.Location = new System.Drawing.Point(171, 563);
+            this.displayTargetsWData.Name = "displayTargetsWData";
+            this.displayTargetsWData.Size = new System.Drawing.Size(169, 17);
+            this.displayTargetsWData.TabIndex = 65;
+            this.displayTargetsWData.Text = "Display only Targets with Data";
+            this.displayTargetsWData.UseVisualStyleBackColor = true;
+            this.displayTargetsWData.CheckedChanged += new System.EventHandler(this.displayTargetsWData_CheckedChanged);
+            // 
+            // displaySelected
+            // 
+            this.displaySelected.AutoSize = true;
+            this.displaySelected.Location = new System.Drawing.Point(707, 564);
+            this.displaySelected.Name = "displaySelected";
+            this.displaySelected.Size = new System.Drawing.Size(160, 17);
+            this.displaySelected.TabIndex = 60;
+            this.displaySelected.Text = "Display only Selected Scans";
+            this.displaySelected.UseVisualStyleBackColor = true;
+            this.displaySelected.CheckedChanged += new System.EventHandler(this.displaySelected_CheckedChanged);
+            // 
+            // selectAll
+            // 
+            this.selectAll.Location = new System.Drawing.Point(576, 560);
+            this.selectAll.Name = "selectAll";
+            this.selectAll.Size = new System.Drawing.Size(118, 23);
+            this.selectAll.TabIndex = 63;
+            this.selectAll.Text = "Select All Scans";
+            this.selectAll.UseVisualStyleBackColor = true;
+            this.selectAll.Click += new System.EventHandler(this.selectAll_Click);
+            // 
+            // deselectAll
+            // 
+            this.deselectAll.Location = new System.Drawing.Point(452, 560);
+            this.deselectAll.Name = "deselectAll";
+            this.deselectAll.Size = new System.Drawing.Size(118, 23);
+            this.deselectAll.TabIndex = 62;
+            this.deselectAll.Text = "Deselect All Scans";
+            this.deselectAll.UseVisualStyleBackColor = true;
+            this.deselectAll.Click += new System.EventHandler(this.deselectAll_Click);
+            // 
+            // exportSELs
+            // 
+            this.exportSELs.Location = new System.Drawing.Point(1311, 560);
+            this.exportSELs.Name = "exportSELs";
+            this.exportSELs.Size = new System.Drawing.Size(180, 23);
+            this.exportSELs.TabIndex = 60;
+            this.exportSELs.Text = "Export Data for Selected Scans";
+            this.exportSELs.UseVisualStyleBackColor = true;
+            this.exportSELs.Click += new System.EventHandler(this.exportSELs_Click);
+            // 
+            // updateMethod
+            // 
+            this.updateMethod.Location = new System.Drawing.Point(1108, 560);
+            this.updateMethod.Name = "updateMethod";
+            this.updateMethod.Size = new System.Drawing.Size(197, 23);
+            this.updateMethod.TabIndex = 61;
+            this.updateMethod.Text = "Update Method w/ Selected Scans";
+            this.updateMethod.UseVisualStyleBackColor = true;
+            this.updateMethod.Click += new System.EventHandler(this.updateMethod_Click);
             // 
             // targetSearchBox
             // 
@@ -789,7 +861,7 @@
             this.targetSearchBox.Location = new System.Drawing.Point(82, 7);
             this.targetSearchBox.Margin = new System.Windows.Forms.Padding(1);
             this.targetSearchBox.Name = "targetSearchBox";
-            this.targetSearchBox.Size = new System.Drawing.Size(194, 20);
+            this.targetSearchBox.Size = new System.Drawing.Size(363, 20);
             this.targetSearchBox.TabIndex = 59;
             this.targetSearchBox.TextChanged += new System.EventHandler(this.targetSearchBox_TextChanged);
             // 
@@ -800,7 +872,7 @@
             this.paramTab.Location = new System.Drawing.Point(4, 22);
             this.paramTab.Name = "paramTab";
             this.paramTab.Padding = new System.Windows.Forms.Padding(3);
-            this.paramTab.Size = new System.Drawing.Size(1498, 569);
+            this.paramTab.Size = new System.Drawing.Size(1498, 589);
             this.paramTab.TabIndex = 1;
             this.paramTab.Text = "Advanced Parameters";
             this.paramTab.UseVisualStyleBackColor = true;
@@ -845,56 +917,12 @@
             this.primingRawOFDia.FileName = "openFileDialog1";
             this.primingRawOFDia.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
-            // exportSELs
-            // 
-            this.exportSELs.Location = new System.Drawing.Point(1337, 622);
-            this.exportSELs.Name = "exportSELs";
-            this.exportSELs.Size = new System.Drawing.Size(160, 23);
-            this.exportSELs.TabIndex = 60;
-            this.exportSELs.Text = "Export Selected Scans";
-            this.exportSELs.UseVisualStyleBackColor = true;
-            this.exportSELs.Click += new System.EventHandler(this.exportSELs_Click);
-            // 
-            // updateMethod
-            // 
-            this.updateMethod.Location = new System.Drawing.Point(1337, 599);
-            this.updateMethod.Name = "updateMethod";
-            this.updateMethod.Size = new System.Drawing.Size(160, 23);
-            this.updateMethod.TabIndex = 61;
-            this.updateMethod.Text = "Update Method";
-            this.updateMethod.UseVisualStyleBackColor = true;
-            this.updateMethod.Click += new System.EventHandler(this.updateMethod_Click);
-            // 
-            // deselectAll
-            // 
-            this.deselectAll.Location = new System.Drawing.Point(1158, 599);
-            this.deselectAll.Name = "deselectAll";
-            this.deselectAll.Size = new System.Drawing.Size(160, 23);
-            this.deselectAll.TabIndex = 62;
-            this.deselectAll.Text = "Deselect All Scans";
-            this.deselectAll.UseVisualStyleBackColor = true;
-            this.deselectAll.Click += new System.EventHandler(this.deselectAll_Click);
-            // 
-            // selectAll
-            // 
-            this.selectAll.Location = new System.Drawing.Point(1158, 625);
-            this.selectAll.Name = "selectAll";
-            this.selectAll.Size = new System.Drawing.Size(160, 23);
-            this.selectAll.TabIndex = 63;
-            this.selectAll.Text = "Select All Scans";
-            this.selectAll.UseVisualStyleBackColor = true;
-            this.selectAll.Click += new System.EventHandler(this.selectAll_Click);
-            // 
             // TomahaqCompanionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1519, 668);
-            this.Controls.Add(this.selectAll);
-            this.Controls.Add(this.deselectAll);
-            this.Controls.Add(this.updateMethod);
-            this.Controls.Add(this.exportSELs);
+            this.ClientSize = new System.Drawing.Size(1510, 668);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.logBox);
             this.Name = "TomahaqCompanionForm";
@@ -998,6 +1026,8 @@
         private System.Windows.Forms.TextBox methodLengthBox;
         private System.Windows.Forms.TextBox xmlTextBox;
         private System.Windows.Forms.Button methodChangerAlone;
+        private System.Windows.Forms.CheckBox displaySelected;
+        private System.Windows.Forms.CheckBox displayTargetsWData;
     }
 }
 

@@ -26,8 +26,13 @@ namespace TomahaqCompanion
 
         public double MaxIntensity { get; set; }
         public double MaxRetentionTime { get; set; }
+
         public double StartRetentionTime { get; set; }
         public double EndRetentionTime { get; set; }
+
+        public double StartSelectionTime { get; set; }
+        public double EndSelectionTime { get; set; }
+
         public double RTWindow { get; set; }
         public double MethodEndTime { get; set; }
 
@@ -90,6 +95,9 @@ namespace TomahaqCompanion
 
             StartRetentionTime = startTime;
             EndRetentionTime = endTime;
+
+            StartSelectionTime = 0;
+            EndSelectionTime = 0;
 
             //Build the dynamic modification dictionary and return the stripped string
             string strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
@@ -529,7 +537,15 @@ namespace TomahaqCompanion
             //Cycle through the dynamic mods and add them to both of the peptides. 
             foreach(KeyValuePair<int, Modification> kvp in DynModDict[type])
             {
-                peptide.SetModification(kvp.Value, kvp.Key);
+                if(kvp.Key == 0)
+                {
+                    peptide.SetModification(kvp.Value, Terminus.N);
+                }
+                else
+                {
+                    peptide.SetModification(kvp.Value, kvp.Key);
+                }
+                
             }
 
             return peptide;
@@ -754,11 +770,18 @@ namespace TomahaqCompanion
 
             List<double> scanRTs = new List<double>();
 
+            foreach(ScanEventLine sel in scanEventLines)
+            {
+                sel.Include = false;
+            }
+
             //Average the spectrum
             for (int i = 0; i < topN; i++)
             {
                 //Get the scan event line that you are going to average
                 ScanEventLine sel = scanEventLines[i];
+
+                sel.Include = true;
 
                 scanRTs.Add(double.Parse(sel.MS2RetentionTime));
 
@@ -832,11 +855,15 @@ namespace TomahaqCompanion
                     }
                 }
 
+                //SelectedScanEventLines.Add(sel);
             }
 
             //Update the RT window based on the User input
             double avgRT = scanRTs.Average();
             UpdateRTWindow(avgRT, force:includeAll);
+
+            StartSelectionTime = scanRTs.Min() - 0.01;
+            EndSelectionTime = scanRTs.Max()  + 0.01;
 
 
             foreach (KeyValuePair<double, ThermoMzPeak> kvp in TargetCompositeSpectrum)
