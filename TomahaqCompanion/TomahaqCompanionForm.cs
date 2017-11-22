@@ -36,6 +36,7 @@ namespace TomahaqCompanion
         private BindingList<TargetPeptideLine> TargetsDisplayed;
         private BindingList<ModificationLine> ModLines;
         private BindingList<ScanEventLine> ScanEvents;
+        private BindingList<string> ModificationFiles;
         private Dictionary<string, Dictionary<string, double>> QuantChannelDict;
         private Dictionary<string, double> QuantChannelsInUse;
         private GraphPane MS1Pane;
@@ -78,6 +79,11 @@ namespace TomahaqCompanion
 
             //Initialize the Quant Channels
             QuantChannelDict = BiuldQuantificationDictionary();
+
+            ModificationFiles = new BindingList<string>();
+            modFileListBox.DataSource = ModificationFiles;
+
+            UpdateMoficationFileList();
 
             InitializePrimingRunGraphs();
         }
@@ -451,7 +457,7 @@ namespace TomahaqCompanion
                     string peptideString = reader["Peptide"];
                     
                     //Determine if a charge is provided or a range needs to be used
-                    int minCharge = 2;
+                    int minCharge = 1;
                     int maxCharge = 4;
                     if(headers.Contains("z"))
                     {
@@ -993,6 +999,7 @@ namespace TomahaqCompanion
             Modification phos = new Modification(79.96633, "Phos", ModificationSites.S | ModificationSites.T | ModificationSites.Y);
             Modification acetyl = new Modification(42.01056, "Acetyl", ModificationSites.A | ModificationSites.M);
 
+            Modification gg = new Modification(114.0429, "gg", ModificationSites.K);
             Modification ggTMT0 = new Modification(338.195378, "ggTMT0", ModificationSites.K);
             Modification ggTMT2 = new Modification(339.20123, "ggTMT2", ModificationSites.K);
             Modification ggTMT10 = new Modification(343.20583, "ggTMT10", ModificationSites.K);
@@ -1015,6 +1022,7 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, true, ox));
             ModLines.Add(new ModificationLine("Phos", Math.Round(phos.MonoisotopicMass, 5), "S,T,Y", "#", "Dynamic", false, false, phos));
             ModLines.Add(new ModificationLine("Acetyl", Math.Round(acetyl.MonoisotopicMass, 5), "NPep", "@", "Dynamic", false, false, acetyl));
+            ModLines.Add(new ModificationLine("gg", Math.Round(gg.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, gg));
             ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT0));
             ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT2));
             ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
@@ -1888,6 +1896,25 @@ namespace TomahaqCompanion
             return (bool)value;
         }
 
+        private bool CheckStringBoolValue(object value)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+            string val = (string)value;
+            if (val == "FALSE")
+            {
+                val = "false";
+            }
+            else if (val == "True")
+            {
+                val = "true";
+            }
+
+            return bool.Parse(val);
+        }
+
         private string CheckStringValue(object value)
         {
             if (value == null)
@@ -2198,6 +2225,143 @@ namespace TomahaqCompanion
         private void displayTargetsWData_CheckedChanged(object sender, EventArgs e)
         {
             DisplayTargets();
+        }
+
+        private void exportTargetList_Click(object sender, EventArgs e)
+        {
+            string outputfile = "C:\\Users\\lumos\\Desktop\\Test.csv";
+
+            using (StreamWriter writer = new StreamWriter(outputfile))
+            {
+                //Write the header line
+                if(Targets.Count > 0)
+                {
+                    writer.WriteLine(Targets.ElementAt(0).Peptide.GetTargetHeaders());
+
+                    foreach (TargetPeptideLine target in Targets)
+                    {
+                        //Write the output for each target
+                        writer.WriteLine(target.ToString());
+                    }
+                }
+            }
+        }
+
+        private void ExportModificationFile(string fileName)
+        {
+            Directory.CreateDirectory(".\\ModificationFiles");
+            string outputfile = ".\\ModificationFiles\\" + fileName + ".csv";
+
+            using (StreamWriter writer = new StreamWriter(outputfile))
+            {
+                writer.WriteLine("Name,Mass,ModSites,ModChar,Type,Trigger,Target");
+
+                foreach (ModificationLine modline in ModLines)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.Append(modline.Name + ",");
+                    sb.Append(modline.Mass + ",");
+                    sb.Append(modline.ModSites.Replace(",", ";") + ",");
+                    sb.Append(modline.ModChar + ",");
+                    sb.Append(modline.Type + ",");
+                    sb.Append(modline.Trigger + ",");
+                    sb.Append(modline.Target + ",");
+
+                    writer.WriteLine(sb.ToString());
+                }
+            }
+
+            UpdateMoficationFileList();
+        }
+
+        private void UpdateMoficationFileList()
+        {
+            Directory.CreateDirectory(".\\ModificationFiles");
+
+            ModificationFiles.Clear();
+            foreach (string fileName in Directory.GetFiles(".\\ModificationFiles", "*.csv", SearchOption.TopDirectoryOnly).ToList())
+            {
+                ModificationFiles.Add(fileName);
+            }
+        }
+
+        private void exportModificationTable_Click_1(object sender, EventArgs e)
+        {
+            ExportModificationFile(modFileName.Text);
+        }
+
+        private void loadUserModFile_Click(object sender, EventArgs e)
+        {
+            ModLines.Clear();
+
+            using (CsvReader reader = new CsvReader(new StreamReader(ModificationFiles[modFileListBox.SelectedIndex]), true))
+            {
+                while (reader.ReadNextRecord())
+                {
+                    string name = reader["Name"];
+                    string mass = reader["Mass"];
+                    string modSites = reader["ModSites"];
+                    string modChar = reader["ModChar"];
+                    string type = reader["Type"];
+                    string trigger = reader["Trigger"];
+                    string target = reader["Target"];
+
+                    AddModLine(name, mass, type, modSites, modChar, trigger, target);
+                }
+            }
+        }
+
+        private void AddModLine(string Name, string Mass, string Type, string Sites, string Symbol, string Trigger, string Target)
+        {
+            //Check the values entered by the user
+            bool trigger = CheckStringBoolValue(Trigger);
+            bool target = CheckStringBoolValue(Target);
+            string name = CheckStringValue(Name);
+            double mass = CheckDoubValue(Mass);
+            string type = CheckStringValue(Type);
+            string symbol = CheckStringValue(Symbol);
+            string sites = CheckStringValue(Sites);
+
+            //Make sure there is enough to make a new modification
+            if (mass != 0 && name != "" && type != "" & sites != "")
+            {
+                //This is a bad way to add in multiple sites
+                List<string> sitesList = sites.Split(',').ToList();
+                List<ModificationSites> modSiteList = new List<ModificationSites>();
+                foreach (string site in sitesList)
+                {
+                    modSiteList.Add(SwitchSite(site));
+                }
+
+                //If sites returned None then something is wrong
+                if (modSiteList[0] == ModificationSites.None) { sites = "None"; }
+
+                //First add the modification with just one of the mods
+                Modification addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0]);
+
+                //Check to see if there are 2 mods
+                if (modSiteList.Count == 2)
+                {
+                    addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1]);
+                }
+                //Check to see if there are 3 mods
+                else if (modSiteList.Count == 3)
+                {
+                    addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2]);
+                }
+                //Check to see if there are 4 mods
+                else if (modSiteList.Count == 4)
+                {
+                    addMod = new Modification(monoMass: mass, name: name, sites: modSiteList[0] | modSiteList[1] | modSiteList[2] | modSiteList[3]);
+                }
+
+                //If it is static then make sure the symbol is cleared
+                if (type == "Static") { symbol = ""; }
+
+                //Add a modification line
+                ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, trigger, target, addMod));
+            }
         }
     }
 }

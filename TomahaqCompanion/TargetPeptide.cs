@@ -39,6 +39,8 @@ namespace TomahaqCompanion
         public double TriggerMZ { get; set; }
         public double TargetMZ { get; set; }
 
+        Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> ModificationDict { get; set; }
+
         public Peptide Trigger { get; set; }
         public Peptide Target { get; set; }
 
@@ -47,7 +49,7 @@ namespace TomahaqCompanion
 
         public SortedList<double, ThermoMzPeak> TriggerCompositeSpectrum { get; set; }
         public SortedList<double, ThermoMzPeak> TargetCompositeSpectrum { get; set; }
-
+        
         public SortedDictionary<int, double> MS1toTriggerInt { get; set; }
 
         public SortedDictionary<double,MS2Event> TriggerMS2sByInt { get; set; }
@@ -99,6 +101,8 @@ namespace TomahaqCompanion
             StartSelectionTime = 0;
             EndSelectionTime = 0;
 
+            ModificationDict = modificationDict;
+
             //Build the dynamic modification dictionary and return the stripped string
             string strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
 
@@ -148,6 +152,78 @@ namespace TomahaqCompanion
 
             TriggerIonsWithCharge = new Dictionary<double, int>();
             TargetSPSIonsWithCharge = new Dictionary<double, int>();
+
+            InitializeTargetSPSFrags();
+        }
+
+        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, Dictionary<double,int> targetSPSIons, Dictionary<double,int> triggerFragIons, double startTime, double endTime, Tolerance fragTol)
+        {
+            //Save the original peptide string
+            PeptideString = peptideString;
+            Charge = charge;
+
+            TargetSPSIonsWithCharge = targetSPSIons;
+            TriggerIonsWithCharge = triggerFragIons;
+
+            TargetSPSIons = TargetSPSIonsWithCharge.Keys.ToList();
+            TriggerIons = TriggerIonsWithCharge.Keys.ToList();
+
+            FragmentTol = fragTol;
+
+            StartRetentionTime = startTime;
+            EndRetentionTime = endTime;
+
+            StartSelectionTime = 0;
+            EndSelectionTime = 0;
+
+            ModificationDict = modificationDict;
+
+            //Build the dynamic modification dictionary and return the stripped string
+            string strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
+
+            //Create the target and the trigger peptides
+            Trigger = new Peptide(strippedPepString);
+            Target = new Peptide(strippedPepString);
+
+            //Add the modifications to the peptide
+            Trigger = AddModifications(Trigger, modificationDict["Static"], "Trigger");
+            Target = AddModifications(Target, modificationDict["Static"], "Target");
+
+            TriggerMZ = Trigger.ToMz(Charge);
+            TargetMZ = Target.ToMz(Charge);
+
+            //Calculte the mass shift for the peptide
+            MassShift = (Target.MonoisotopicMass - Trigger.MonoisotopicMass) / Charge;
+
+            //Populate the fragments
+            TriggerFrags = PopulateFragments(Trigger, "Trigger");
+            TargetFrags = PopulateFragments(Target, "Target");
+
+            TriggerMS1xic = new SortedList<double, double>();
+            TargetMS1xic = new SortedList<double, double>();
+
+            TriggerMS2s = new List<MS2Event>();
+            TargetMS2s = new List<MS2Event>();
+            TargetMS3s = new List<MS3Event>();
+
+            ScanEventLines = new List<ScanEventLine>();
+            SelectedScanEventLines = new List<ScanEventLine>();
+
+            TriggerMS1XicPoints = new PointPairList();
+            TargetMS1XicPoints = new PointPairList();
+            TriggerMS2Points = new PointPairList();
+            TargetMS2Points = new PointPairList();
+            TargetMS3Points = new PointPairList();
+            TargetCompositeMS2Points = new PointPairList();
+
+            MS1toTriggerInt = new SortedDictionary<int, double>();
+
+            TriggerMS2sByInt = new SortedDictionary<double, MS2Event>();
+
+            TargetMS2sByTriggerInt = new SortedDictionary<double, MS2Event>();
+
+            TriggerCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
+            TargetCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
 
             InitializeTargetSPSFrags();
         }
@@ -259,6 +335,11 @@ namespace TomahaqCompanion
         private double CalculateIsolationSpecificity(ThermoSpectrum targetMS2Spectrum, List<double> spsIons)
         {
             double isoSpec = 0;
+
+            if(spsIons.Count == 0)
+            {
+                return isoSpec;
+            }
 
             double isoQ = 0.86;
             double isoWidth = 3;
@@ -998,6 +1079,117 @@ namespace TomahaqCompanion
                 if (EndRetentionTime > MethodEndTime) { EndRetentionTime = MethodEndTime; }
                 if (StartRetentionTime < 0) { StartRetentionTime = 0; }
             }
+        }
+
+        public string GetTargetHeaders()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("PeptideString" + ",");
+            sb.Append("Charge" + ",");
+            sb.Append("StartRetentionTime" + ",");
+            sb.Append("EndRetentionTime" + ",");
+            sb.Append("FragmentTol.Unit" + ",");
+            sb.Append("FragmentTol.Value" + ",");
+
+            sb.Append("ModificationDict" + ",");
+
+            sb.Append("TriggerIonsWithCharge" + ",");
+
+            sb.Append("TargetIonsWithCharge" + ",");
+
+            return sb.ToString();
+        }
+
+        public string AnalysisToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(PeptideString + ",");
+            sb.Append(Charge + ",");
+            sb.Append(MassShift + ",");
+            sb.Append(FragmentTol.Unit + ",");
+            sb.Append(FragmentTol.Value + ",");
+            sb.Append(MaxIntensity + ",");
+            sb.Append(MaxRetentionTime + ",");
+            sb.Append(StartRetentionTime + ",");
+            sb.Append(EndRetentionTime + ",");
+            sb.Append(StartSelectionTime + ",");
+            sb.Append(EndSelectionTime + ",");
+            sb.Append(RTWindow + ",");
+            sb.Append(MethodEndTime + ",");
+            sb.Append(TriggerMZ + ",");
+            sb.Append(TargetMZ + ",");
+            sb.Append(ModificationDictToString(ModificationDict));
+
+            //sb.Append(Trigger + ","); //This is the Trigger Peptide object - will probably need to re-make this upon re-import
+            //sb.Append(Target + ","); //This is the Target Peptide object - will probably need to re-make this upon re-import
+
+
+
+            return sb.ToString();
+        }
+
+
+        public string TargetToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(PeptideString + ",");
+            sb.Append(Charge + ",");
+            sb.Append(StartRetentionTime + ",");
+            sb.Append(EndRetentionTime + ",");
+            sb.Append(FragmentTol.Unit + ",");
+            sb.Append(FragmentTol.Value + ",");
+
+            sb.Append(ModificationDictToString(ModificationDict));
+
+            sb.Append(IonsWithChargeToString(TriggerIonsWithCharge));
+
+            sb.Append(IonsWithChargeToString(TargetSPSIonsWithCharge));
+
+            return sb.ToString();
+        }
+
+        public string ModificationDictToString(Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modDict)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (KeyValuePair<string, Dictionary<string, Dictionary<Modification, string>>> kvp in ModificationDict)
+            {
+                foreach (KeyValuePair<string, Dictionary<Modification, string>> kvp2 in kvp.Value)
+                {
+                    sb.Append(kvp.Key + "|" + kvp2.Key + "|");
+
+                    foreach (KeyValuePair<Modification, string> kvp3 in kvp2.Value)
+                    {
+                        sb.Append(kvp3.Key.Name + ":" + kvp3.Value + ";");
+                    }
+
+                    sb.Remove(sb.Length - 1, 1);
+                    sb.Append("]");
+
+                }
+            }
+
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append(',');
+
+            return sb.ToString();
+        }
+
+        public string IonsWithChargeToString(Dictionary<double, int> fragDict)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach(KeyValuePair<double, int> frag in fragDict)
+            {
+                sb.Append(frag.Key + ";" + frag.Value + "|");
+            }
+
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append(',');
+
+            return sb.ToString();
         }
     }
 }

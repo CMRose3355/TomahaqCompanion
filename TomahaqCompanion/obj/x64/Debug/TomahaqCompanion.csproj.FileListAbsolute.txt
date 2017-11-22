@@ -40,5 +40,4 @@ C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\Fusion.API-1.0.dll
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\Thermo.TNG.Factory.dll
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\Fusion.API-1.0.xml
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\Thermo.TNG.Factory.xml
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\Thermo.TNG.Factory.pdb

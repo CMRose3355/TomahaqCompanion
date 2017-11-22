@@ -71,7 +71,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>1H6SvO4qS0scML672OHCaJhazDkGq8mBAO7jI5u29xI=</dsig:DigestValue>
+        <dsig:DigestValue>GwcN1a5KgUH6/BbqdFhmrRfK+RK4d64Bp3w15lYLf84=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -83,7 +83,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>7vimTwP8zjMXvPthroZf6kIDQJlHkc3S5bx1Ee0Dwjc=</dsig:DigestValue>
+        <dsig:DigestValue>7Ysbe0hbLD0EQBt4I+ZEUHPtuOae8HjA80Ri3cHM8wY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -112,14 +112,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.Factory.dll" size="9728">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.Factory.dll" size="10240">
       <assemblyIdentity name="Thermo.TNG.Factory" version="1.0.0.0" publicKeyToken="35EFC4498449BC4C" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>km4p0c5/umvPGBwzqz9P4/MowuRMwTIRSK77IwtXVAY=</dsig:DigestValue>
+        <dsig:DigestValue>hN57YpymBlbqNCD0lG52w9zAulzsMSn5D0pBSahRS10=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -148,14 +148,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="103424">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="111104">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>A/oAMdtxFFIXb4HQ9OHjJNqIeHMJPWkju4Ds5tuCk/A=</dsig:DigestValue>
+        <dsig:DigestValue>106twvZH/lavcD5yaqsRz5MFFpaMxAVGqyJn3zDdS5A=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

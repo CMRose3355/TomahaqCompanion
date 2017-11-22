@@ -40,5 +40,10 @@ namespace TomahaqCompanion
 
             MaxIntensity = maxInt.ToString("G2", CultureInfo.InvariantCulture);
         }
+
+        public override string ToString()
+        {
+            return Peptide.TargetToString();
+        }
     }
 }
