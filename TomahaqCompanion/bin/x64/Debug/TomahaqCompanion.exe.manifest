@@ -64,14 +64,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.Thermo.dll" size="22528">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.Thermo.dll" size="23552">
       <assemblyIdentity name="CSMSL.Thermo" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>GwcN1a5KgUH6/BbqdFhmrRfK+RK4d64Bp3w15lYLf84=</dsig:DigestValue>
+        <dsig:DigestValue>OmN+jdrRyBkh8JW+/iwsN8iGNzf9V3CwH4fm/pUZ4+g=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -155,7 +155,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>106twvZH/lavcD5yaqsRz5MFFpaMxAVGqyJn3zDdS5A=</dsig:DigestValue>
+        <dsig:DigestValue>xvzbtxp7rg8l3zDV7ap1hluyXVJ5bX0ge0G1SyUyCFg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
