@@ -30,6 +30,7 @@ namespace TomahaqCompanion
         public string MS3Quant8 { get; set; }
         public string MS3Quant9 { get; set; }
         public string MS3Quant10 { get; set; }
+        public string MS3Quant11 { get; set; }
 
         public ScanEventLine(MS2Event ms2ScanEvent)
         {
@@ -66,6 +67,7 @@ namespace TomahaqCompanion
                 MS3Quant8 = Math.Round(ms3.QuantPeaks[7].Y, 1).ToString();
                 MS3Quant9 = Math.Round(ms3.QuantPeaks[8].Y, 1).ToString();
                 MS3Quant10 = Math.Round(ms3.QuantPeaks[9].Y, 1).ToString();
+                MS3Quant11 = Math.Round(ms3.QuantPeaks[10].Y, 1).ToString();
             }
             else
             {
@@ -83,6 +85,7 @@ namespace TomahaqCompanion
                 MS3Quant8 = "";
                 MS3Quant9 = "";
                 MS3Quant10 = "";
+                MS3Quant11 = "";
             }
         }
 
@@ -90,7 +93,7 @@ namespace TomahaqCompanion
         {
             return MS1TriggerIntensity + "," + MS2RetentionTime + "," + MS2ScanNumber + "," + MS3ScanNumber + "," + MS2InjectionTime + "," + MS3InjectionTime + "," +
                 MS3SPSIons + "," + MS3SumSN + "," + MS3IsoSpec + "," + MS3Quant1 + "," + MS3Quant2 + "," + MS3Quant3 + "," + MS3Quant4 + "," + MS3Quant5 + "," + MS3Quant6 + 
-                "," + MS3Quant7 + "," + MS3Quant8 + "," + MS3Quant9 + "," + MS3Quant10;
+                "," + MS3Quant7 + "," + MS3Quant8 + "," + MS3Quant9 + "," + MS3Quant10 + "," + MS3Quant11;
         }
     }
 }

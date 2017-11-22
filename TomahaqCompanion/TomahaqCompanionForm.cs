@@ -378,7 +378,8 @@ namespace TomahaqCompanion
             retDict["TMT10"].Add("129c", 129.137787);
             retDict["TMT10"].Add("130n", 130.134822);
             retDict["TMT10"].Add("130c", 130.141141);
-            retDict["TMT10"].Add("131", 131.138176);
+            retDict["TMT10"].Add("131n", 131.138176);
+            retDict["TMT10"].Add("131c", 131.138176);
 
             return retDict;
         }
@@ -1101,7 +1102,7 @@ namespace TomahaqCompanion
             quantCol1.DataPropertyName = "MS3Quant1";
             quantCol1.HeaderText = "Quant #1";
             quantCol1.ReadOnly = true;
-            quantCol1.Width = 50;
+            quantCol1.Width = 45;
             quantCol1.SortMode = DataGridViewColumnSortMode.Automatic;
             scanGridView.Columns.Add(quantCol1);
 
@@ -1109,14 +1110,14 @@ namespace TomahaqCompanion
             quantCol2.DataPropertyName = "MS3Quant2";
             quantCol2.HeaderText = "Quant #2";
             quantCol2.ReadOnly = true;
-            quantCol2.Width = 50;
+            quantCol2.Width = 45;
             scanGridView.Columns.Add(quantCol2);
 
             DataGridViewTextBoxColumn quantCol3 = new DataGridViewTextBoxColumn();
             quantCol3.DataPropertyName = "MS3Quant3";
             quantCol3.HeaderText = "Quant #3";
             quantCol3.ReadOnly = true;
-            quantCol3.Width = 50;
+            quantCol3.Width = 45;
             quantCol3.SortMode = DataGridViewColumnSortMode.Automatic;
             scanGridView.Columns.Add(quantCol3);
 
@@ -1124,14 +1125,14 @@ namespace TomahaqCompanion
             quantCol4.DataPropertyName = "MS3Quant4";
             quantCol4.HeaderText = "Quant #4";
             quantCol4.ReadOnly = true;
-            quantCol4.Width = 50;
+            quantCol4.Width = 45;
             scanGridView.Columns.Add(quantCol4);
 
             DataGridViewTextBoxColumn quantCol5 = new DataGridViewTextBoxColumn();
             quantCol5.DataPropertyName = "MS3Quant5";
             quantCol5.HeaderText = "Quant #5";
             quantCol5.ReadOnly = true;
-            quantCol5.Width = 50;
+            quantCol5.Width = 45;
             quantCol5.SortMode = DataGridViewColumnSortMode.Automatic;
             scanGridView.Columns.Add(quantCol5);
 
@@ -1139,14 +1140,14 @@ namespace TomahaqCompanion
             quantCol6.DataPropertyName = "MS3Quant6";
             quantCol6.HeaderText = "Quant #6";
             quantCol6.ReadOnly = true;
-            quantCol6.Width = 50;
+            quantCol6.Width = 45;
             scanGridView.Columns.Add(quantCol6);
 
             DataGridViewTextBoxColumn quantCol7 = new DataGridViewTextBoxColumn();
             quantCol7.DataPropertyName = "MS3Quant7";
             quantCol7.HeaderText = "Quant #7";
             quantCol7.ReadOnly = true;
-            quantCol7.Width = 50;
+            quantCol7.Width = 45;
             quantCol7.SortMode = DataGridViewColumnSortMode.Automatic;
             scanGridView.Columns.Add(quantCol7);
 
@@ -1154,14 +1155,14 @@ namespace TomahaqCompanion
             quantCol8.DataPropertyName = "MS3Quant8";
             quantCol8.HeaderText = "Quant #8";
             quantCol8.ReadOnly = true;
-            quantCol8.Width = 50;
+            quantCol8.Width = 45;
             scanGridView.Columns.Add(quantCol8);
 
             DataGridViewTextBoxColumn quantCol9 = new DataGridViewTextBoxColumn();
             quantCol9.DataPropertyName = "MS3Quant9";
             quantCol9.HeaderText = "Quant #9";
             quantCol9.ReadOnly = true;
-            quantCol9.Width = 50;
+            quantCol9.Width = 45;
             quantCol9.SortMode = DataGridViewColumnSortMode.Automatic;
             scanGridView.Columns.Add(quantCol9);
 
@@ -1169,21 +1170,28 @@ namespace TomahaqCompanion
             quantCol10.DataPropertyName = "MS3Quant10";
             quantCol10.HeaderText = "Quant #10";
             quantCol10.ReadOnly = true;
-            quantCol10.Width = 50;
+            quantCol10.Width = 45;
             scanGridView.Columns.Add(quantCol10);
+
+            DataGridViewTextBoxColumn quantCol11 = new DataGridViewTextBoxColumn();
+            quantCol11.DataPropertyName = "MS3Quant11";
+            quantCol11.HeaderText = "Quant #11";
+            quantCol11.ReadOnly = true;
+            quantCol11.Width = 45;
+            scanGridView.Columns.Add(quantCol11);
 
             DataGridViewTextBoxColumn sumSNCol = new DataGridViewTextBoxColumn();
             sumSNCol.DataPropertyName = "MS3SumSN";
             sumSNCol.HeaderText = "Sum SN";
             sumSNCol.ReadOnly = true;
-            sumSNCol.Width = 50;
+            sumSNCol.Width = 45;
             scanGridView.Columns.Add(sumSNCol);
 
             DataGridViewTextBoxColumn isoSpecCol = new DataGridViewTextBoxColumn();
             isoSpecCol.DataPropertyName = "MS3IsoSpec";
             isoSpecCol.HeaderText = "Iso Spec";
             isoSpecCol.ReadOnly = true;
-            isoSpecCol.Width = 50;
+            isoSpecCol.Width = 45;
             scanGridView.Columns.Add(isoSpecCol);
 
         }
@@ -2301,7 +2309,7 @@ namespace TomahaqCompanion
                 {
                     string name = reader["Name"];
                     string mass = reader["Mass"];
-                    string modSites = reader["ModSites"];
+                    string modSites = reader["ModSites"].Replace(";",",");
                     string modChar = reader["ModChar"];
                     string type = reader["Type"];
                     string trigger = reader["Trigger"];
