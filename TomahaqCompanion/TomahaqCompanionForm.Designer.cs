@@ -975,7 +975,7 @@
             this.modSaveLoadGroup.Controls.Add(this.modFileName);
             this.modSaveLoadGroup.Controls.Add(this.exportModificationTable);
             this.modSaveLoadGroup.Controls.Add(this.label13);
-            this.modSaveLoadGroup.Location = new System.Drawing.Point(6, 22);
+            this.modSaveLoadGroup.Location = new System.Drawing.Point(6, 6);
             this.modSaveLoadGroup.Name = "modSaveLoadGroup";
             this.modSaveLoadGroup.Size = new System.Drawing.Size(380, 284);
             this.modSaveLoadGroup.TabIndex = 66;
@@ -1029,7 +1029,7 @@
             // 
             // exportTargetList
             // 
-            this.exportTargetList.Location = new System.Drawing.Point(941, 226);
+            this.exportTargetList.Location = new System.Drawing.Point(6, 559);
             this.exportTargetList.Name = "exportTargetList";
             this.exportTargetList.Size = new System.Drawing.Size(180, 23);
             this.exportTargetList.TabIndex = 61;
@@ -1039,7 +1039,7 @@
             // 
             // xmlTextBox
             // 
-            this.xmlTextBox.Location = new System.Drawing.Point(938, 102);
+            this.xmlTextBox.Location = new System.Drawing.Point(859, 562);
             this.xmlTextBox.Name = "xmlTextBox";
             this.xmlTextBox.Size = new System.Drawing.Size(476, 20);
             this.xmlTextBox.TabIndex = 1;
@@ -1048,7 +1048,7 @@
             // 
             // methodChangerAlone
             // 
-            this.methodChangerAlone.Location = new System.Drawing.Point(1263, 128);
+            this.methodChangerAlone.Location = new System.Drawing.Point(1341, 560);
             this.methodChangerAlone.Name = "methodChangerAlone";
             this.methodChangerAlone.Size = new System.Drawing.Size(151, 23);
             this.methodChangerAlone.TabIndex = 0;
