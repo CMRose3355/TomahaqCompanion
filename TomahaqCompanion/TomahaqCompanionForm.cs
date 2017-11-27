@@ -379,7 +379,7 @@ namespace TomahaqCompanion
             retDict["TMT10"].Add("130n", 130.134822);
             retDict["TMT10"].Add("130c", 130.141141);
             retDict["TMT10"].Add("131n", 131.138176);
-            retDict["TMT10"].Add("131c", 131.138176);
+            retDict["TMT10"].Add("131c", 131.144499);
 
             return retDict;
         }
