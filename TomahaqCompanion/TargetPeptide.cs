@@ -477,13 +477,23 @@ namespace TomahaqCompanion
                         double fragMZ = frag.ToMz(i);
                         double distanceFromPrec = fragMZ - TriggerMZ;
 
-                        //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
-                        double fragMZMin = TriggerMZ - 70;
-                        double fragMZMax = TriggerMZ + 5;
+                        bool addTriggerIon = true; //TODO:Make this a user paramater
 
-                        if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
+                        if(!addTriggerIon)
                         {
-                            //check if there is another entry with the same distance from the precursor
+                            //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
+                            double fragMZMin = TriggerMZ - 70;
+                            double fragMZMax = TriggerMZ + 5;
+
+                            if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
+                            {
+                                addTriggerIon = true;
+                            }
+                        }
+
+                        //check if there is another entry with the same distance from the precursor
+                        if (addTriggerIon)
+                        {
                             double outDoub = 0;
                             if (!mzsToAdd.TryGetValue(distanceFromPrec, out outDoub))
                             {
@@ -679,8 +689,8 @@ namespace TomahaqCompanion
             }
 
             //Ensure Lysine residues for any Y ions of target peptides
-            //if (type == "Target")
-            //{
+            if (type == "Target")
+            {
                 foreach(Fragment frag in candidateFrags)
                 {
                     if(frag.GetSequence().Contains("K") || frag.Type == FragmentTypes.b || frag.Type == FragmentTypes.bNeuLoss)
@@ -688,11 +698,11 @@ namespace TomahaqCompanion
                         retFrags.Add(frag);
                     }
                 }
-            //}
-            //else
-            //{
-            //    retFrags = candidateFrags;
-            //}
+            }
+            else
+            {
+                retFrags = candidateFrags;
+            }
 
             return retFrags;
         }
@@ -877,41 +887,19 @@ namespace TomahaqCompanion
                     {
                         //The fragment from matched spectrum
                         string fragName = kvp2.Key.ToString();
-                        Fragment targetFrag = null;
+                        Fragment triggerFrag = null;
 
                         //We will see if this fragment exsists within the target fragment list...it should
-                        if(indexTargetFrags.TryGetValue(fragName, out targetFrag))
+                        if(indexTriggerFrag.TryGetValue(fragName, out triggerFrag))
                         {
                             //We want to use the same list for the trigger and target fragments so calculate both m/z values here
-                            double triggerMZ = indexTriggerFrag[fragName].ToMz(charge);
-                            double targetMZ = targetFrag.ToMz(charge);
+                            double triggerMZ = triggerFrag.ToMz(charge);
 
                             //The same intensity will be used for each
                             double intensity = kvp2.Value;
 
                             //Calculate a narrow mass range to look for the peak
-                            MzRange targetRange = new MzRange(targetMZ, FragmentTol);
                             MzRange triggerRange = new MzRange(triggerMZ, FragmentTol);
-
-                            //Deal with the target first to try and see if you can add the peak
-                            bool targetAdded = false;
-                            foreach (KeyValuePair<double, ThermoMzPeak> kvp3 in TargetCompositeSpectrum)
-                            {
-                                double testMZ = kvp3.Key;
-                                ThermoMzPeak testPeak = kvp3.Value;
-
-                                if (targetRange.Contains(testMZ))
-                                {
-                                    TargetCompositeSpectrum[testMZ].Intensity += testPeak.Intensity;
-                                    targetAdded = true;
-                                    break;
-                                }
-                            }
-
-                            if (!targetAdded)
-                            {
-                                TargetCompositeSpectrum.Add(targetMZ, new ThermoMzPeak(targetMZ, intensity, charge: charge));
-                            }
 
                             //Then deal with the trigger peptide
                             bool triggerAdded = false;
@@ -932,6 +920,34 @@ namespace TomahaqCompanion
                             {
                                 TriggerCompositeSpectrum.Add(triggerMZ, new ThermoMzPeak(triggerMZ, intensity, charge: charge));
                             }
+
+
+                            Fragment targetFrag = null;
+                            if (indexTargetFrags.TryGetValue(fragName, out targetFrag))
+                            {
+                                double targetMZ = triggerFrag.ToMz(charge);
+                                MzRange targetRange = new MzRange(targetMZ, FragmentTol);
+
+                                //Deal with the target first to try and see if you can add the peak
+                                bool targetAdded = false;
+                                foreach (KeyValuePair<double, ThermoMzPeak> kvp3 in TargetCompositeSpectrum)
+                                {
+                                    double testMZ = kvp3.Key;
+                                    ThermoMzPeak testPeak = kvp3.Value;
+
+                                    if (targetRange.Contains(testMZ))
+                                    {
+                                        TargetCompositeSpectrum[testMZ].Intensity += testPeak.Intensity;
+                                        targetAdded = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!targetAdded)
+                                {
+                                    TargetCompositeSpectrum.Add(targetMZ, new ThermoMzPeak(targetMZ, intensity, charge: charge));
+                                }
+                            } 
                         }
                     }
                 }
@@ -940,7 +956,6 @@ namespace TomahaqCompanion
             }
 
             //Update the RT window based on the User input
-
             if(scanRTs.Count > 0 )
             {
                 double avgRT = scanRTs.Average();
@@ -963,7 +978,7 @@ namespace TomahaqCompanion
             //This will go through the composite spectrum and choose the topN most intense ions
             List<double> targetSPSIons = new List<double>();
             Dictionary<double, int> targetSPSIonsWithCharge = new Dictionary<double, int>();
-            GetTopNIons(TargetMZ, TargetCompositeSpectrum, numIons, out targetSPSIons, out targetSPSIonsWithCharge);
+            GetTopNIons(TargetMZ, TargetCompositeSpectrum, numIons, out targetSPSIons, out targetSPSIonsWithCharge, "target");
 
             TargetSPSIons = targetSPSIons;
             TargetSPSIonsWithCharge = targetSPSIonsWithCharge;
@@ -971,7 +986,7 @@ namespace TomahaqCompanion
             //This will go through the composite spectrum and choose the topN most intense ions
             List<double> triggerSPSIons = new List<double>();
             Dictionary<double, int> triggerSPSIonsWithCharge = new Dictionary<double, int>();
-            GetTopNIons(TriggerMZ, TriggerCompositeSpectrum, numIons, out triggerSPSIons, out triggerSPSIonsWithCharge);
+            GetTopNIons(TriggerMZ, TriggerCompositeSpectrum, numIons, out triggerSPSIons, out triggerSPSIonsWithCharge, "trigger");
 
             TriggerIons = triggerSPSIons;
             TriggerIonsWithCharge = triggerSPSIonsWithCharge;
@@ -983,7 +998,7 @@ namespace TomahaqCompanion
             }
         }
 
-        private void GetTopNIons(double precMZ, SortedList<double, ThermoMzPeak> compositeSpectrum, int numIons, out List<double> mzValues, out Dictionary<double, int> mzValuesWithCharge)
+        private void GetTopNIons(double precMZ, SortedList<double, ThermoMzPeak> compositeSpectrum, int numIons, out List<double> mzValues, out Dictionary<double, int> mzValuesWithCharge, string type)
         {
             mzValues = new List<double>();
             mzValuesWithCharge = new Dictionary<double, int>();
@@ -1024,16 +1039,17 @@ namespace TomahaqCompanion
                 double peakMZ = peak.MZ;
                 int peakCharge = peak.Charge;
 
-                double peakMZMin = precMZ - 70;
-                double peakMZMax = precMZ + 5;
+                //double peakMZMin = precMZ - 70;
+                //double peakMZMax = precMZ + 5;
 
+                //TODO: The filtering should be done somewhere less obscure
                 //if(peakMZ > 400 && peakMZ < 2000 && (peakMZ < peakMZMin || peakMZ > peakMZMax))
-                if (peakMZ < peakMZMin || peakMZ > peakMZMax)
-                {
+                //if (peakMZ < peakMZMin || peakMZ > peakMZMax)
+                //{
                     mzValues.Add(peakMZ);
                     mzValuesWithCharge.Add(peakMZ, peakCharge);
                     numIonsAdded++;
-                }
+                //}
                 
                 index++;
             }
@@ -1130,7 +1146,6 @@ namespace TomahaqCompanion
             return sb.ToString();
         }
 
-
         public string TargetToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -1158,20 +1173,19 @@ namespace TomahaqCompanion
             {
                 foreach (KeyValuePair<string, Dictionary<Modification, string>> kvp2 in kvp.Value)
                 {
-                    sb.Append(kvp.Key + "|" + kvp2.Key + "|");
-
                     foreach (KeyValuePair<Modification, string> kvp3 in kvp2.Value)
                     {
-                        sb.Append(kvp3.Key.Name + ":" + kvp3.Value + ";");
+                        sb.Append(kvp.Key + ">" + kvp2.Key + ">");
+                        sb.Append(kvp3.Key.Name + ":" + kvp3.Key.MonoisotopicMass + ":" + kvp3.Key.Sites + ":" + kvp3.Value + "]");
                     }
-
-                    sb.Remove(sb.Length - 1, 1);
-                    sb.Append("]");
-
                 }
             }
 
             sb.Remove(sb.Length - 1, 1);
+
+            sb.Replace(",", "|");
+            sb.Replace(" ", "");
+
             sb.Append(',');
 
             return sb.ToString();

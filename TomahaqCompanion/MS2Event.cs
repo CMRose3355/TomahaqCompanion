@@ -85,7 +85,7 @@ namespace TomahaqCompanion
 
                     //Search the spectrum and return the peak that is the tallest
                     PointPair point = SearchSpectrum(minMZ, maxMZ, AllPeaks);
-                    if(point != null && point.X >400 && point.X <2000)
+                    if(point != null)
                     {
                         double outDoub = 0;
                         if(!MatchedFragDict[charge].TryGetValue(frag, out outDoub))

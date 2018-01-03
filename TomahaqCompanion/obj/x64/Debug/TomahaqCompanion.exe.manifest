@@ -148,14 +148,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="111616">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="112128">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>U+tqoQnORJsM8/qkXlXhcOWGUjudp796Q9DJtAEVzxE=</dsig:DigestValue>
+        <dsig:DigestValue>Akt7wWnyKj2ukQ5lMbxUhHMc80p1yyMLbISTPTpWXHw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
