@@ -925,7 +925,7 @@ namespace TomahaqCompanion
                             Fragment targetFrag = null;
                             if (indexTargetFrags.TryGetValue(fragName, out targetFrag))
                             {
-                                double targetMZ = triggerFrag.ToMz(charge);
+                                double targetMZ = targetFrag.ToMz(charge);
                                 MzRange targetRange = new MzRange(targetMZ, FragmentTol);
 
                                 //Deal with the target first to try and see if you can add the peak

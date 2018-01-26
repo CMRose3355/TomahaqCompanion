@@ -1,0 +1,6 @@
+Name,Mass,ModSites,ModChar,Type,Trigger,Target
+TMT10,229.16293,K;NPep,,Static,False,True,
+TMTsh,235.17677,K;NPep,,Static,True,False,
+CAM,57.02146,C,,Static,True,True,
+Phos,79.96633,S;T;Y,#,Dynamic,True,True,
+Acetyl,42.01056,NPep,@,Dynamic,True,True,
