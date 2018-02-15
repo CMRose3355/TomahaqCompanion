@@ -171,13 +171,10 @@ C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.xml
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.Thermo.pdb
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\API-2.0.xml
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\Fusion.API-1.0.xml
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\LumenWorks.Framework.IO.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\LumenWorks.Framework.IO.xml
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\MethodChanger.pdb
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\Spectrum-1.0.xml
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\Thermo.TNG.Factory.xml
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\Thermo.TNG.Factory.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\ZedGraph.xml
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\de\ZedGraph.resources.dll
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Release\es\ZedGraph.resources.dll

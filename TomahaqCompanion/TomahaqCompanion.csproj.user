@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PublishUrlHistory>\\nucleus\gygilab\Chris_Rose\SharedPrograms\TomahaqCompanion\</PublishUrlHistory>
-    <InstallUrlHistory />
+    <PublishUrlHistory>C:\Users\lumos\Desktop\TomahaqCompanionProgram\TomahaqCompanion\|C:\Users\lumos\Desktop\TomahaqCompanionProgram\|C:\Users\lumos\Desktop\TomahaqCompanion\|\\nucleus\gygilab\Chris_Rose\SharedPrograms\TomahaqCompanion\</PublishUrlHistory>
+    <InstallUrlHistory>https://raw.githubusercontent.com/CMRose3355/TomahaqCompanionProgram/master/TomahaqCompanion/|https://raw.githubusercontent.com/CMRose3355/TomahaqCompanionProgram/master/|https://raw.githubusercontent.com/CMRose3355/TomahaqCompanionProgram/|https://raw.githubusercontent.com/CMRose3355/TomahaqCompanionProgram/publish/</InstallUrlHistory>
     <SupportUrlHistory />
     <UpdateUrlHistory />
     <BootstrapperUrlHistory />
