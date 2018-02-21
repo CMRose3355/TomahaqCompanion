@@ -86,6 +86,8 @@ namespace TomahaqCompanion
             UpdateMoficationFileList();
 
             InitializePrimingRunGraphs();
+
+            UpdateLog("Version = 1.0.0.0");
         }
 
         //These are the main buttons that perform functions within the program
