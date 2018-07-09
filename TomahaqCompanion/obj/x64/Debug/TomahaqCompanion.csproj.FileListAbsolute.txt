@@ -18,7 +18,6 @@ C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\LumenWorks.Framework.IO.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\LumenWorks.Framework.IO.xml
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\MethodChanger.pdb
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\Thermo.TNG.Factory.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\ZedGraph.xml
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\de\ZedGraph.resources.dll
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\es\ZedGraph.resources.dll

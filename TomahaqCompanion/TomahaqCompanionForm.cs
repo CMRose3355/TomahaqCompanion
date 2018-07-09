@@ -87,7 +87,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.0.0.0");
+            UpdateLog("Version = 1.0.1.0");
         }
 
         //These are the main buttons that perform functions within the program
@@ -313,7 +313,21 @@ namespace TomahaqCompanion
                 Dictionary<int, int> TriggerMS2toMS1 = null;
                 Dictionary<int, List<int>> TriggerMS2toTargetMS2 = null;
                 Dictionary<int, List<int>> TargetMS2toTargetMS3 = null;
-                List<int> ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
+
+                //Get a spectrum number in the middle of the run
+                int midSpectrum = rawFile.LastSpectrumNumber / 2;
+                string scanDescription = rawFile.GetScanDescription(midSpectrum);
+
+                List<int> ms1Scans = new List<int>();
+                if (scanDescription.Contains("API"))
+                {
+                    
+                    ms1Scans = MapAPIMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3, targetList);
+                }
+                else
+                {
+                    ms1Scans = MapMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
+                }
 
                 //Extract MS1 Information
                 UpdateLog("Extracting MS1 XICs");
@@ -460,8 +474,8 @@ namespace TomahaqCompanion
                     string peptideString = reader["Peptide"];
                     
                     //Determine if a charge is provided or a range needs to be used
-                    int minCharge = 1;
-                    int maxCharge = 4;
+                    int minCharge = 2; //TODO: User Param
+                    int maxCharge = 3; //TODO: User Param
                     if(headers.Contains("z"))
                     {
                         minCharge = int.Parse(reader["z"]);
@@ -596,6 +610,160 @@ namespace TomahaqCompanion
             }
 
             return ms1List;
+        }
+
+        private List<int> MapAPIMSDataScans(ThermoRawFile rawFile, out Dictionary<int, int> TriggerMS2toMS1, out Dictionary<int, List<int>> TriggerMS2toTargetMS2, out Dictionary<int, List<int>> TargetMS2toTargetMS3, SortedList<double, TargetPeptide> targetList)
+        {
+            List<int> ms1List = new List<int>();
+            TriggerMS2toMS1 = new Dictionary<int, int>();
+            TriggerMS2toTargetMS2 = new Dictionary<int, List<int>>();
+            TargetMS2toTargetMS3 = new Dictionary<int, List<int>>();
+
+            Dictionary<int, int> mappedTargetMS2s = new Dictionary<int, int>();
+
+            int lastSpectrumNumber = rawFile.LastSpectrumNumber;
+
+            for(int i = lastSpectrumNumber; i > 0; i--)
+            {
+                //I am just querying the msn order of the scan, I think this is faster than getting the whole scan each time
+                int msnOrder = rawFile.GetMsnOrder(i);
+
+                //If it is an MS1 then just add the number to a list
+                if (msnOrder == 1)
+                {
+                    ms1List.Add(i);
+                }
+                //If it is an MS3 then make the connection to the target MS2
+                else if (msnOrder == 3)
+                {
+                    //MS3 Find parent scan number
+                    int ms3ParentScanNumber = FindParentMS3(rawFile, i, mappedTargetMS2s, out mappedTargetMS2s);
+
+                    List<int> outList = null;
+                    if (TargetMS2toTargetMS3.TryGetValue(ms3ParentScanNumber, out outList))
+                    {
+                        outList.Add(i);
+                    }
+                    else
+                    {
+                        TargetMS2toTargetMS3.Add(ms3ParentScanNumber, new List<int>());
+                        TargetMS2toTargetMS3[ms3ParentScanNumber].Add(i);
+                    }
+
+                }
+                //If it is an MS2 then it could be a trigger or target
+                else if (msnOrder == 2)
+                {
+                    int triggerScanNumber = i;
+                    double precMZ = double.Parse(rawFile.GetScanFilterMZ(i));
+;
+                    foreach(KeyValuePair<double, TargetPeptide> kvp in targetList)
+                    {
+                        MzRange triggerRange = new MzRange(kvp.Key, new Tolerance(ToleranceUnit.PPM, 15));
+                        if(triggerRange.Contains(precMZ))
+                        {
+                            int targetMS2ScanNumber = FindTargetMS2(rawFile, triggerScanNumber, kvp.Value);
+
+                            if(targetMS2ScanNumber > 0)
+                            {
+                                List<int> outList = null;
+                                if (TriggerMS2toTargetMS2.TryGetValue(triggerScanNumber, out outList))
+                                {
+                                    outList.Add(i);
+                                }
+                                else
+                                {
+                                    TriggerMS2toTargetMS2.Add(triggerScanNumber, new List<int>());
+                                    TriggerMS2toTargetMS2[triggerScanNumber].Add(targetMS2ScanNumber);
+                                }
+                            }
+
+                            //FIND THE MS1 JUST GO BACKWARDS
+                            int ms1ScanNumber = FindMS1(rawFile, triggerScanNumber);
+                            TriggerMS2toMS1.Add(triggerScanNumber, ms1ScanNumber);
+                        }
+                    }
+                }
+            }
+
+            return ms1List;
+        }
+
+        private int FindParentMS3(ThermoRawFile rawFile, int ms3ScanNumber, Dictionary<int, int> mappedTargetMS2s, out Dictionary<int, int> ret_mappedTargetMS2s)
+        {
+            int targetMS2ScanNumber = 0;
+            string precursorMZ = rawFile.GetScanFilterMZ(ms3ScanNumber);
+            ret_mappedTargetMS2s = new Dictionary<int, int>();
+
+            for (int i = ms3ScanNumber; i >= 1; i--)
+            {
+                //I am just querying the msn order of the scan, I think this is faster than getting the whole scan each time
+                int msnOrder = rawFile.GetMsnOrder(i);
+
+                if(msnOrder == 2 && rawFile.GetScanFilterMZ(i).Equals(precursorMZ))
+                {
+                    int outSN = 0;
+                    if(!mappedTargetMS2s.TryGetValue(i, out outSN))
+                    {
+                        mappedTargetMS2s.Add(i, i);
+                        ret_mappedTargetMS2s = mappedTargetMS2s;
+                        return i;
+                    }
+                }
+
+            }
+
+            return targetMS2ScanNumber;
+        }
+
+        private int FindTargetMS2(ThermoRawFile rawFile, int triggerMS2ScanNumber, TargetPeptide targetPeptide)
+        {
+            int targetMS2ScanNumber = 0;
+
+            int endScanNumber = triggerMS2ScanNumber + 10;
+            if(endScanNumber > rawFile.LastSpectrumNumber)
+            {
+                endScanNumber = rawFile.LastSpectrumNumber;
+            }
+
+            for (int i = triggerMS2ScanNumber; i <= endScanNumber; i++)
+            {
+                //I am just querying the msn order of the scan, I think this is faster than getting the whole scan each time
+                int msnOrder = rawFile.GetMsnOrder(i);
+
+                if (msnOrder == 2)
+                {
+                    double testMZ = double.Parse(rawFile.GetScanFilterMZ(i));
+
+                    MzRange targetMZRange = new MzRange(targetPeptide.TargetMZ, new Tolerance(ToleranceUnit.PPM, 15));
+                    if(targetMZRange.Contains(testMZ))
+                    {
+                        return i;
+                    }
+                }
+
+            }
+
+            return targetMS2ScanNumber;
+        }
+
+        private int FindMS1(ThermoRawFile rawFile, int triggerMS2ScanNumber)
+        {
+            int targetMS2ScanNumber = 0;
+
+            for (int i = triggerMS2ScanNumber; i >= 1; i--)
+            {
+                //I am just querying the msn order of the scan, I think this is faster than getting the whole scan each time
+                int msnOrder = rawFile.GetMsnOrder(i);
+
+                if (msnOrder == 1)
+                {
+                    return i;
+                }
+
+            }
+
+            return targetMS2ScanNumber;
         }
 
         private void ExtractMS1XIC(ThermoRawFile rawFile, List<int> ms1Scans, SortedList<double, TargetPeptide> targetList)
@@ -907,6 +1075,13 @@ namespace TomahaqCompanion
 
         private void InitializeTargetGrid()
         {
+            DataGridViewCheckBoxColumn selectedColumn = new DataGridViewCheckBoxColumn();
+            selectedColumn.DataPropertyName = "Selected";
+            selectedColumn.HeaderText = "Selected";
+            selectedColumn.ReadOnly = false;
+            selectedColumn.Width = 50;
+            targetGridView.Columns.Add(selectedColumn);
+
             DataGridViewTextBoxColumn peptideColumn = new DataGridViewTextBoxColumn();
             peptideColumn.DataPropertyName = "PeptideString";
             peptideColumn.HeaderText = "Peptide";
@@ -965,21 +1140,21 @@ namespace TomahaqCompanion
             massColumn.DataPropertyName = "Mass";
             massColumn.HeaderText = "Mono Mass";
             massColumn.ReadOnly = true;
-            massColumn.Width = 90;
+            massColumn.Width = 70;
             modGridView.Columns.Add(massColumn);
 
             DataGridViewTextBoxColumn modTypeColumn = new DataGridViewTextBoxColumn();
             modTypeColumn.DataPropertyName = "Type";
             modTypeColumn.HeaderText = "Type";
             modTypeColumn.ReadOnly = true;
-            modTypeColumn.Width = 70;
+            modTypeColumn.Width = 60;
             modGridView.Columns.Add(modTypeColumn);
 
             DataGridViewTextBoxColumn modCharColumn = new DataGridViewTextBoxColumn();
             modCharColumn.DataPropertyName = "ModChar";
             modCharColumn.HeaderText = "Symbol";
             modCharColumn.ReadOnly = true;
-            modCharColumn.Width = 45;
+            modCharColumn.Width = 30;
             modGridView.Columns.Add(modCharColumn);
 
             DataGridViewTextBoxColumn modSitesColumn = new DataGridViewTextBoxColumn();
@@ -1649,6 +1824,13 @@ namespace TomahaqCompanion
             {
                 double l_distance = Math.Abs(sel.ScanEvent.RetentionTime - rt);
 
+                ScanEventLine outSel = null;
+                while(sortedSEL.TryGetValue(l_distance, out outSel))
+                {
+                    l_distance += 0.0000001;
+                }
+
+
                 sortedSEL.Add(l_distance, sel);
             }
 
@@ -1789,26 +1971,37 @@ namespace TomahaqCompanion
             //
             foreach (TargetPeptideLine targetPepLine in TargetsDisplayed)
             {
-                TargetPeptide target = targetPepLine.Peptide;
-                target.SelectedScanEventLines = new List<ScanEventLine>();
-                foreach (ScanEventLine sel in target.ScanEventLines)
+                //Only update the peptide if the peptide was seleted by the user
+                if (targetPepLine.Selected)
                 {
-                    if (sel.Include)
+                    TargetPeptide target = targetPepLine.Peptide;
+                    target.SelectedScanEventLines = new List<ScanEventLine>();
+                    foreach (ScanEventLine sel in target.ScanEventLines)
                     {
-                        target.SelectedScanEventLines.Add(sel);
+                        if (sel.Include)
+                        {
+                            target.SelectedScanEventLines.Add(sel);
+                        }
                     }
+
+                    target.AverageScanEventsLines(target.SelectedScanEventLines, target.SelectedScanEventLines.Count, includeAll: true);
+                    target.UpdateTargetIons(15, spsEdited: SPSIonsEdited);
+
+                    //target.PopulateTriggerAndTargetIons(20, force:true); //Is this necessary - if we are here there is a raw file
                 }
-
-                target.AverageScanEventsLines(target.SelectedScanEventLines,target.SelectedScanEventLines.Count, includeAll:true);
-                target.UpdateTargetIons(15, spsEdited:SPSIonsEdited);
-
-                //target.PopulateTriggerAndTargetIons(20, force:true); //Is this necessary - if we are here there is a raw file
             }
 
             //Make the XMLfile that will be used to alter the method
             //Only change the parameters the user wants to
             List<TargetPeptide> targets = new List<TargetPeptide>();
-            foreach(TargetPeptideLine pep in TargetsDisplayed) { targets.Add(pep.Peptide); }
+            foreach(TargetPeptideLine pep in TargetsDisplayed)
+            {
+                //Only add to the list of targets if the peptide was seleted by the user
+                if(pep.Selected)
+                {
+                    targets.Add(pep.Peptide);
+                }
+            }
 
             UpdateLog("Building XML");
             bool addMS1TargetedMass = addMS1TargetMassList.Checked;
@@ -2239,7 +2432,7 @@ namespace TomahaqCompanion
 
         private void exportTargetList_Click(object sender, EventArgs e)
         {
-            string outputfile = "C:\\Users\\lumos\\Desktop\\Test.csv";
+            string outputfile = "C:\\Users\\lumos\\Desktop\\PierceRTPeptides.csv";
 
             using (StreamWriter writer = new StreamWriter(outputfile))
             {
@@ -2371,6 +2564,33 @@ namespace TomahaqCompanion
 
                 //Add a modification line
                 ModLines.Add(new ModificationLine(addMod.Name, Math.Round(addMod.MonoisotopicMass, 5), sites, symbol, type, trigger, target, addMod));
+            }
+        }
+
+        private void displaySelectedLine_CheckedChanged(object sender, EventArgs e)
+        {
+            if(displaySelectedLine.Checked)
+            {
+                List<TargetPeptideLine> toDisplay = new List<TargetPeptideLine>();
+
+                foreach (TargetPeptideLine targetLine in TargetsDisplayed)
+                {
+                    if (targetLine.Selected)
+                    {
+                        toDisplay.Add(targetLine);
+                    }
+                }
+
+                TargetsDisplayed.Clear();
+
+                foreach(TargetPeptideLine target in toDisplay)
+                {
+                    TargetsDisplayed.Add(target);
+                }
+            }
+            else
+            {
+                DisplayTargets();
             }
         }
     }

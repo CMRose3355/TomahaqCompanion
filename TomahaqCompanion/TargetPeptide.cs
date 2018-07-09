@@ -84,6 +84,8 @@ namespace TomahaqCompanion
         public PointPairList TargetMS3Points { get; set; }
         public PointPairList TargetCompositeMS2Points { get; set; }
 
+        public bool Analyzing { get; set; }
+
 
         public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol)
         {
@@ -154,6 +156,8 @@ namespace TomahaqCompanion
             TargetSPSIonsWithCharge = new Dictionary<double, int>();
 
             InitializeTargetSPSFrags();
+
+            Analyzing = false;
         }
 
         public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, Dictionary<double,int> targetSPSIons, Dictionary<double,int> triggerFragIons, double startTime, double endTime, Tolerance fragTol)
@@ -305,7 +309,13 @@ namespace TomahaqCompanion
             List<ThermoMzPeak> peaks = null;
             if (spectrum.TryGetPeaks(0, 2000, out peaks))
             {
-                double triggerInt = MS1toTriggerInt[ms1ScanNumber];
+                double triggerInt = 0;
+
+                if(MS1toTriggerInt.TryGetValue(ms1ScanNumber, out triggerInt))
+                {
+                    triggerInt = MS1toTriggerInt[ms1ScanNumber];
+                }
+
                 MS2Event ms2Event = new MS2Event(scanNumber, rt, peaks, it, triggerInt, FragmentTol);
                 TargetMS2s.Add(ms2Event);
 
