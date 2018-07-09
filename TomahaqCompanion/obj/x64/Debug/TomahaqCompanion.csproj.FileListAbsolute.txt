@@ -32,7 +32,6 @@ C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\tr\ZedGraph.resources.dll
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\zh-cn\ZedGraph.resources.dll
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\x64\Debug\zh-tw\ZedGraph.resources.dll
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.csprojResolveAssemblyReference.cache
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.TomahaqCompanionForm.resources
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.Properties.Resources.resources
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.csproj.GenerateResource.Cache
@@ -40,3 +39,6 @@ C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.application
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.exe
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.pdb
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.csprojAssemblyReference.cache
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.csproj.CoreCompileInputs.cache
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\x64\Debug\TomahaqCompanion.csproj.CopyComplete

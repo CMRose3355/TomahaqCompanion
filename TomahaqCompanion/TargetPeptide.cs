@@ -44,15 +44,15 @@ namespace TomahaqCompanion
         public Peptide Trigger { get; set; }
         public Peptide Target { get; set; }
 
-        public SortedList<double, double> TriggerMS1xic {get; set;}
+        public SortedList<double, double> TriggerMS1xic { get; set; }
         public SortedList<double, double> TargetMS1xic { get; set; }
 
         public SortedList<double, ThermoMzPeak> TriggerCompositeSpectrum { get; set; }
         public SortedList<double, ThermoMzPeak> TargetCompositeSpectrum { get; set; }
-        
+
         public SortedDictionary<int, double> MS1toTriggerInt { get; set; }
 
-        public SortedDictionary<double,MS2Event> TriggerMS2sByInt { get; set; }
+        public SortedDictionary<double, MS2Event> TriggerMS2sByInt { get; set; }
         public SortedDictionary<double, MS2Event> TargetMS2sByTriggerInt { get; set; }
 
         public List<MS2Event> TriggerMS2s { get; set; }
@@ -69,8 +69,8 @@ namespace TomahaqCompanion
         public List<double> TriggerIons { get; set; }
         public List<double> TargetSPSIons { get; set; }
 
-        public Dictionary<double,int> TriggerIonsWithCharge { get; set; }
-        public Dictionary<double,int> TargetSPSIonsWithCharge { get; set; }
+        public Dictionary<double, int> TriggerIonsWithCharge { get; set; }
+        public Dictionary<double, int> TargetSPSIonsWithCharge { get; set; }
 
         private Dictionary<string, Dictionary<int, Modification>> DynModDict { get; set; }
 
@@ -86,8 +86,14 @@ namespace TomahaqCompanion
 
         public bool Analyzing { get; set; }
 
+        public double EO {get; set;}
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol)
+        public MzRange SPSInclRange { get; set; } //Upon import set the min to the value, unless higher than Prec MZ is chosen - then switch
+
+        public MzRange PrecExclRange { get; set; }
+
+
+        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh, bool spsAbovePrec)
         {
             //Save the original peptide string
             PeptideString = peptideString;
@@ -158,9 +164,18 @@ namespace TomahaqCompanion
             InitializeTargetSPSFrags();
 
             Analyzing = false;
+
+            if(spsAbovePrec && this.TargetMZ > spsMin)
+            {
+                spsMin = this.TargetMZ;
+            }
+
+            SPSInclRange = new MzRange(spsMin, spsMax);
+
+            PrecExclRange = new MzRange(this.TargetMZ - precExLow, this.TargetMZ + precExHigh);
         }
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, Dictionary<double,int> targetSPSIons, Dictionary<double,int> triggerFragIons, double startTime, double endTime, Tolerance fragTol)
+        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, Dictionary<double,int> targetSPSIons, Dictionary<double,int> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh, bool spsAbovePrec)
         {
             //Save the original peptide string
             PeptideString = peptideString;
@@ -230,6 +245,15 @@ namespace TomahaqCompanion
             TargetCompositeSpectrum = new SortedList<double, ThermoMzPeak>();
 
             InitializeTargetSPSFrags();
+
+            if (spsAbovePrec && this.TargetMZ > spsMin)
+            {
+                spsMin = this.TargetMZ;
+            }
+
+            SPSInclRange = new MzRange(spsMin, spsMax);
+
+            PrecExclRange = new MzRange(this.TargetMZ - precExLow, this.TargetMZ + precExHigh);
         }
 
         public void AddMS1XICPoint(ThermoSpectrum spectrum, double rt, int scanNumber)
@@ -397,7 +421,7 @@ namespace TomahaqCompanion
             return isoSpec;
         }
 
-        private void PopulateTargetSPSIons(int numSPSIons, bool force = false)
+        private void PopulateTargetSPSIons(int numSPSIons, bool force = false) //NOTE:This is where SPS Ion Filters are applied
         {
             if (TargetSPSIons.Count > 0 && !force)
             {
@@ -426,11 +450,7 @@ namespace TomahaqCompanion
                         double fragMZ = frag.ToMz(i);
                         double distanceFromPrec = fragMZ - TargetMZ;
 
-                        //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
-                        double fragMZMin = TargetMZ - 70;
-                        double fragMZMax = TargetMZ + 5;
-
-                        if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
+                        if (SPSInclRange.Contains(fragMZ) && !PrecExclRange.Contains(fragMZ))
                         {
                             //check if there is another entry with the same distance from the precursor
                             double outDoub = 0;
@@ -489,17 +509,17 @@ namespace TomahaqCompanion
 
                         bool addTriggerIon = true; //TODO:Make this a user paramater
 
-                        if(!addTriggerIon)
-                        {
-                            //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
-                            double fragMZMin = TriggerMZ - 70;
-                            double fragMZMax = TriggerMZ + 5;
-
-                            if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
-                            {
-                                addTriggerIon = true;
-                            }
-                        }
+                        //if(!addTriggerIon) //I don't think that I want to put a filter on the trigger ions...this shouldn't be necessary anymore
+                        //{
+                        //    //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
+                        //    double fragMZMin = TriggerMZ - 70;
+                        //    double fragMZMax = TriggerMZ + 5;
+                        //
+                        //    if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
+                        //    {
+                        //        addTriggerIon = true;
+                        //    }
+                        //}
 
                         //check if there is another entry with the same distance from the precursor
                         if (addTriggerIon)
@@ -1049,17 +1069,12 @@ namespace TomahaqCompanion
                 double peakMZ = peak.MZ;
                 int peakCharge = peak.Charge;
 
-                //double peakMZMin = precMZ - 70;
-                //double peakMZMax = precMZ + 5;
-
-                //TODO: The filtering should be done somewhere less obscure
-                //if(peakMZ > 400 && peakMZ < 2000 && (peakMZ < peakMZMin || peakMZ > peakMZMax))
-                //if (peakMZ < peakMZMin || peakMZ > peakMZMax)
-                //{
+                if (SPSInclRange.Contains(peakMZ) && !PrecExclRange.Contains(peakMZ))
+                {
                     mzValues.Add(peakMZ);
                     mzValuesWithCharge.Add(peakMZ, peakCharge);
                     numIonsAdded++;
-                //}
+                }
                 
                 index++;
             }

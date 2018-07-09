@@ -10,6 +10,7 @@ namespace TomahaqCompanion
     public class ScanEventLine
     {
         public MS2Event ScanEvent { get; set; }
+        public MS3Event MS3Event { get; set; }
         public bool Include { get; set; }
         public string MS1TriggerIntensity { get; set; }
         public string MS2RetentionTime { get; set; }
@@ -35,6 +36,7 @@ namespace TomahaqCompanion
         public ScanEventLine(MS2Event ms2ScanEvent)
         {
             ScanEvent = ms2ScanEvent;
+            MS3Event = ms2ScanEvent.MS3;
             MS2RetentionTime = Math.Round(ms2ScanEvent.RetentionTime,2).ToString();
             MS2ScanNumber = ms2ScanEvent.ScanNumber.ToString();
             MS2InjectionTime = Math.Round(ms2ScanEvent.InjectionTime,1).ToString();
@@ -91,9 +93,19 @@ namespace TomahaqCompanion
 
         public override string ToString()
         {
-            return MS1TriggerIntensity + "," + MS2RetentionTime + "," + MS2ScanNumber + "," + MS3ScanNumber + "," + MS2InjectionTime + "," + MS3InjectionTime + "," +
+            string retVal = MS1TriggerIntensity + "," + MS2RetentionTime + "," + MS2ScanNumber + "," + MS3ScanNumber + "," + MS2InjectionTime + "," + MS3InjectionTime + "," +
                 MS3SPSIons + "," + MS3SumSN + "," + MS3IsoSpec + "," + MS3Quant1 + "," + MS3Quant2 + "," + MS3Quant3 + "," + MS3Quant4 + "," + MS3Quant5 + "," + MS3Quant6 + 
                 "," + MS3Quant7 + "," + MS3Quant8 + "," + MS3Quant9 + "," + MS3Quant10 + "," + MS3Quant11;
+
+            if(MS3Event != null)
+            {
+                foreach(PointPair ppmError in MS3Event.QuantPeaksMassError)
+                {
+                    retVal += "," + ppmError.Y.ToString();
+                }
+            }
+
+            return retVal;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="TomahaqCompanion.exe" version="1.0.0.29" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="TomahaqCompanion.exe" version="1.0.1.30" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
     <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="289792">
-      <assemblyIdentity name="CSMSL" version="0.3.6614.29205" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="319488">
+      <assemblyIdentity name="CSMSL" version="0.3.6719.15894" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>DKZ0WYgJw1Jaw3gXM7AEqU3tZYTQ1pHwhLYsyXFyPxw=</dsig:DigestValue>
+        <dsig:DigestValue>a2xUbHWLLiIF4kfFmQoVu1OTbjUSYDrEKm4kN3P+uno=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -73,7 +73,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>3JwadJf7BHG0P3/WW7fuHh/ii964ZC3EMFitfxuklk4=</dsig:DigestValue>
+        <dsig:DigestValue>bj0gSPjHyJZbwCHy96RCZ4N1IGU0UnqR2zIS4nkD2jE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -162,14 +162,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="114688">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="116224">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>oppRLvtjXMTGujtTlJ/sQxqG2HcNiURuG9HxY4iNjtU=</dsig:DigestValue>
+        <dsig:DigestValue>MMrh8iaLFMXJlI7AcD2pqDPoDNQyqGgjBHMJhgPw/lk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

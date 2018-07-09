@@ -24,6 +24,7 @@ namespace TomahaqCompanion
 
         public PointPairList AllPeaks { get; set; }
         public PointPairList QuantPeaks { get; set; }
+        public PointPairList QuantPeaksMassError { get; set; }
 
         public List<double> SPSIons { get; set; }
         public int SPSIonCount { get; set; }
@@ -38,6 +39,7 @@ namespace TomahaqCompanion
 
             AllPeaks = new PointPairList();
             QuantPeaks = new PointPairList();
+            QuantPeaksMassError = new PointPairList();
 
             foreach (ThermoMzPeak peak in peaks)
             {
@@ -53,10 +55,12 @@ namespace TomahaqCompanion
                 if(peak == null)
                 {
                     QuantPeaks.Add(peakCount, 0);
+                    QuantPeaksMassError.Add(peakCount, -100);
                 }
                 else
                 {
                     QuantPeaks.Add(peakCount, peak.SignalToNoise);
+                    QuantPeaksMassError.Add(peakCount, ((quantMZ - peak.MZ)/quantMZ*1000000));
                 }
 
                 peakCount++;

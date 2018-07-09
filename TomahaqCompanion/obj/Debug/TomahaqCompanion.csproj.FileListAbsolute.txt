@@ -197,7 +197,6 @@ C:\Users\rosec6\Desktop\Instruments\Tomahaq\TomahaqCompanion-master\TomahaqCompa
 C:\Users\rosec6\Desktop\InstrumentFiles_NewComputer\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Debug\TomahaqCompanion.exe.config
 C:\Users\rosec6\Desktop\InstrumentFiles_NewComputer\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.exe
 C:\Users\rosec6\Desktop\InstrumentFiles_NewComputer\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.pdb
-C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csprojResolveAssemblyReference.cache
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.TomahaqCompanionForm.resources
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.Properties.Resources.resources
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csproj.GenerateResource.Cache
@@ -238,3 +237,6 @@ C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Debug\MethodChanger.pdb
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Debug\Fusion.API-1.0.dll
 C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\bin\Debug\Thermo.TNG.Factory.dll
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csprojAssemblyReference.cache
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csproj.CoreCompileInputs.cache
+C:\Users\lumos\Desktop\IAPI Development\IAPI\VSProjects\Oracle\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csproj.CopyComplete

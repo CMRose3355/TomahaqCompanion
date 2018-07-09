@@ -45,7 +45,7 @@ namespace TomahaqCompanion
         private double MouseDownTime;
         private double MouseUpTime;
 
-        private Tolerance FragmentTol; 
+        private Tolerance FragmentTol;
 
         public TomahaqCompanionForm()
         {
@@ -87,7 +87,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.0.1.0");
+            UpdateLog("Version = 1.0.2.0");
         }
 
         //These are the main buttons that perform functions within the program
@@ -217,7 +217,7 @@ namespace TomahaqCompanion
 
                 //Choose the best charge state, but only if there is a raw file provided.
                 //If the user provided the charge states skip this as well
-                if(rawFileProvided && !chargeProvided)
+                if(rawFileProvided && !chargeProvided && chooseBestCharge.Checked)
                 {
                     targets = ChooseBestChargeState(targets);
                 }
@@ -251,7 +251,6 @@ namespace TomahaqCompanion
                     string templateMethod = templateBox.Text;
                     string outputMethod = targetFile.Replace(".csv", ".meth");
                     XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
-
                     UpdateLog("Writing method to " + outputMethod);
                 }
                 else
@@ -319,10 +318,14 @@ namespace TomahaqCompanion
                 string scanDescription = rawFile.GetScanDescription(midSpectrum);
 
                 List<int> ms1Scans = new List<int>();
-                if (scanDescription.Contains("API"))
+                if (tomaAPIRawFile.Checked) //USER_INPUT
                 {
                     
                     ms1Scans = MapAPIMSDataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3, targetList);
+                }
+                else if(ms2DataAnalysis.Checked)
+                {
+                    ms1Scans = MapMS2DataScans(rawFile, out TriggerMS2toMS1, out TriggerMS2toTargetMS2, out TargetMS2toTargetMS3);
                 }
                 else
                 {
@@ -373,7 +376,6 @@ namespace TomahaqCompanion
         {
             updateInstrumentMethod();
         }
-
 
         //Below are the methods and functions that are called from the buttons above
         private Dictionary<string, Dictionary<string, double>> BiuldQuantificationDictionary()
@@ -475,7 +477,7 @@ namespace TomahaqCompanion
                     
                     //Determine if a charge is provided or a range needs to be used
                     int minCharge = 2; //TODO: User Param
-                    int maxCharge = 3; //TODO: User Param
+                    int maxCharge = 4; //TODO: User Param
                     if(headers.Contains("z"))
                     {
                         minCharge = int.Parse(reader["z"]);
@@ -509,7 +511,7 @@ namespace TomahaqCompanion
                     //
                     for (int charge = minCharge; charge <= maxCharge;charge++)
                     {
-                        TargetPeptide target = new TargetPeptide(peptideString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol);
+                        TargetPeptide target = new TargetPeptide(peptideString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), spsIonsAbovePrec.Checked);
 
                         TargetPeptide outPep = null;
                         double mz = target.Trigger.ToMz(charge);
@@ -655,7 +657,8 @@ namespace TomahaqCompanion
                 else if (msnOrder == 2)
                 {
                     int triggerScanNumber = i;
-                    double precMZ = double.Parse(rawFile.GetScanFilterMZ(i));
+                    string mzToParse = rawFile.GetScanFilterMZ(i);
+                    double precMZ = double.Parse(mzToParse);
 ;
                     foreach(KeyValuePair<double, TargetPeptide> kvp in targetList)
                     {
@@ -682,6 +685,69 @@ namespace TomahaqCompanion
                             int ms1ScanNumber = FindMS1(rawFile, triggerScanNumber);
                             TriggerMS2toMS1.Add(triggerScanNumber, ms1ScanNumber);
                         }
+                    }
+                }
+            }
+
+            return ms1List;
+        }
+
+        private List<int> MapMS2DataScans(ThermoRawFile rawFile, out Dictionary<int, int> TriggerMS2toMS1, out Dictionary<int, List<int>> TriggerMS2toTargetMS2, out Dictionary<int, List<int>> TargetMS2toTargetMS3)
+        {
+            List<int> ms1List = new List<int>();
+            TriggerMS2toMS1 = new Dictionary<int, int>();
+            TriggerMS2toTargetMS2 = new Dictionary<int, List<int>>();
+            TargetMS2toTargetMS3 = new Dictionary<int, List<int>>();
+
+            int lastSpectrumNumber = rawFile.LastSpectrumNumber;
+
+            //Cycle through the raw file
+            for (int i = 1; i <= lastSpectrumNumber; i++)
+            {
+                //I am just querying the msn order of the scan, I think this is faster than getting the whole scan each time
+                int msnOrder = rawFile.GetMsnOrder(i);
+
+                //If it is an MS1 then just add the number to a list
+                if (msnOrder == 1)
+                {
+                    ms1List.Add(i);
+                }
+                //If it is an MS2 then it could be a trigger or target
+                else if (msnOrder == 2)
+                {
+                    int parentScanNumber = rawFile.GetParentSpectrumNumber(i);
+                    int parentOrder = rawFile.GetMsnOrder(parentScanNumber);
+
+                    //If the parent order is 2 then this is a target ms2 and the parent is the trigger
+                    if (parentOrder == 2)
+                    {
+
+                        List<int> outList = null;
+                        if (TriggerMS2toTargetMS2.TryGetValue(parentScanNumber, out outList))
+                        {
+                            outList.Add(i);
+                        }
+                        else
+                        {
+                            TriggerMS2toTargetMS2.Add(parentScanNumber, new List<int>());
+                            TriggerMS2toTargetMS2[parentScanNumber].Add(i);
+                        }
+
+                        outList = null;
+                        if (TargetMS2toTargetMS3.TryGetValue(i, out outList))
+                        {
+                            outList.Add(i);
+                        }
+                        else
+                        {
+                            TargetMS2toTargetMS3.Add(i, new List<int>());
+                            TargetMS2toTargetMS3[i].Add(i);
+                        }
+                    }
+                    //If the parent order is 1 then this is a trigger ms2 and the parent is an MS1
+                    else if (parentOrder == 1)
+                    {
+                        TriggerMS2toMS1.Add(i, parentScanNumber);
                     }
                 }
             }
@@ -786,10 +852,6 @@ namespace TomahaqCompanion
             foreach (int scanNumber in TriggerMS2toMS1.Keys)
             {
                 Console.WriteLine(scanNumber);
-                if(scanNumber == 26118)
-                {
-                    int a = 0;
-                }
 
                 int ms1ScanNumber = TriggerMS2toMS1[scanNumber];
 
@@ -830,8 +892,6 @@ namespace TomahaqCompanion
                         }
                     }
                 }
-
-                int b = 0;
             }
         }
 
@@ -858,7 +918,12 @@ namespace TomahaqCompanion
                         ms3rt = rawFile.GetRetentionTime(ms3ScanNumber);
                         ms3it = rawFile.GetInjectionTime(ms3ScanNumber);
                         ms3spectrum = rawFile.GetSpectrum(ms3ScanNumber);
-                        spsIons = rawFile.GetSPSMasses(ms3ScanNumber);
+
+                        if(rawFile.GetMsnOrder(ms3ScanNumber)==3)
+                        {
+                            spsIons = rawFile.GetSPSMasses(ms3ScanNumber);
+                        }
+                        
 
                         //Add the target data and if there was an MS3 add that data too
                         targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, spsIons, quantChannelDict);
@@ -934,6 +999,19 @@ namespace TomahaqCompanion
 
         private string BuildMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
         {
+
+            List<TargetPeptide> _targetList = new List<TargetPeptide>();
+
+            foreach(TargetPeptide targetPep in targetList)
+            {
+                if(targetPep.TargetSPSIonsWithCharge.Count >0)
+                {
+                    _targetList.Add(targetPep);
+                }
+            }
+
+            int a = 0;
+
             //Only change the parameters the user wants to
             bool addMS1TargetedMass = ms1Target;
             bool addMS2TriggerMass = ms2Trigger;
@@ -952,7 +1030,7 @@ namespace TomahaqCompanion
             //First we will make sure we have enough trees for all of the peptides
             int modCount = 1;
             int experimentIndex = 0;
-            for(int i = 1;i<targetList.Count;i++)
+            for(int i = 1;i< _targetList.Count;i++)
             {
                 int sourceNodeForCopy = modCount - 1;
                 Experiment addExp = new Experiment(experimentIndex);
@@ -966,7 +1044,7 @@ namespace TomahaqCompanion
 
             //Next, we will change all of the trees to include all of the attributes of the peptides
             int treeIndex = 0;
-            foreach (TargetPeptide target in targetList)
+            foreach (TargetPeptide target in _targetList)
             {
                 if(addMS2IsoOffset)
                 {
@@ -1037,6 +1115,144 @@ namespace TomahaqCompanion
             return file;
         }
 
+        private string BuildLargeMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
+        {
+            //Only change the parameters the user wants to
+            bool addMS1TargetedMass = ms1Target;
+            bool addMS2TriggerMass = ms2Trigger;
+            bool addMS2IsoOffset = ms2Offset;
+            bool addMS3TargetedMass = ms3target;
+
+            //Save the xml for future use
+            string file = inputFile;
+
+            //Set up the serializer
+            XmlSerializer serializer = new XmlSerializer(typeof(MethodModifications));
+
+            //Set up the class that will hold all of the instructions
+            MethodModifications methodMods = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+            //Set up the class that will hold all of the instructions
+            MethodModifications methodMods1 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+            //Set up the class that will hold all of the instructions
+            MethodModifications methodMods2 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+            //Set up the class that will hold all of the instructions
+            MethodModifications methodMods3 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+            //Set up the class that will hold all of the instructions
+            MethodModifications methodMods4 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+
+
+            //First we will make sure we have enough trees for all of the peptides
+            int modCount = 1;
+            int experimentIndex = 0;
+            for (int i = 1; i < targetList.Count; i++)
+            {
+                int sourceNodeForCopy = modCount - 1;
+                Experiment addExp = new Experiment(experimentIndex);
+                addExp.CopyAndPasteScanNode(sourceNodeForCopy);
+
+                MethodModification addMod = new MethodModification(modCount, addExp);
+                methodMods.Modifications.Add(addMod);
+
+                modCount++;
+            }
+
+            //Next, we will change all of the trees to include all of the attributes of the peptides
+            int treeIndex = 0;
+            int modCount1 = 1;
+            int modCount2 = 1;
+            int modCount3 = 1;
+            int modCount4 = 1;
+            foreach (TargetPeptide target in targetList)
+            {
+                if (addMS2IsoOffset)
+                {
+                    //Add in the MS2 isolation offset
+                    Experiment addExp = new Experiment(experimentIndex);
+                    addExp.ChangeScanParams(treeIndex, target.MassShift);
+
+                    MethodModification addMod = new MethodModification(modCount, addExp);
+                    methodMods1.Modifications.Add(addMod);
+
+                    modCount1++;
+                }
+
+                if (addMS1TargetedMass)
+                {
+                    //Add in the MS1 inclusion list, and MS2 isolation offset
+                    Experiment addExp0 = new Experiment(experimentIndex);
+
+                    //If the retention times have not been populated then don't change them
+                    if (target.StartRetentionTime == -1)
+                    {
+                        addExp0.AddMS1InclusionSingle(treeIndex, target.TriggerMZ, target.Charge);
+                    }
+                    else
+                    {
+                        addExp0.AddMS1InclusionSingleWithRTWindow(treeIndex, target.TriggerMZ, target.Charge, target.StartRetentionTime, target.EndRetentionTime);
+                    }
+
+                    MethodModification addMod0 = new MethodModification(modCount, addExp0);
+                    methodMods2.Modifications.Add(addMod0);
+
+                    modCount2++;
+                }
+
+                if (addMS2TriggerMass)
+                {
+                    //Add the MS2 trigger mass List
+                    Experiment addExp1 = new Experiment(experimentIndex);
+                    addExp1.AddMS2TriggerList(treeIndex, target.TriggerIonsWithCharge);
+
+                    MethodModification addMod1 = new MethodModification(modCount, addExp1);
+                    methodMods3.Modifications.Add(addMod1);
+
+                    modCount3++;
+                }
+
+                if (addMS3TargetedMass)
+                {
+                    //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
+                    Experiment addExp2 = new Experiment(experimentIndex);
+                    addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIonsWithCharge);
+
+                    MethodModification addMod2 = new MethodModification(modCount, addExp2);
+                    methodMods4.Modifications.Add(addMod2);
+
+                    modCount4++;
+                }
+
+                treeIndex++;
+            }
+
+            //Write the XML
+            using (TextWriter writer = new StreamWriter(file))
+            {
+                serializer.Serialize(writer, methodMods);
+            }
+
+            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_1.xml")))
+            {
+                serializer.Serialize(writer, methodMods1);
+            }
+
+            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_2.xml")))
+            {
+                serializer.Serialize(writer, methodMods2);
+            }
+
+            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_3.xml")))
+            {
+                serializer.Serialize(writer, methodMods3);
+            }
+
+            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_4.xml")))
+            {
+                serializer.Serialize(writer, methodMods4);
+            }
+
+            return file;
+        }
+
         private void UpdateLog(string message)
         {
             logBox.AppendText(string.Format("[{0}]\t{1}\n", DateTime.Now.ToLongTimeString(), message));
@@ -1081,7 +1297,7 @@ namespace TomahaqCompanion
             selectedColumn.ReadOnly = false;
             selectedColumn.Width = 50;
             targetGridView.Columns.Add(selectedColumn);
-
+            
             DataGridViewTextBoxColumn peptideColumn = new DataGridViewTextBoxColumn();
             peptideColumn.DataPropertyName = "PeptideString";
             peptideColumn.HeaderText = "Peptide";
@@ -1910,7 +2126,7 @@ namespace TomahaqCompanion
             {
                 writer.WriteLine("Peptide,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
                     "MS2ScanNumber,MS3ScanNumber,MS2InjectionTime,MS3InjectionTime,MS3SPSIons,MS3SumSN,MS3IS,MS3Quant1,MS3Quant2,MS3Quant3,MS3Quant4,MS3Quant5," +
-                    "MS3Quant6, MS3Quant7, MS3Quant8, MS3Quant9, MS3Quant10");
+                    "MS3Quant6,MS3Quant7,MS3Quant8,MS3Quant9,MS3Quant10,MSQuant11,QuantError1,QuantError2,QuantError3,QuantError4,QuantError5,QuantError6,QuantError7,QuantError8,QuantError9,QuantError10,QuantError11");
 
                 foreach (TargetPeptideLine targetPepLine in TargetsDisplayed)
                 {
@@ -1945,7 +2161,7 @@ namespace TomahaqCompanion
             {
                 writer.WriteLine("Peptide,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
                     "MS2ScanNumber,MS3ScanNumber,MS2InjectionTime,MS3InjectionTime,MS3SPSIons,MS3SumSN,MS3IS,MS3Quant1,MS3Quant2,MS3Quant3,MS3Quant4,MS3Quant5," +
-                    "MS3Quant6, MS3Quant7, MS3Quant8, MS3Quant9, MS3Quant10");
+                    "MS3Quant6,MS3Quant7,MS3Quant8,MS3Quant9,MS3Quant10,MSQuant11,QuantError1,QuantError2,QuantError3,QuantError4,QuantError5,QuantError6,QuantError7,QuantError8,QuantError9,QuantError10,QuantError11");
 
                 foreach (TargetPeptideLine targetPepLine in TargetsDisplayed)
                 {
@@ -2592,6 +2808,11 @@ namespace TomahaqCompanion
             {
                 DisplayTargets();
             }
+        }
+
+        private void modGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }
