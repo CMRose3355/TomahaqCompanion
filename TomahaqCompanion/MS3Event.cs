@@ -49,7 +49,7 @@ namespace TomahaqCompanion
             int peakCount = 1;
             foreach(double quantMZ in quantChannelDict.Values)
             {
-                MzRange quantRange = new MzRange(quantMZ, new Tolerance(ToleranceUnit.PPM, 15));
+                MzRange quantRange = new MzRange(quantMZ, new Tolerance(ToleranceUnit.PPM, 20)); //TODO: Make a User Input
                 ThermoMzPeak peak = GetTallestPeak(quantRange, ms3spectrum);
 
                 if(peak == null)

@@ -18,6 +18,7 @@ namespace TomahaqCompanion
     public class TargetPeptide
     {
         public string PeptideString { get; set; }
+        public string ProteinString { get; set; }
         public int Charge { get; set; }
 
         public double MassShift { get; set; }
@@ -93,10 +94,11 @@ namespace TomahaqCompanion
         public MzRange PrecExclRange { get; set; }
 
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh, bool spsAbovePrec)
+        public TargetPeptide(string peptideString, string protein, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh,double eo, bool spsAbovePrec)
         {
             //Save the original peptide string
             PeptideString = peptideString;
+            ProteinString = protein;
             Charge = charge;
             TargetSPSIons = targetSPSIons;
             TriggerIons = triggerFragIons;
@@ -173,12 +175,15 @@ namespace TomahaqCompanion
             SPSInclRange = new MzRange(spsMin, spsMax);
 
             PrecExclRange = new MzRange(this.TargetMZ - precExLow, this.TargetMZ + precExHigh);
+
+            EO = eo;
         }
 
-        public TargetPeptide(string peptideString, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, Dictionary<double,int> targetSPSIons, Dictionary<double,int> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh, bool spsAbovePrec)
+        public TargetPeptide(string peptideString, string protein, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, Dictionary<double,int> targetSPSIons, Dictionary<double,int> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh, double eo, bool spsAbovePrec)
         {
             //Save the original peptide string
             PeptideString = peptideString;
+            ProteinString = protein;
             Charge = charge;
 
             TargetSPSIonsWithCharge = targetSPSIons;
@@ -198,7 +203,13 @@ namespace TomahaqCompanion
             ModificationDict = modificationDict;
 
             //Build the dynamic modification dictionary and return the stripped string
-            string strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
+            string strippedPepString = peptideString;
+
+            Dictionary<string, Dictionary<Modification, string>> outDict = null;
+            if (modificationDict.TryGetValue("Dynamic", out outDict))
+            {
+                strippedPepString = BuildDynamicModDict(peptideString, modificationDict["Dynamic"]);
+            }
 
             //Create the target and the trigger peptides
             Trigger = new Peptide(strippedPepString);
@@ -254,6 +265,8 @@ namespace TomahaqCompanion
             SPSInclRange = new MzRange(spsMin, spsMax);
 
             PrecExclRange = new MzRange(this.TargetMZ - precExLow, this.TargetMZ + precExHigh);
+
+            EO = eo;
         }
 
         public void AddMS1XICPoint(ThermoSpectrum spectrum, double rt, int scanNumber)
@@ -329,6 +342,12 @@ namespace TomahaqCompanion
 
         public void AddTargetData(int ms1ScanNumber, int scanNumber, ThermoSpectrum spectrum, double rt, double it, int ms3scanNumber, ThermoSpectrum ms3spectrum, double ms3rt, double ms3it, List<double> spsIons, Dictionary<string, double> quantChannelDict)
         {
+            if (MS1toTriggerInt == null) { return; }
+
+            if (TargetMS2s == null) { return; }
+
+            if(TargetMS3s == null) { return; }
+
             //See if there are any peaks within the MS2 event
             List<ThermoMzPeak> peaks = null;
             if (spectrum.TryGetPeaks(0, 2000, out peaks))
@@ -656,17 +675,20 @@ namespace TomahaqCompanion
             }
 
             //Cycle through the dynamic mods and add them to both of the peptides. 
-            foreach(KeyValuePair<int, Modification> kvp in DynModDict[type])
+            if(DynModDict != null)
             {
-                if(kvp.Key == 0)
+                foreach (KeyValuePair<int, Modification> kvp in DynModDict[type])
                 {
-                    peptide.SetModification(kvp.Value, Terminus.N);
+                    if (kvp.Key == 0)
+                    {
+                        peptide.SetModification(kvp.Value, Terminus.N);
+                    }
+                    else
+                    {
+                        peptide.SetModification(kvp.Value, kvp.Key);
+                    }
+
                 }
-                else
-                {
-                    peptide.SetModification(kvp.Value, kvp.Key);
-                }
-                
             }
 
             return peptide;
@@ -1127,9 +1149,11 @@ namespace TomahaqCompanion
             StringBuilder sb = new StringBuilder();
 
             sb.Append("PeptideString" + ",");
+            sb.Append("ProteinString" + ",");
             sb.Append("Charge" + ",");
             sb.Append("StartRetentionTime" + ",");
             sb.Append("EndRetentionTime" + ",");
+            sb.Append("EO" + ",");
             sb.Append("FragmentTol.Unit" + ",");
             sb.Append("FragmentTol.Value" + ",");
 
@@ -1176,9 +1200,11 @@ namespace TomahaqCompanion
             StringBuilder sb = new StringBuilder();
 
             sb.Append(PeptideString + ",");
+            sb.Append(ProteinString + ",");
             sb.Append(Charge + ",");
             sb.Append(StartRetentionTime + ",");
             sb.Append(EndRetentionTime + ",");
+            sb.Append(EO + ",");
             sb.Append(FragmentTol.Unit + ",");
             sb.Append(FragmentTol.Value + ",");
 

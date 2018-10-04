@@ -110,6 +110,9 @@
             this.targetBoxBrowse = new System.Windows.Forms.Button();
             this.targetTextBox = new System.Windows.Forms.TextBox();
             this.analysisTab = new System.Windows.Forms.TabPage();
+            this.sortTargetProteins = new System.Windows.Forms.Button();
+            this.proteinSearchBox = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
             this.sortTargetsPeptide = new System.Windows.Forms.Button();
             this.displaySelectedLine = new System.Windows.Forms.CheckBox();
             this.displayTargetsWData = new System.Windows.Forms.CheckBox();
@@ -120,6 +123,7 @@
             this.updateMethod = new System.Windows.Forms.Button();
             this.targetSearchBox = new System.Windows.Forms.TextBox();
             this.paramTab = new System.Windows.Forms.TabPage();
+            this.printDebug = new System.Windows.Forms.CheckBox();
             this.modSaveLoadGroup = new System.Windows.Forms.GroupBox();
             this.loadUserModFile = new System.Windows.Forms.Button();
             this.modFileListBox = new System.Windows.Forms.ListBox();
@@ -134,6 +138,7 @@
             this.rawFileFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawOFDia = new System.Windows.Forms.OpenFileDialog();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.targetGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.scanGridView)).BeginInit();
             this.tabControl.SuspendLayout();
@@ -171,7 +176,7 @@
             this.targetGridView.DefaultCellStyle = dataGridViewCellStyle11;
             this.targetGridView.Location = new System.Drawing.Point(3, 34);
             this.targetGridView.Name = "targetGridView";
-            this.targetGridView.Size = new System.Drawing.Size(441, 495);
+            this.targetGridView.Size = new System.Drawing.Size(472, 495);
             this.targetGridView.TabIndex = 0;
             this.targetGridView.SelectionChanged += new System.EventHandler(this.targetGridView_SelectionChanged);
             // 
@@ -198,17 +203,17 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(0, 9);
+            this.label2.Location = new System.Drawing.Point(0, 12);
             this.label2.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(80, 13);
+            this.label2.Size = new System.Drawing.Size(82, 13);
             this.label2.TabIndex = 43;
-            this.label2.Text = "Search Targets";
+            this.label2.Text = "Search Proteins";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // ms1GraphControl
             // 
-            this.ms1GraphControl.Location = new System.Drawing.Point(453, 6);
+            this.ms1GraphControl.Location = new System.Drawing.Point(482, 6);
             this.ms1GraphControl.Margin = new System.Windows.Forms.Padding(1);
             this.ms1GraphControl.Name = "ms1GraphControl";
             this.ms1GraphControl.ScrollGrace = 0D;
@@ -218,7 +223,7 @@
             this.ms1GraphControl.ScrollMinX = 0D;
             this.ms1GraphControl.ScrollMinY = 0D;
             this.ms1GraphControl.ScrollMinY2 = 0D;
-            this.ms1GraphControl.Size = new System.Drawing.Size(983, 190);
+            this.ms1GraphControl.Size = new System.Drawing.Size(954, 190);
             this.ms1GraphControl.TabIndex = 46;
             this.ms1GraphControl.UseExtendedPrintDialog = true;
             this.ms1GraphControl.MouseDownEvent += new ZedGraph.ZedGraphControl.ZedMouseEventHandler(this.ms1GraphControl_MouseDownEvent);
@@ -227,7 +232,7 @@
             // 
             // spectrumGraphControl1
             // 
-            this.spectrumGraphControl1.Location = new System.Drawing.Point(453, 203);
+            this.spectrumGraphControl1.Location = new System.Drawing.Point(482, 203);
             this.spectrumGraphControl1.Margin = new System.Windows.Forms.Padding(1);
             this.spectrumGraphControl1.Name = "spectrumGraphControl1";
             this.spectrumGraphControl1.ScrollGrace = 0D;
@@ -237,15 +242,16 @@
             this.spectrumGraphControl1.ScrollMinX = 0D;
             this.spectrumGraphControl1.ScrollMinY = 0D;
             this.spectrumGraphControl1.ScrollMinY2 = 0D;
-            this.spectrumGraphControl1.Size = new System.Drawing.Size(478, 179);
+            this.spectrumGraphControl1.Size = new System.Drawing.Size(467, 179);
             this.spectrumGraphControl1.TabIndex = 47;
             this.spectrumGraphControl1.UseExtendedPrintDialog = true;
+            this.spectrumGraphControl1.Load += new System.EventHandler(this.spectrumGraphControl1_Load);
             this.spectrumGraphControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.spectrumGraphControl1_MouseClick);
             this.spectrumGraphControl1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.spectrumGraphControl1_MouseDoubleClick);
             // 
             // spectrumGraphControl2
             // 
-            this.spectrumGraphControl2.Location = new System.Drawing.Point(956, 203);
+            this.spectrumGraphControl2.Location = new System.Drawing.Point(967, 203);
             this.spectrumGraphControl2.Margin = new System.Windows.Forms.Padding(1);
             this.spectrumGraphControl2.Name = "spectrumGraphControl2";
             this.spectrumGraphControl2.ScrollGrace = 0D;
@@ -255,7 +261,7 @@
             this.spectrumGraphControl2.ScrollMinX = 0D;
             this.spectrumGraphControl2.ScrollMinY = 0D;
             this.spectrumGraphControl2.ScrollMinY2 = 0D;
-            this.spectrumGraphControl2.Size = new System.Drawing.Size(478, 179);
+            this.spectrumGraphControl2.Size = new System.Drawing.Size(467, 179);
             this.spectrumGraphControl2.TabIndex = 49;
             this.spectrumGraphControl2.UseExtendedPrintDialog = true;
             // 
@@ -278,16 +284,16 @@
             dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.scanGridView.DefaultCellStyle = dataGridViewCellStyle13;
-            this.scanGridView.Location = new System.Drawing.Point(452, 401);
+            this.scanGridView.Location = new System.Drawing.Point(482, 401);
             this.scanGridView.Name = "scanGridView";
-            this.scanGridView.Size = new System.Drawing.Size(982, 153);
+            this.scanGridView.Size = new System.Drawing.Size(952, 153);
             this.scanGridView.TabIndex = 52;
             this.scanGridView.SelectionChanged += new System.EventHandler(this.scanGridView_SelectionChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(449, 385);
+            this.label5.Location = new System.Drawing.Point(479, 385);
             this.label5.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 13);
@@ -396,7 +402,6 @@
             // tomaAPIRawFile
             // 
             this.tomaAPIRawFile.AutoSize = true;
-            this.tomaAPIRawFile.Enabled = false;
             this.tomaAPIRawFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tomaAPIRawFile.Location = new System.Drawing.Point(155, 69);
             this.tomaAPIRawFile.Name = "tomaAPIRawFile";
@@ -1030,6 +1035,9 @@
             // 
             // analysisTab
             // 
+            this.analysisTab.Controls.Add(this.sortTargetProteins);
+            this.analysisTab.Controls.Add(this.proteinSearchBox);
+            this.analysisTab.Controls.Add(this.label19);
             this.analysisTab.Controls.Add(this.sortTargetsPeptide);
             this.analysisTab.Controls.Add(this.displaySelectedLine);
             this.analysisTab.Controls.Add(this.displayTargetsWData);
@@ -1057,19 +1065,49 @@
             this.analysisTab.UseVisualStyleBackColor = true;
             this.analysisTab.Click += new System.EventHandler(this.analysisTab_Click);
             // 
+            // sortTargetProteins
+            // 
+            this.sortTargetProteins.Location = new System.Drawing.Point(7, 560);
+            this.sortTargetProteins.Name = "sortTargetProteins";
+            this.sortTargetProteins.Size = new System.Drawing.Size(75, 23);
+            this.sortTargetProteins.TabIndex = 70;
+            this.sortTargetProteins.Text = "Sort by Pep";
+            this.sortTargetProteins.UseVisualStyleBackColor = true;
+            this.sortTargetProteins.Click += new System.EventHandler(this.sortTargetProteins_Click);
+            // 
+            // proteinSearchBox
+            // 
+            this.proteinSearchBox.AllowDrop = true;
+            this.proteinSearchBox.Location = new System.Drawing.Point(82, 9);
+            this.proteinSearchBox.Margin = new System.Windows.Forms.Padding(1);
+            this.proteinSearchBox.Name = "proteinSearchBox";
+            this.proteinSearchBox.Size = new System.Drawing.Size(148, 20);
+            this.proteinSearchBox.TabIndex = 69;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(240, 12);
+            this.label19.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(85, 13);
+            this.label19.TabIndex = 68;
+            this.label19.Text = "Search Peptides";
+            // 
             // sortTargetsPeptide
             // 
-            this.sortTargetsPeptide.Location = new System.Drawing.Point(168, 535);
+            this.sortTargetsPeptide.Location = new System.Drawing.Point(88, 560);
             this.sortTargetsPeptide.Name = "sortTargetsPeptide";
             this.sortTargetsPeptide.Size = new System.Drawing.Size(75, 23);
             this.sortTargetsPeptide.TabIndex = 67;
             this.sortTargetsPeptide.Text = "Sort by Pep";
             this.sortTargetsPeptide.UseVisualStyleBackColor = true;
+            this.sortTargetsPeptide.Click += new System.EventHandler(this.sortTargetsPeptide_Click);
             // 
             // displaySelectedLine
             // 
             this.displaySelectedLine.AutoSize = true;
-            this.displaySelectedLine.Location = new System.Drawing.Point(275, 537);
+            this.displaySelectedLine.Location = new System.Drawing.Point(243, 539);
             this.displaySelectedLine.Name = "displaySelectedLine";
             this.displaySelectedLine.Size = new System.Drawing.Size(166, 17);
             this.displaySelectedLine.TabIndex = 66;
@@ -1080,7 +1118,7 @@
             // displayTargetsWData
             // 
             this.displayTargetsWData.AutoSize = true;
-            this.displayTargetsWData.Location = new System.Drawing.Point(275, 560);
+            this.displayTargetsWData.Location = new System.Drawing.Point(243, 562);
             this.displayTargetsWData.Name = "displayTargetsWData";
             this.displayTargetsWData.Size = new System.Drawing.Size(169, 17);
             this.displayTargetsWData.TabIndex = 65;
@@ -1091,7 +1129,7 @@
             // displaySelected
             // 
             this.displaySelected.AutoSize = true;
-            this.displaySelected.Location = new System.Drawing.Point(707, 564);
+            this.displaySelected.Location = new System.Drawing.Point(737, 564);
             this.displaySelected.Name = "displaySelected";
             this.displaySelected.Size = new System.Drawing.Size(160, 17);
             this.displaySelected.TabIndex = 60;
@@ -1101,7 +1139,7 @@
             // 
             // selectAll
             // 
-            this.selectAll.Location = new System.Drawing.Point(576, 560);
+            this.selectAll.Location = new System.Drawing.Point(606, 560);
             this.selectAll.Name = "selectAll";
             this.selectAll.Size = new System.Drawing.Size(118, 23);
             this.selectAll.TabIndex = 63;
@@ -1111,7 +1149,7 @@
             // 
             // deselectAll
             // 
-            this.deselectAll.Location = new System.Drawing.Point(452, 560);
+            this.deselectAll.Location = new System.Drawing.Point(482, 560);
             this.deselectAll.Name = "deselectAll";
             this.deselectAll.Size = new System.Drawing.Size(118, 23);
             this.deselectAll.TabIndex = 62;
@@ -1142,15 +1180,17 @@
             // targetSearchBox
             // 
             this.targetSearchBox.AllowDrop = true;
-            this.targetSearchBox.Location = new System.Drawing.Point(82, 7);
+            this.targetSearchBox.Location = new System.Drawing.Point(327, 9);
             this.targetSearchBox.Margin = new System.Windows.Forms.Padding(1);
             this.targetSearchBox.Name = "targetSearchBox";
-            this.targetSearchBox.Size = new System.Drawing.Size(363, 20);
+            this.targetSearchBox.Size = new System.Drawing.Size(148, 20);
             this.targetSearchBox.TabIndex = 59;
             this.targetSearchBox.TextChanged += new System.EventHandler(this.targetSearchBox_TextChanged);
             // 
             // paramTab
             // 
+            this.paramTab.Controls.Add(this.button1);
+            this.paramTab.Controls.Add(this.printDebug);
             this.paramTab.Controls.Add(this.modSaveLoadGroup);
             this.paramTab.Controls.Add(this.exportTargetList);
             this.paramTab.Controls.Add(this.xmlTextBox);
@@ -1162,6 +1202,16 @@
             this.paramTab.TabIndex = 1;
             this.paramTab.Text = "Advanced Parameters";
             this.paramTab.UseVisualStyleBackColor = true;
+            // 
+            // printDebug
+            // 
+            this.printDebug.AutoSize = true;
+            this.printDebug.Location = new System.Drawing.Point(402, 17);
+            this.printDebug.Name = "printDebug";
+            this.printDebug.Size = new System.Drawing.Size(153, 17);
+            this.printDebug.TabIndex = 67;
+            this.printDebug.Text = "Print Debugging Messages";
+            this.printDebug.UseVisualStyleBackColor = true;
             // 
             // modSaveLoadGroup
             // 
@@ -1272,12 +1322,22 @@
             this.primingRawOFDia.FileName = "openFileDialog1";
             this.primingRawOFDia.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(6, 530);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(180, 23);
+            this.button1.TabIndex = 69;
+            this.button1.Text = "Trigger Peptide Inclusion List";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // TomahaqCompanionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1360, 668);
+            this.ClientSize = new System.Drawing.Size(1476, 673);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.logBox);
             this.Name = "TomahaqCompanionForm";
@@ -1407,6 +1467,11 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox precExHigh;
         private System.Windows.Forms.TextBox precExLow;
+        private System.Windows.Forms.CheckBox printDebug;
+        private System.Windows.Forms.Button sortTargetProteins;
+        private System.Windows.Forms.TextBox proteinSearchBox;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Button button1;
     }
 }
 

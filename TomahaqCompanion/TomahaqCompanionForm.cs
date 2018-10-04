@@ -103,13 +103,20 @@ namespace TomahaqCompanion
             bool chargeProvided = false;
             SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, modificationDict, out chargeProvided);
 
+            Dictionary<string, TargetPeptide> addedTargets = new Dictionary<string, TargetPeptide>();
+
             //Print the Priming Run Target List
             using (StreamWriter writer = new StreamWriter(targetFile.Replace(".csv", "_primingRunInclusionList.csv")))
             {
                 writer.WriteLine("Name,M,z range");
                 foreach (TargetPeptide peptide in targetList.Values)
                 {
-                    writer.WriteLine(peptide.PeptideString + "," + peptide.Trigger.MonoisotopicMass + ",2-5");
+                    TargetPeptide outPep = null;
+                    if(!addedTargets.TryGetValue(peptide.PeptideString, out outPep))
+                    {
+                        writer.WriteLine(peptide.PeptideString + "," + peptide.Trigger.MonoisotopicMass + ",2-5");
+                        addedTargets.Add(peptide.PeptideString, peptide);
+                    }
                 }
             }
         }
@@ -168,7 +175,6 @@ namespace TomahaqCompanion
                         methodLengthBox.Text = Math.Round(methodLength, 0).ToString();
                         methodLength = actualMethodLength;
                     }
-                    
 
                     //Build a map of the MS/MS scan events
                     UpdateLog("Mapping MS Scans");
@@ -257,11 +263,15 @@ namespace TomahaqCompanion
                 {
                     UpdateLog("Cannot Create New Method Because No Template Was Provided");
                 }
+
+                //This will switch the GUI to the data analysis tab, whose index is 1
+                tabControl.SelectTab(1);
             }
             catch (Exception exp)
             {
                 UpdateLog("Error! " + exp.Message);
             }
+
         }
 
         private void methodChangerAlone_Click(object sender, EventArgs e)
@@ -275,8 +285,8 @@ namespace TomahaqCompanion
 
         private void analyzeRun_Click(object sender, EventArgs e)
         {
-            try
-            {
+           try
+           {
                 Priming = false;
                 Analysis = true;
 
@@ -474,7 +484,13 @@ namespace TomahaqCompanion
                 {
                     //Get the peptide string
                     string peptideString = reader["Peptide"];
-                    
+
+                    string proteinString = "";
+                    if(headers.Contains("Protein"))
+                    {
+                        proteinString = reader["Protein"];
+                    }
+
                     //Determine if a charge is provided or a range needs to be used
                     int minCharge = 2; //TODO: User Param
                     int maxCharge = 4; //TODO: User Param
@@ -494,6 +510,13 @@ namespace TomahaqCompanion
                         endTime = double.Parse(reader["EndTime"]);
                     }
 
+                    //Determine if a start and end time is provided
+                    double eo = -1;
+                    if (headers.Contains("EO"))
+                    {
+                        eo = double.Parse(reader["EO"]);
+                    }
+
                     //Determine if the user wants to use specific trigger masses
                     List<double> triggerFragIons = new List<double>();
                     if (headers.Contains("MS2 Trigger m/z"))
@@ -511,7 +534,7 @@ namespace TomahaqCompanion
                     //
                     for (int charge = minCharge; charge <= maxCharge;charge++)
                     {
-                        TargetPeptide target = new TargetPeptide(peptideString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), spsIonsAbovePrec.Checked);
+                        TargetPeptide target = new TargetPeptide(peptideString, proteinString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), eo, spsIonsAbovePrec.Checked);
 
                         TargetPeptide outPep = null;
                         double mz = target.Trigger.ToMz(charge);
@@ -683,7 +706,12 @@ namespace TomahaqCompanion
 
                             //FIND THE MS1 JUST GO BACKWARDS
                             int ms1ScanNumber = FindMS1(rawFile, triggerScanNumber);
-                            TriggerMS2toMS1.Add(triggerScanNumber, ms1ScanNumber);
+
+                            int outNum = 0;
+                            if(!TriggerMS2toMS1.TryGetValue(triggerScanNumber, out outNum))
+                            {
+                                TriggerMS2toMS1.Add(triggerScanNumber, ms1ScanNumber);
+                            }
                         }
                     }
                 }
@@ -843,6 +871,8 @@ namespace TomahaqCompanion
                 {
                     target.AddMS1XICPoint(spectrum, rt, scanNumber);
                 }
+
+                spectrum = null;
             }
         }
 
@@ -851,7 +881,7 @@ namespace TomahaqCompanion
             //Cycle through the trigger MS2 scan numbers
             foreach (int scanNumber in TriggerMS2toMS1.Keys)
             {
-                Console.WriteLine(scanNumber);
+                if (printDebug.Checked) { UpdateLog("Analyzing Scan Number " + scanNumber); }
 
                 int ms1ScanNumber = TriggerMS2toMS1[scanNumber];
 
@@ -887,8 +917,13 @@ namespace TomahaqCompanion
                         List<int> targetScanNumber = null;
                         if (TriggerMS2toTargetMS2.TryGetValue(scanNumber, out targetScanNumber))
                         {
+                            if (printDebug.Checked) { UpdateLog("Extracting MS2/3 Data"); }
+
                             //If we did an ms2 on the target peptides then get that data as well
                             ExtractTargetData(targetPeptide, rawFile, ms1ScanNumber, targetScanNumber, TargetMS2toTargetMS3, quantChannelDict);
+
+                            if (printDebug.Checked) { UpdateLog("Extracted MS2/3 Data"); }
+
                         }
                     }
                 }
@@ -897,6 +932,7 @@ namespace TomahaqCompanion
 
         private void ExtractTargetData(TargetPeptide targetPeptide, ThermoRawFile rawFile, int ms1ScanNumber, List<int> targetScanNumbers, Dictionary<int, List<int>> TargetMS2toTargetMS3, Dictionary<string, double> quantChannelDict)
         {
+
             foreach(int targetScanNumber in targetScanNumbers)
             {
                 //Grab all of the data for the target and add that data
@@ -908,25 +944,48 @@ namespace TomahaqCompanion
                 List<int> ms3ScanNumbers = null;
                 if (TargetMS2toTargetMS3.TryGetValue(targetScanNumber, out ms3ScanNumbers))
                 {
-                    foreach(int ms3ScanNumber in ms3ScanNumbers)
+                    foreach (int ms3ScanNumber in ms3ScanNumbers)
                     {
-                        double ms3rt = 0;
-                        double ms3it = 0;
+
+                        double ms3rt = rawFile.GetRetentionTime(ms3ScanNumber);
+                        double ms3it = rawFile.GetInjectionTime(ms3ScanNumber);
+                        ThermoSpectrum ms3spectrum = rawFile.GetSpectrum(ms3ScanNumber);
                         List<double> spsIons = new List<double>();
-                        ThermoSpectrum ms3spectrum = null;
 
-                        ms3rt = rawFile.GetRetentionTime(ms3ScanNumber);
-                        ms3it = rawFile.GetInjectionTime(ms3ScanNumber);
-                        ms3spectrum = rawFile.GetSpectrum(ms3ScanNumber);
-
-                        if(rawFile.GetMsnOrder(ms3ScanNumber)==3)
+                        if (rawFile.GetMsnOrder(ms3ScanNumber) == 3)
                         {
                             spsIons = rawFile.GetSPSMasses(ms3ScanNumber);
+
+                            if (spsIons == null)
+                            {
+                                spsIons = new List<double>();
+                            }
                         }
-                        
+
+                        if (ms3rt == null) { ms3rt = 0; }
+                        if (ms3it == null) { ms3it = 0; }
+                        if (spsIons == null) { spsIons = new List<double>(); }
+
+                        if (printDebug.Checked)
+                        {
+                            if (ms3spectrum == null) { UpdateLog("No MS3 Spectrum"); }
+                            if (spectrum == null) { UpdateLog("No MS2 Spectrum"); }
+                            if (quantChannelDict == null) { UpdateLog("No Quant Dict"); }
+
+                            UpdateLog("MS1 Scan Number" + ms1ScanNumber);
+                            UpdateLog("Target Scan Number" + targetScanNumber);
+                            UpdateLog("MS2 RT" + rt);
+                            UpdateLog("MS2 IT" + it);
+                            UpdateLog("MS3 Scan Number" + ms3ScanNumber);
+                            UpdateLog("MS3 RT" + ms3rt);
+                            UpdateLog("MS3 IT" + ms3it);
+                            UpdateLog("Adding Target Data 1");
+                        }
 
                         //Add the target data and if there was an MS3 add that data too
                         targetPeptide.AddTargetData(ms1ScanNumber, targetScanNumber, spectrum, rt, it, ms3ScanNumber, ms3spectrum, ms3rt, ms3it, spsIons, quantChannelDict);
+
+                        if (printDebug.Checked) { UpdateLog("Added Target Data 1"); }
                     }
                 }
                 else
@@ -1295,28 +1354,36 @@ namespace TomahaqCompanion
             selectedColumn.DataPropertyName = "Selected";
             selectedColumn.HeaderText = "Selected";
             selectedColumn.ReadOnly = false;
-            selectedColumn.Width = 50;
+            selectedColumn.Width = 60;
             targetGridView.Columns.Add(selectedColumn);
-            
+
+            DataGridViewTextBoxColumn proteinColumn = new DataGridViewTextBoxColumn();
+            proteinColumn.DataPropertyName = "ProteinString";
+            proteinColumn.HeaderText = "Protein";
+            proteinColumn.ReadOnly = true;
+            proteinColumn.Width = 80;
+            targetGridView.Columns.Add(proteinColumn);
+
             DataGridViewTextBoxColumn peptideColumn = new DataGridViewTextBoxColumn();
             peptideColumn.DataPropertyName = "PeptideString";
             peptideColumn.HeaderText = "Peptide";
             peptideColumn.ReadOnly = true;
-            peptideColumn.Width = 160;
+            peptideColumn.Width = 100;
             targetGridView.Columns.Add(peptideColumn);
+
 
             DataGridViewTextBoxColumn triggerMZColumn = new DataGridViewTextBoxColumn();
             triggerMZColumn.DataPropertyName = "TriggerMZ";
             triggerMZColumn.HeaderText = "Trigger";
             triggerMZColumn.ReadOnly = true;
-            triggerMZColumn.Width = 80;
+            triggerMZColumn.Width = 60;
             targetGridView.Columns.Add(triggerMZColumn);
 
             DataGridViewTextBoxColumn targetColumn = new DataGridViewTextBoxColumn();
             targetColumn.DataPropertyName = "TargetMZ";
             targetColumn.HeaderText = "Target";
             targetColumn.ReadOnly = true;
-            targetColumn.Width = 80;
+            targetColumn.Width = 60;
             targetColumn.SortMode = DataGridViewColumnSortMode.Automatic;
             targetGridView.Columns.Add(targetColumn);
 
@@ -1324,7 +1391,7 @@ namespace TomahaqCompanion
             chargeColumn.DataPropertyName = "Charge";
             chargeColumn.HeaderText = "Charge";
             chargeColumn.ReadOnly = true;
-            chargeColumn.Width = 60;
+            chargeColumn.Width = 45;
             targetGridView.Columns.Add(chargeColumn);
 
         }
@@ -2124,7 +2191,7 @@ namespace TomahaqCompanion
 
             using (StreamWriter writer = new StreamWriter(outputFile))
             {
-                writer.WriteLine("Peptide,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
+                writer.WriteLine("Peptide,Protein,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
                     "MS2ScanNumber,MS3ScanNumber,MS2InjectionTime,MS3InjectionTime,MS3SPSIons,MS3SumSN,MS3IS,MS3Quant1,MS3Quant2,MS3Quant3,MS3Quant4,MS3Quant5," +
                     "MS3Quant6,MS3Quant7,MS3Quant8,MS3Quant9,MS3Quant10,MSQuant11,QuantError1,QuantError2,QuantError3,QuantError4,QuantError5,QuantError6,QuantError7,QuantError8,QuantError9,QuantError10,QuantError11");
 
@@ -2133,7 +2200,7 @@ namespace TomahaqCompanion
                     TargetPeptide target = targetPepLine.Peptide;
                     foreach (ScanEventLine sel in target.ScanEventLines)
                     {
-                        writer.WriteLine(target.PeptideString + "," + target.Charge.ToString() + "," + target.TriggerMZ + "," + target.TargetMZ + "," + sel.ToString());
+                        writer.WriteLine(target.PeptideString + "," + target.ProteinString + "," + target.Charge.ToString() + "," + target.TriggerMZ + "," + target.TargetMZ + "," + sel.ToString());
                     }
                 }
             }
@@ -2159,7 +2226,7 @@ namespace TomahaqCompanion
 
             using (StreamWriter writer = new StreamWriter(outputFile))
             {
-                writer.WriteLine("Peptide,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
+                writer.WriteLine("Peptide,Protein,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
                     "MS2ScanNumber,MS3ScanNumber,MS2InjectionTime,MS3InjectionTime,MS3SPSIons,MS3SumSN,MS3IS,MS3Quant1,MS3Quant2,MS3Quant3,MS3Quant4,MS3Quant5," +
                     "MS3Quant6,MS3Quant7,MS3Quant8,MS3Quant9,MS3Quant10,MSQuant11,QuantError1,QuantError2,QuantError3,QuantError4,QuantError5,QuantError6,QuantError7,QuantError8,QuantError9,QuantError10,QuantError11");
 
@@ -2170,7 +2237,7 @@ namespace TomahaqCompanion
                     {
                         if (sel.Include)
                         {
-                            writer.WriteLine(target.PeptideString + "," + target.Charge.ToString() + "," + target.TriggerMZ + "," + target.TargetMZ + "," + sel.ToString());
+                            writer.WriteLine(target.PeptideString + "," + target.ProteinString + "," + target.Charge.ToString() + "," + target.TriggerMZ + "," + target.TargetMZ + "," + sel.ToString());
                         }
                     }
                 }
@@ -2648,7 +2715,7 @@ namespace TomahaqCompanion
 
         private void exportTargetList_Click(object sender, EventArgs e)
         {
-            string outputfile = "C:\\Users\\lumos\\Desktop\\PierceRTPeptides.csv";
+            string outputfile = targetTextBox.Text.Replace(".csv", "_targetlist.csv");
 
             using (StreamWriter writer = new StreamWriter(outputfile))
             {
@@ -2813,6 +2880,119 @@ namespace TomahaqCompanion
         private void modGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void sortTargetsPeptide_Click(object sender, EventArgs e)
+        {
+            //Create a list that will be used to sort the peptides based on the max rt
+            SortedList<string, List<TargetPeptideLine>> sortedPeptideLines = new SortedList<string, List<TargetPeptideLine>>();
+
+            foreach (TargetPeptideLine pepLine in TargetsDisplayed)
+            {
+                List<TargetPeptideLine> outList = new List<TargetPeptideLine>();
+                if(sortedPeptideLines.TryGetValue(pepLine.Peptide.PeptideString, out outList))
+                {
+                    outList.Add(pepLine);
+                }
+                else
+                {
+                    sortedPeptideLines.Add(pepLine.Peptide.PeptideString, new List<TargetPeptideLine>());
+                    sortedPeptideLines[pepLine.Peptide.PeptideString].Add(pepLine);
+                }
+            }
+
+            //Add the targets back into what is being displayed
+            TargetsDisplayed.Clear();
+
+            foreach (KeyValuePair<string, List<TargetPeptideLine>> kvp in sortedPeptideLines)
+            {
+                foreach(TargetPeptideLine pepLine in kvp.Value)
+                {
+                    TargetsDisplayed.Add(pepLine);
+                }
+            }
+        }
+
+        private void spectrumGraphControl1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void sortTargetProteins_Click(object sender, EventArgs e)
+        {
+            //Create a list that will be used to sort the peptides based on the max rt
+            SortedList<string, List<TargetPeptideLine>> sortedPeptideLines = new SortedList<string, List<TargetPeptideLine>>();
+
+            foreach (TargetPeptideLine pepLine in TargetsDisplayed)
+            {
+                List<TargetPeptideLine> outList = new List<TargetPeptideLine>();
+                if (sortedPeptideLines.TryGetValue(pepLine.Peptide.ProteinString, out outList))
+                {
+                    outList.Add(pepLine);
+                }
+                else
+                {
+                    sortedPeptideLines.Add(pepLine.Peptide.ProteinString, new List<TargetPeptideLine>());
+                    sortedPeptideLines[pepLine.Peptide.ProteinString].Add(pepLine);
+                }
+            }
+
+            //Add the targets back into what is being displayed
+            TargetsDisplayed.Clear();
+
+            foreach (KeyValuePair<string, List<TargetPeptideLine>> kvp in sortedPeptideLines)
+            {
+                foreach (TargetPeptideLine pepLine in kvp.Value)
+                {
+                    TargetsDisplayed.Add(pepLine);
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //Import the modifications
+            UpdateLog("Importing Modifications");
+            //<Static/Dynamic, <Trigger/Target, <Modification, Symbol>>>
+            Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict = BuildModificationDictionary();
+
+            //Import the Peptides
+            string targetFile = targetTextBox.Text;
+            bool chargeProvided = false;
+            SortedList<double, TargetPeptide> targetList = ImportTargets(targetFile, modificationDict, out chargeProvided);
+
+            Dictionary<string, TargetPeptide> addedTargets = new Dictionary<string, TargetPeptide>();
+
+            Dictionary<double, List<TargetPeptide>> addDicts = new Dictionary<double, List<TargetPeptide>>();
+
+            foreach(TargetPeptide peptide in targetList.Values)
+            {
+                double offset = Math.Round(peptide.MassShift, 2);
+
+                List<TargetPeptide> outList = new List<TargetPeptide>();
+                if(!addDicts.TryGetValue(offset, out outList))
+                {
+                    addDicts.Add(offset, new List<TargetPeptide>());
+                }
+
+                addDicts[offset].Add(peptide);
+            }
+
+            foreach(KeyValuePair<double, List<TargetPeptide>> kvp in addDicts)
+            {
+                double offset = kvp.Key;
+
+                using (StreamWriter writer = new StreamWriter(targetFile.Replace(".csv", "_triggerPeptideInclusion_Offset_" + offset + "mz.csv")))
+                {
+                    writer.WriteLine("Name,m/z,z");
+
+                    foreach(TargetPeptide peptide in kvp.Value)
+                    {
+                        writer.WriteLine(peptide.PeptideString + "," + peptide.TriggerMZ + "," + peptide.Charge);
+                    }
+                }
+
+            }
         }
     }
 }

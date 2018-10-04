@@ -12,6 +12,7 @@ namespace TomahaqCompanion
         public TargetPeptide Peptide { get; set; }
         public bool Selected { get; set; }
         public string PeptideString { get; set; }
+        public string ProteinString { get; set; }
         public double TargetMZ { get; set; }
         public double TriggerMZ { get; set; }
         public string Name { get; set; }
@@ -23,6 +24,8 @@ namespace TomahaqCompanion
             Selected = true;
 
             Peptide = peptide;
+
+            ProteinString = peptide.ProteinString;
 
             PeptideString = peptide.PeptideString;
             Charge = peptide.Charge.ToString();
@@ -36,6 +39,9 @@ namespace TomahaqCompanion
             Peptide = peptide;
 
             PeptideString = peptide.PeptideString;
+
+            ProteinString = peptide.ProteinString;
+
             Charge = peptide.Charge.ToString();
 
             TriggerMZ = Math.Round(peptide.TriggerMZ, 4);
