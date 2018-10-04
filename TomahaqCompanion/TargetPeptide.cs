@@ -94,7 +94,8 @@ namespace TomahaqCompanion
         public MzRange PrecExclRange { get; set; }
 
 
-        public TargetPeptide(string peptideString, string protein, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh,double eo, bool spsAbovePrec)
+        public TargetPeptide(string peptideString, string protein, int charge, Dictionary<string, Dictionary<string, Dictionary<Modification, string>>> modificationDict, List<double> targetSPSIons, 
+            List<double> triggerFragIons, double startTime, double endTime, Tolerance fragTol, double spsMin, double spsMax, double precExLow, double precExHigh,double eo, bool spsAbovePrec)
         {
             //Save the original peptide string
             PeptideString = peptideString;
@@ -967,6 +968,7 @@ namespace TomahaqCompanion
                                     break;
                                 }
                             }
+
 
                             if (!triggerAdded)
                             {
