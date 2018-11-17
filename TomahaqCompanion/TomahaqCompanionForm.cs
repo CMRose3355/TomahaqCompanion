@@ -87,7 +87,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.0.2.0");
+            UpdateLog("Version = 1.0.3.0");
         }
 
         //These are the main buttons that perform functions within the program
@@ -392,22 +392,22 @@ namespace TomahaqCompanion
         {
             Dictionary<string, Dictionary<string, double>> retDict = new Dictionary<string, Dictionary<string, double>>();
 
-            retDict.Add("TMT10", new Dictionary<string, double>());
+            retDict.Add("TMT11", new Dictionary<string, double>());
             //retDict.Add("TMT6", new Dictionary<string, double>());
             //retDict.Add("iTRAQ4", new Dictionary<string, double>());
             //retDict.Add("iTRAQ8", new Dictionary<string, double>());
 
-            retDict["TMT10"].Add("126", 126.127725);
-            retDict["TMT10"].Add("127n", 127.124760);
-            retDict["TMT10"].Add("127c", 127.131079);
-            retDict["TMT10"].Add("128n", 128.128114);
-            retDict["TMT10"].Add("128c", 128.134433);
-            retDict["TMT10"].Add("129n", 129.131468);
-            retDict["TMT10"].Add("129c", 129.137787);
-            retDict["TMT10"].Add("130n", 130.134822);
-            retDict["TMT10"].Add("130c", 130.141141);
-            retDict["TMT10"].Add("131n", 131.138176);
-            retDict["TMT10"].Add("131c", 131.144499);
+            retDict["TMT11"].Add("126", 126.127725);
+            retDict["TMT11"].Add("127n", 127.124760);
+            retDict["TMT11"].Add("127c", 127.131079);
+            retDict["TMT11"].Add("128n", 128.128114);
+            retDict["TMT11"].Add("128c", 128.134433);
+            retDict["TMT11"].Add("129n", 129.131468);
+            retDict["TMT11"].Add("129c", 129.137787);
+            retDict["TMT11"].Add("130n", 130.134822);
+            retDict["TMT11"].Add("130c", 130.141141);
+            retDict["TMT11"].Add("131n", 131.138176);
+            retDict["TMT11"].Add("131c", 131.144499);
 
             return retDict;
         }
@@ -1450,7 +1450,7 @@ namespace TomahaqCompanion
             //Populate modded proteins - build a list of possible modifications
             Modification tmt0 = new Modification(224.152478, "TMT0", ModificationSites.K | ModificationSites.NPep);
             Modification tmt2 = new Modification(225.15833, "TMT2", ModificationSites.K | ModificationSites.NPep);
-            Modification tmt10 = new Modification(229.162932, "TMT10", ModificationSites.K | ModificationSites.NPep);
+            Modification tmt11 = new Modification(229.162932, "TMT11", ModificationSites.K | ModificationSites.NPep);
             Modification tmtSH = new Modification(235.17677, "TMTsh", ModificationSites.K | ModificationSites.NPep);
 
             Modification cam = new Modification(57.02146, "CAM", ModificationSites.C);
@@ -1463,7 +1463,7 @@ namespace TomahaqCompanion
             Modification gg = new Modification(114.0429, "gg", ModificationSites.K);
             Modification ggTMT0 = new Modification(338.195378, "ggTMT0", ModificationSites.K);
             Modification ggTMT2 = new Modification(339.20123, "ggTMT2", ModificationSites.K);
-            Modification ggTMT10 = new Modification(343.20583, "ggTMT10", ModificationSites.K);
+            Modification ggTMT11 = new Modification(343.20583, "ggTMT11", ModificationSites.K);
             Modification ggTMTsh = new Modification(349.21967, "ggTMTsh", ModificationSites.K);
 
             Modification C2N1 = new Modification(3.004, "C2N1", ModificationSites.G);
@@ -1472,31 +1472,33 @@ namespace TomahaqCompanion
             Modification C6N1 = new Modification(7.0171, "C6N1", ModificationSites.I | ModificationSites.L);
             Modification C9N1 = new Modification(10.0272, "C9N1", ModificationSites.Y | ModificationSites.F);
 
-            Modification tmt10OL = new Modification(229.162932, "TMT10OL", ModificationSites.S | ModificationSites.T | ModificationSites.Y | ModificationSites.H);
+            Modification r10 = new Modification(10.00827, "R10", ModificationSites.R);
+            Modification k8TMT11 = new Modification(237.1771, "K8TMT11", ModificationSites.K);
+
+            Modification tmt11OL = new Modification(229.162932, "TMT11OL", ModificationSites.S | ModificationSites.T | ModificationSites.Y | ModificationSites.H);
 
             ModLines.Add(new ModificationLine("TMT0", Math.Round(tmt0.MonoisotopicMass, 5), "K,NPep", "", "Static", true, false, tmt0));
-            ModLines.Add(new ModificationLine("TMT2", Math.Round(tmt2.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmt2));
-            ModLines.Add(new ModificationLine("TMT10", Math.Round(tmt10.MonoisotopicMass, 5), "K,NPep", "", "Static", false, true, tmt10));
-            ModLines.Add(new ModificationLine("TMTsh", Math.Round(tmtSH.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmtSH));
+            //ModLines.Add(new ModificationLine("TMT2", Math.Round(tmt2.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmt2));
+            ModLines.Add(new ModificationLine("SH-TMT", Math.Round(tmtSH.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmtSH));
+            ModLines.Add(new ModificationLine("TMT11", Math.Round(tmt11.MonoisotopicMass, 5), "K,NPep", "", "Static", false, true, tmt11));
+            ModLines.Add(new ModificationLine("R10", Math.Round(r10.MonoisotopicMass, 5), "R", "$", "Dynamic", false, false, r10));
+            ModLines.Add(new ModificationLine("K8TMT11", Math.Round(k8TMT11.MonoisotopicMass, 5), "K", "@", "Dynamic", false, false, k8TMT11));
             ModLines.Add(new ModificationLine("CAM", Math.Round(cam.MonoisotopicMass, 5), "C", "", "Static", true, true, cam));
             ModLines.Add(new ModificationLine("NEM", Math.Round(nem.MonoisotopicMass, 5), "C", "", "Static", false, false, nem));
-            ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, true, ox));
             ModLines.Add(new ModificationLine("Phos", Math.Round(phos.MonoisotopicMass, 5), "S,T,Y", "#", "Dynamic", false, false, phos));
-            ModLines.Add(new ModificationLine("Acetyl", Math.Round(acetyl.MonoisotopicMass, 5), "NPep", "@", "Dynamic", false, false, acetyl));
-            ModLines.Add(new ModificationLine("gg", Math.Round(gg.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, gg));
-            ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT0));
-            ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT2));
-            ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
-            ModLines.Add(new ModificationLine("ggTMTsh", Math.Round(ggTMTsh.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMTsh));
-            ModLines.Add(new ModificationLine("C2N1", Math.Round(C2N1.MonoisotopicMass, 5), "G", "^", "Dynamic", false, false, C2N1));
-            ModLines.Add(new ModificationLine("C3N1", Math.Round(C3N1.MonoisotopicMass, 5), "A", "#", "Dynamic", false, false, C3N1));
-            ModLines.Add(new ModificationLine("C5N1", Math.Round(C5N1.MonoisotopicMass, 5), "V,P", "&", "Dynamic", false, false, C5N1));
-            ModLines.Add(new ModificationLine("C6N1", Math.Round(C6N1.MonoisotopicMass, 5), "I,L", "@", "Dynamic", false, false, C6N1));
-            ModLines.Add(new ModificationLine("C9N1", Math.Round(C9N1.MonoisotopicMass, 5), "F,Y", "^", "Dynamic", false, false, C9N1));
-            ModLines.Add(new ModificationLine("TMT10OL", Math.Round(tmt10OL.MonoisotopicMass, 5), "S,T,Y,H", "$", "Dynamic", false, false, tmt10OL));
-           
-
-            //ModLines.Add(new ModificationLine("ggTMT10", Math.Round(ggTMT10.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, ggTMT10));
+            ModLines.Add(new ModificationLine("Acetyl", Math.Round(acetyl.MonoisotopicMass, 5), "NPep", "&", "Dynamic", false, false, acetyl));
+            //ModLines.Add(new ModificationLine("gg", Math.Round(gg.MonoisotopicMass, 5), "K", "*", "Dynamic", false, false, gg));
+            ModLines.Add(new ModificationLine("ggTMT0", Math.Round(ggTMT0.MonoisotopicMass, 5), "K", "^", "Dynamic", false, false, ggTMT0));
+            //ModLines.Add(new ModificationLine("ggTMT2", Math.Round(ggTMT2.MonoisotopicMass, 5), "K", "^", "Dynamic", false, false, ggTMT2));
+            ModLines.Add(new ModificationLine("ggTMT11", Math.Round(ggTMT11.MonoisotopicMass, 5), "K", "^", "Dynamic", false, false, ggTMT11));
+            ModLines.Add(new ModificationLine("ggTMTsh", Math.Round(ggTMTsh.MonoisotopicMass, 5), "K", "^", "Dynamic", false, false, ggTMTsh));
+            ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, true, ox));
+            //ModLines.Add(new ModificationLine("C2N1", Math.Round(C2N1.MonoisotopicMass, 5), "G", "^", "Dynamic", false, false, C2N1));
+            //ModLines.Add(new ModificationLine("C3N1", Math.Round(C3N1.MonoisotopicMass, 5), "A", "#", "Dynamic", false, false, C3N1));
+            //ModLines.Add(new ModificationLine("C5N1", Math.Round(C5N1.MonoisotopicMass, 5), "V,P", "&", "Dynamic", false, false, C5N1));
+            //ModLines.Add(new ModificationLine("C6N1", Math.Round(C6N1.MonoisotopicMass, 5), "I,L", "@", "Dynamic", false, false, C6N1));
+            //ModLines.Add(new ModificationLine("C9N1", Math.Round(C9N1.MonoisotopicMass, 5), "F,Y", "^", "Dynamic", false, false, C9N1));
+            //ModLines.Add(new ModificationLine("TMT11OL", Math.Round(tmt11OL.MonoisotopicMass, 5), "S,T,Y,H", "$", "Dynamic", false, false, tmt11OL));
         }
 
         private void InitializeScanGrid()

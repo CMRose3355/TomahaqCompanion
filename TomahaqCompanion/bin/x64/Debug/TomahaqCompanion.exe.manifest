@@ -42,38 +42,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="API-2.0.dll" size="73216">
-      <assemblyIdentity name="API-2.0" version="1.1.0.1" publicKeyToken="C03BF447005257EB" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="318464">
+      <assemblyIdentity name="CSMSL" version="0.3.6851.25087" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>iFck+KkTAkzwuom7b/Q/u8uRz9Rn4w8GGKMvlVDl2j0=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="319488">
-      <assemblyIdentity name="CSMSL" version="0.3.6719.15894" language="neutral" processorArchitecture="x86" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>a2xUbHWLLiIF4kfFmQoVu1OTbjUSYDrEKm4kN3P+uno=</dsig:DigestValue>
+        <dsig:DigestValue>aPkO/O2B/Cn0L+88i4EAmfb0RVqR4VSuMjUSz/YmQ0A=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.Thermo.dll" size="23552">
-      <assemblyIdentity name="CSMSL.Thermo" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
+      <assemblyIdentity name="CSMSL.Thermo" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Mu2GdFsAZtJ4UK8z05EcOu0GokajCGEWVMDuiv5jHuk=</dsig:DigestValue>
+        <dsig:DigestValue>GrjLIjrq9bWzzx/Uj6PNp7iPO+fG2kEhzRRLVDtyNhU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -114,18 +102,6 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Spectrum-1.0.dll" size="62464">
-      <assemblyIdentity name="Spectrum-1.0" version="1.1.0.1" publicKeyToken="C03BF447005257EB" language="neutral" processorArchitecture="msil" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>5MR5oM2F79kPhdTgKXA93X2zuQVBAERB0qyakXO6mj0=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.Factory.dll" size="10240">
       <assemblyIdentity name="Thermo.TNG.Factory" version="1.0.0.0" publicKeyToken="35EFC4498449BC4C" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -162,14 +138,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="126976">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="126464">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>YyI08C/GcGi7y3VqGTh12mhZecV04qx+B1u36kNMGws=</dsig:DigestValue>
+        <dsig:DigestValue>9eDauYoZdZrvUPf43NUuD9AaovHxK8gjpTV01em3OYI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
