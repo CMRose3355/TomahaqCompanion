@@ -87,7 +87,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.0.3.0");
+            UpdateLog("Version = 1.0.4.0");
         }
 
         //These are the main buttons that perform functions within the program
@@ -393,7 +393,7 @@ namespace TomahaqCompanion
             Dictionary<string, Dictionary<string, double>> retDict = new Dictionary<string, Dictionary<string, double>>();
 
             retDict.Add("TMT11", new Dictionary<string, double>());
-            //retDict.Add("TMT6", new Dictionary<string, double>());
+            retDict.Add("TMT6", new Dictionary<string, double>());
             //retDict.Add("iTRAQ4", new Dictionary<string, double>());
             //retDict.Add("iTRAQ8", new Dictionary<string, double>());
 
@@ -408,6 +408,18 @@ namespace TomahaqCompanion
             retDict["TMT11"].Add("130c", 130.141141);
             retDict["TMT11"].Add("131n", 131.138176);
             retDict["TMT11"].Add("131c", 131.144499);
+
+            retDict["TMT6"].Add("126", 126.127725);
+            retDict["TMT6"].Add("127n", 127.124760);
+            retDict["TMT6"].Add("127c", 127.131079);
+            retDict["TMT6"].Add("128n", 128.128114);
+            retDict["TMT6"].Add("128c", 128.134433);
+            retDict["TMT6"].Add("129n", 129.131468);
+            retDict["TMT6"].Add("129c", 129.137787);
+            retDict["TMT6"].Add("130n", 130.134822);
+            retDict["TMT6"].Add("130c", 130.141141);
+            retDict["TMT6"].Add("131n", 131.138176);
+            retDict["TMT6"].Add("131c", 131.144499);
 
             return retDict;
         }
@@ -1069,8 +1081,6 @@ namespace TomahaqCompanion
                 }
             }
 
-            int a = 0;
-
             //Only change the parameters the user wants to
             bool addMS1TargetedMass = ms1Target;
             bool addMS2TriggerMass = ms2Trigger;
@@ -1129,7 +1139,8 @@ namespace TomahaqCompanion
                     }
                     else
                     {
-                        addExp0.AddMS1InclusionSingleWithRTWindow(treeIndex, target.TriggerMZ, target.Charge, target.StartRetentionTime, target.EndRetentionTime);
+                        addExp0.AddMS1InclusionSingleWithRTWindow(treeIndex, target.TriggerMZ, target.Charge, 
+                            target.StartRetentionTime, target.EndRetentionTime);
                     }
 
                     MethodModification addMod0 = new MethodModification(modCount, addExp0);
@@ -1152,7 +1163,7 @@ namespace TomahaqCompanion
                 
                 if(addMS3TargetedMass)
                 {
-                    //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
+                    //Add in the MS3 inclusion list
                     Experiment addExp2 = new Experiment(experimentIndex);
                     addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIonsWithCharge);
 
