@@ -123,8 +123,8 @@ namespace TomahaqCompanion
 
         private void createMethod_Click_1(object sender, EventArgs e)
         {
-            try
-            {
+            //try
+            //{
                 Priming = true;
                 Analysis = false;
                 SPSIonsEdited = false;
@@ -266,11 +266,11 @@ namespace TomahaqCompanion
 
                 //This will switch the GUI to the data analysis tab, whose index is 1
                 tabControl.SelectTab(1);
-            }
-            catch (Exception exp)
-            {
-                UpdateLog("Error! " + exp.Message);
-            }
+            //}
+            //catch (Exception exp)
+            //{
+            //    UpdateLog("Error! " + exp.Message);
+            //}
 
         }
 
@@ -901,13 +901,13 @@ namespace TomahaqCompanion
                 double it = rawFile.GetInjectionTime(scanNumber);
 
                 //Try to get the precursor mono mz
-                double precursorMZ = rawFile.GetPrecMonoMZ(scanNumber);
+                //double precursorMZ = rawFile.GetPrecMonoMZ(scanNumber);
 
                 //If this returns as 0, then just get the precursor mz
-                if (precursorMZ == 0)
-                {
-                    precursorMZ = rawFile.GetPrecursorMz(scanNumber);
-                }
+                //if (precursorMZ == 0)
+                //{
+                double precursorMZ = rawFile.GetPrecursorMz(scanNumber);
+                //}
 
                 //Define the range around the peak
                 MassRange precursorRange = new MassRange(precursorMZ, new Tolerance(ToleranceUnit.PPM, 15));
