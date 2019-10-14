@@ -1094,7 +1094,12 @@ namespace TomahaqCompanion
             XmlSerializer serializer = new XmlSerializer(typeof(MethodModifications));
 
             //Set up the class that will hold all of the instructions
-            MethodModifications methodMods = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+            string instrument = "OrbitrapFusion";
+            if(eclipseCheckbox.Checked)
+            {
+                instrument = "OrbitrapEclipse";
+            }
+            MethodModifications methodMods = new MethodModifications("1", instrument, "Calcium", "SL");
 
             //First we will make sure we have enough trees for all of the peptides
             int modCount = 1;
@@ -3006,6 +3011,11 @@ namespace TomahaqCompanion
                 }
 
             }
+        }
+
+        private void paramTab_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

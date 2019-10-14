@@ -114,26 +114,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.MethodXMLFactory.dll" size="16384">
-      <assemblyIdentity name="Thermo.TNG.MethodXMLFactory" version="2.0.0.0" publicKeyToken="35EFC4498449BC4C" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.MethodXMLFactory.dll" size="14848">
+      <assemblyIdentity name="Thermo.TNG.MethodXMLFactory" version="2.0.0.0" publicKeyToken="35EFC4498449BC4C" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>1+wIJmU+gFrB+kSkjkeCoqh4+HdwPRGxsNKF0XMzpZI=</dsig:DigestValue>
+        <dsig:DigestValue>/aTeF494Sv1gBT6NXoKEsic/q+dRiaPcwIdvwXSyRbI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.MethodXMLInterface.dll" size="8192">
-      <assemblyIdentity name="Thermo.TNG.MethodXMLInterface" version="2.0.0.0" publicKeyToken="35EFC4498449BC4C" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thermo.TNG.MethodXMLInterface.dll" size="7680">
+      <assemblyIdentity name="Thermo.TNG.MethodXMLInterface" version="2.0.0.0" publicKeyToken="35EFC4498449BC4C" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>4ovKB3HT4lU7NMQTvcV0EWIl7+pzlHo4Q0i1XbfFSck=</dsig:DigestValue>
+        <dsig:DigestValue>W+vE4ihx/CFD8pWqyUiXntr+r97N/GgAW0OutFgY3fI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -145,7 +145,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>rRVrYcCDwoAM3vH5KbCBAkNouR8FGaMZ5SIqf97vyU0=</dsig:DigestValue>
+        <dsig:DigestValue>O9XRfNNV1GdLefi6g0Wqc6kEKWk876hNkEqVKFYC1s4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
