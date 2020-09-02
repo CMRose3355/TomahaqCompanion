@@ -20,6 +20,7 @@ using LumenWorks.Framework.IO.Csv;
 using ZedGraph;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Diagnostics;
 using XmlMethodChanger; 
 using XmlMethodChanger.lib;
 
@@ -47,9 +48,18 @@ namespace TomahaqCompanion
 
         private Tolerance FragmentTol;
 
+        public string FolderPath { get; set; }
+
         public TomahaqCompanionForm()
         {
             InitializeComponent();
+
+            string newFolder = "TomahaqCompanionFiles";
+            FolderPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), newFolder);
+            if (!System.IO.Directory.Exists(FolderPath))
+            {
+                System.IO.Directory.CreateDirectory(FolderPath);
+            }
 
             //
             Analysis = false;
@@ -211,11 +221,11 @@ namespace TomahaqCompanion
                     if (rawFileProvided)
                     {
                         target.PopulatePrimingData(methodLength);
-                        target.UpdateTargetIons(15);
+                        target.UpdateIons((int) triggerIonMax.Value, (int) targetIonMax.Value);
                     }
 
                     //This code will ensure that target or trigger ions are produced in the absence of a raw file
-                    target.PopulateTriggerAndTargetIons(20);
+                    target.PopulateTriggerAndTargetIons((int)triggerIonMax.Value, (int)targetIonMax.Value); //TODO: Change this to a user param
 
                     //Add this to a list of targets that is not indexed on m/z
                     targets.Add(target);
@@ -248,7 +258,16 @@ namespace TomahaqCompanion
                 bool addMS2TriggerMass = addMS2TriggerMassList.Checked;
                 bool addMS2IsoOffset = addMS2IsolationOffset.Checked;
                 bool addMS3TargetedMass = addMS3TargetMassList.Checked;
-                string xmlFile = BuildMethodXML(targetFile.Replace(".csv", "_method.xml"), targets, addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass);
+                string xmlFile = null;               
+                if(!groupIDCheckBox.Checked)
+                {
+                    xmlFile = BuildMethodXML(targetFile.Replace(".csv", "_method.xml"), targets, addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass); //TODO: Change Back to Not Large
+                }
+                else
+                {
+                    xmlFile = BuildLargeMethodXML(targetFile.Replace(".csv", "_method.xml"), targets, addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass); //TODO: Change Back to Not Large
+                }
+            
 
                 //Export the method last in case it fails due to the program not being run on the instrument
                 UpdateLog("Creating New Method");
@@ -256,7 +275,8 @@ namespace TomahaqCompanion
                 {
                     string templateMethod = templateBox.Text;
                     string outputMethod = targetFile.Replace(".csv", ".meth");
-                    XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+                    EditMethod(templateMethod, xmlFile, outputMethod);
+                    ////XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
                     UpdateLog("Writing method to " + outputMethod);
                 }
                 else
@@ -280,7 +300,58 @@ namespace TomahaqCompanion
             string outputMethod = targetTextBox.Text.Replace(".csv", ".meth");
             string xmlFile = xmlTextBox.Text;
 
-            XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+            EditMethod(templateMethod, xmlFile, outputMethod);
+        }
+
+        public void EditMethod(string templatePath, string modPath, string outputPath)
+        {
+            File.Copy(templatePath, ".\\XMLMethodChanger\\Template.meth", true);
+            File.Copy(modPath, ".\\XMLMethodChanger\\Mods.xml", true);
+
+            string exePath = ".\\XMLMethodChanger\\XmlMethodChanger.exe";
+            string args = "-i .\\XMLMethodChanger\\Template.meth -m .\\XMLMethodChanger\\Mods.xml -o .\\XMLMethodChanger\\Output.meth";
+            Console.WriteLine(args);
+            ExecuteCommand(exePath, args);
+
+            File.Copy(".\\XMLMethodChanger\\Output.meth", outputPath, true);
+
+            File.Delete(".\\XMLMethodChanger\\Template.meth");
+            File.Delete(".\\XMLMethodChanger\\Mods.xml");
+            File.Delete(".\\XMLMethodChanger\\Output.meth");
+        }
+
+        public bool ExecuteCommand(string exePath, string args)
+        {
+            try
+            {
+                ProcessStartInfo procStartInfo = new ProcessStartInfo();
+
+                procStartInfo.FileName = exePath;
+                procStartInfo.Arguments = args;
+                procStartInfo.RedirectStandardOutput = true;
+                procStartInfo.UseShellExecute = false;
+                procStartInfo.CreateNoWindow = true;
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = procStartInfo;
+                    process.Start();
+
+                    process.WaitForExit();
+
+                    string result = process.StandardOutput.ReadToEnd();
+                    Console.WriteLine(result);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("*** Error occured executing the following commands.");
+                Console.WriteLine(exePath);
+                Console.WriteLine(args);
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
 
         private void analyzeRun_Click(object sender, EventArgs e)
@@ -1075,7 +1146,7 @@ namespace TomahaqCompanion
 
             foreach(TargetPeptide targetPep in targetList)
             {
-                if(targetPep.TargetSPSIonsWithCharge.Count >0)
+                if(targetPep.TargetSPSIonsWithCharge.Count >0 && targetPep.TriggerMZ < 2000)
                 {
                     _targetList.Add(targetPep);
                 }
@@ -1192,6 +1263,50 @@ namespace TomahaqCompanion
 
         private string BuildLargeMethodXML(string inputFile, List<TargetPeptide> targetList, bool ms1Target, bool ms2Trigger, bool ms2Offset, bool ms3target)
         {
+            SortedDictionary<double, TargetPeptide> _methodTargetList = new SortedDictionary<double, TargetPeptide>();
+            List<TargetPeptide> _targetList = new List<TargetPeptide>();
+
+            foreach (TargetPeptide targetPep in targetList)
+            {
+                if (targetPep.TargetSPSIonsWithCharge.Count > 0 && targetPep.TriggerMZ < 2000)
+                {
+                    double targetMZ = Math.Round(targetPep.TargetMZ,4);
+                    double triggerMZ = Math.Round(targetPep.TriggerMZ, 4);
+
+                    TargetPeptide outPep = null;
+                    while(_methodTargetList.TryGetValue(triggerMZ, out outPep))
+                    {
+                        targetMZ += 0.0001;
+                        triggerMZ += 0.0001;
+                    }
+
+                    targetPep.TargetMZ = targetMZ;
+                    targetPep.TriggerMZ = triggerMZ;
+
+                    _methodTargetList.Add(triggerMZ, targetPep);
+                    _targetList.Add(targetPep);
+                }
+            }
+
+            SortedDictionary<double, List<TargetPeptide>> massShift_to_TargetList = new SortedDictionary<double, List<TargetPeptide>>();
+            foreach (TargetPeptide targetPep in _targetList)
+            {
+                double massShift = Math.Round(targetPep.TriggerMZ - targetPep.TargetMZ, 2);
+
+                List<TargetPeptide> outList = null;
+                if(massShift_to_TargetList.TryGetValue(massShift, out outList))
+                {
+                    massShift_to_TargetList[massShift].Add(targetPep);
+                }
+                else
+                {
+                    massShift_to_TargetList.Add(massShift, new List<TargetPeptide>());
+                    massShift_to_TargetList[massShift].Add(targetPep);
+                }
+            }
+
+            List<double> uniqueMassShifts = massShift_to_TargetList.Keys.ToList();
+
             //Only change the parameters the user wants to
             bool addMS1TargetedMass = ms1Target;
             bool addMS2TriggerMass = ms2Trigger;
@@ -1205,23 +1320,19 @@ namespace TomahaqCompanion
             XmlSerializer serializer = new XmlSerializer(typeof(MethodModifications));
 
             //Set up the class that will hold all of the instructions
-            MethodModifications methodMods = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
-            //Set up the class that will hold all of the instructions
-            MethodModifications methodMods1 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
-            //Set up the class that will hold all of the instructions
-            MethodModifications methodMods2 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
-            //Set up the class that will hold all of the instructions
-            MethodModifications methodMods3 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
-            //Set up the class that will hold all of the instructions
-            MethodModifications methodMods4 = new MethodModifications("1", "OrbitrapFusion", "Calcium", "SL");
+            string instrument = "OrbitrapFusion";
+            if (eclipseCheckbox.Checked)
+            {
+                instrument = "OrbitrapEclipse";
+            }
+            MethodModifications methodMods = new MethodModifications("1", instrument, "Calcium", "SL");
 
-
-            //First we will make sure we have enough trees for all of the peptides
+            //This will make a tree for all of the unique mass shifts
             int modCount = 1;
             int experimentIndex = 0;
-            for (int i = 1; i < targetList.Count; i++)
+            for (int i = 1; i < uniqueMassShifts.Count; i++)
             {
-                int sourceNodeForCopy = modCount - 1;
+                int sourceNodeForCopy = 0;
                 Experiment addExp = new Experiment(experimentIndex);
                 addExp.CopyAndPasteScanNode(sourceNodeForCopy);
 
@@ -1233,96 +1344,75 @@ namespace TomahaqCompanion
 
             //Next, we will change all of the trees to include all of the attributes of the peptides
             int treeIndex = 0;
-            int modCount1 = 1;
-            int modCount2 = 1;
-            int modCount3 = 1;
-            int modCount4 = 1;
-            foreach (TargetPeptide target in targetList)
+            foreach(KeyValuePair<double, List<TargetPeptide>> kvp in massShift_to_TargetList)
             {
-                if (addMS2IsoOffset)
-                {
-                    //Add in the MS2 isolation offset
-                    Experiment addExp = new Experiment(experimentIndex);
-                    addExp.ChangeScanParams(treeIndex, target.MassShift);
+                double massShift = kvp.Key;
+                List<TargetPeptide> targetPeptides = kvp.Value;
 
-                    MethodModification addMod = new MethodModification(modCount, addExp);
-                    methodMods1.Modifications.Add(addMod);
-
-                    modCount1++;
-                }
 
                 if (addMS1TargetedMass)
                 {
                     //Add in the MS1 inclusion list, and MS2 isolation offset
                     Experiment addExp0 = new Experiment(experimentIndex);
 
-                    //If the retention times have not been populated then don't change them
-                    if (target.StartRetentionTime == -1)
-                    {
-                        addExp0.AddMS1InclusionSingle(treeIndex, target.TriggerMZ, target.Charge);
-                    }
-                    else
-                    {
-                        addExp0.AddMS1InclusionSingleWithRTWindow(treeIndex, target.TriggerMZ, target.Charge, target.StartRetentionTime, target.EndRetentionTime);
-                    }
+                    addExp0.AddMS1Inclusion(treeIndex, targetPeptides);
 
                     MethodModification addMod0 = new MethodModification(modCount, addExp0);
-                    methodMods2.Modifications.Add(addMod0);
+                    methodMods.Modifications.Add(addMod0);
 
-                    modCount2++;
+                    modCount++;
                 }
+
 
                 if (addMS2TriggerMass)
                 {
                     //Add the MS2 trigger mass List
                     Experiment addExp1 = new Experiment(experimentIndex);
-                    addExp1.AddMS2TriggerList(treeIndex, target.TriggerIonsWithCharge);
+
+                    addExp1.AddMassShiftGroupedMS2TriggerList(treeIndex, targetPeptides);
 
                     MethodModification addMod1 = new MethodModification(modCount, addExp1);
-                    methodMods3.Modifications.Add(addMod1);
+                    methodMods.Modifications.Add(addMod1);
 
-                    modCount3++;
+                    modCount++;
                 }
+
+
+                if (addMS2IsoOffset)
+                {
+                    //Add in the MS2 isolation offset
+                    Experiment addExp = new Experiment(experimentIndex);
+
+                    addExp.ChangeScanParams(treeIndex, massShift);
+
+                    MethodModification addMod = new MethodModification(modCount, addExp);
+                    methodMods.Modifications.Add(addMod);
+
+                    modCount++;
+                }
+
 
                 if (addMS3TargetedMass)
                 {
-                    //Add in the MS3 inclusion list - This needs to be done seperately because I don't think there can be multiple mass lists in one experiment
+                    //Add in the MS3 inclusion list
                     Experiment addExp2 = new Experiment(experimentIndex);
-                    addExp2.AddMS3InclusionList(treeIndex, target.TargetSPSIonsWithCharge);
+
+                    addExp2.AddMassShiftGroupedMS3InclusionList(treeIndex, targetPeptides, massShift);
 
                     MethodModification addMod2 = new MethodModification(modCount, addExp2);
-                    methodMods4.Modifications.Add(addMod2);
+                    methodMods.Modifications.Add(addMod2);
 
-                    modCount4++;
+                    modCount++;
                 }
 
                 treeIndex++;
             }
 
+
             //Write the XML
             using (TextWriter writer = new StreamWriter(file))
             {
                 serializer.Serialize(writer, methodMods);
-            }
-
-            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_1.xml")))
-            {
-                serializer.Serialize(writer, methodMods1);
-            }
-
-            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_2.xml")))
-            {
-                serializer.Serialize(writer, methodMods2);
-            }
-
-            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_3.xml")))
-            {
-                serializer.Serialize(writer, methodMods3);
-            }
-
-            using (TextWriter writer = new StreamWriter(file.Replace(".xml", "_4.xml")))
-            {
-                serializer.Serialize(writer, methodMods4);
             }
 
             return file;
@@ -2286,7 +2376,7 @@ namespace TomahaqCompanion
                     }
 
                     target.AverageScanEventsLines(target.SelectedScanEventLines, target.SelectedScanEventLines.Count, includeAll: true);
-                    target.UpdateTargetIons(15, spsEdited: SPSIonsEdited);
+                    target.UpdateIons((int)triggerIonMax.Value, (int)targetIonMax.Value, spsEdited: SPSIonsEdited);
 
                     //target.PopulateTriggerAndTargetIons(20, force:true); //Is this necessary - if we are here there is a raw file
                 }
@@ -2309,7 +2399,15 @@ namespace TomahaqCompanion
             bool addMS2TriggerMass = addMS2TriggerMassList.Checked;
             bool addMS2IsoOffset = addMS2IsolationOffset.Checked;
             bool addMS3TargetedMass = addMS3TargetMassList.Checked;
-            string xmlFile = BuildMethodXML(targetFile.Replace(".csv", "_curatedMethod.xml"), targets, addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass);
+            string xmlFile = null;
+            if (!groupIDCheckBox.Checked)
+            {
+                xmlFile = BuildMethodXML(targetFile.Replace(".csv", "_curatedMethod.xml"), targets, addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass); //TODO: Change Back to Not Large
+            }
+            else
+            {
+                xmlFile = BuildLargeMethodXML(targetFile.Replace(".csv", "_curatedMethod.xml"), targets, addMS1TargetedMass, addMS2TriggerMass, addMS2IsoOffset, addMS3TargetedMass); //TODO: Change Back to Not Large
+            }
 
             //Export the method last in case it fails due to the program not being run on the instrument
             UpdateLog("Creating New Method");
@@ -2317,7 +2415,8 @@ namespace TomahaqCompanion
             {
                 string templateMethod = templateBox.Text;
                 string outputMethod = targetFile.Replace(".csv", "_curated.meth");
-                MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+                EditMethod(templateMethod, xmlFile, outputMethod);
+                ////MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
             }
             else
             {
@@ -3014,6 +3113,11 @@ namespace TomahaqCompanion
         }
 
         private void paramTab_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void eclipseCheckbox_CheckedChanged(object sender, EventArgs e)
         {
 
         }

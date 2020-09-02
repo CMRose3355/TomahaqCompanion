@@ -136,6 +136,41 @@ namespace TomahaqCompanion
             MassListFilter.MassList.AddMassListRecord(mz, z, startTime, endTime);
         }
 
+        public void AddMS1Inclusion(int treeIndex, List<TargetPeptide> targetPeptides)
+        {
+            string type = "TargetedMassInclusion";
+            bool above = true;
+            int msnLevel = 1;
+
+            MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
+
+            foreach (TargetPeptide targetPeptide in targetPeptides)
+            {
+                if(targetPeptide.StartRetentionTime != -1)
+                {
+                    MassListFilter.MassList.AddMassListRecord(targetPeptide.TriggerMZ, targetPeptide.Charge, targetPeptide.StartRetentionTime, targetPeptide.EndRetentionTime);
+                }
+                else
+                {
+                    MassListFilter.MassList.AddMassListRecord(targetPeptide.TriggerMZ, targetPeptide.Charge);
+                }
+            }
+        }
+
+        public void AddMS2Inclusion(int treeIndex, List<TargetPeptide> targetPeptides)
+        {
+            string type = "TargetedMassInclusion";
+            bool above = true;
+            int msnLevel = 2;
+
+            MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
+
+            foreach (TargetPeptide targetPeptide in targetPeptides)
+            {
+                MassListFilter.MassList.AddMassListRecord(targetPeptide.TargetMZ, targetPeptide.Charge);
+            }
+        }
+
         public void AddMS3InclusionList(int treeIndex, List<double> mzList)
         {
             string type = "TargetedMassInclusion";
@@ -168,6 +203,30 @@ namespace TomahaqCompanion
             }
         }
 
+        public void AddMassShiftGroupedMS3InclusionList(int treeIndex, List<TargetPeptide> targetPeptides, double massShift)
+        {
+            string type = "TargetedMassInclusion";
+            bool above = true;
+            int msnLevel = 3;
+
+            MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
+
+            foreach (TargetPeptide targetPeptide in targetPeptides)
+            {
+                foreach (KeyValuePair<double, int> kvp in targetPeptide.TargetSPSIonsWithCharge)
+                {
+                    double roundedMZ = Math.Round(kvp.Key, 4);
+                    int charge = kvp.Value;
+                    MassListFilter.MassList.AddMassListRecord(roundedMZ, charge, targetPeptide.TriggerMZ - massShift);
+
+                    if (targetPeptide.TriggerMZ - massShift < 0 || targetPeptide.TriggerMZ - massShift > 2000)
+                    {
+                        Console.WriteLine(targetPeptide.TriggerMZ - massShift);
+                    }
+                }
+            }
+        }
+
         public void AddMS2TriggerList(int treeIndex, List<double> mzList)
         {
             string type = "TargetedMassTrigger";
@@ -183,6 +242,30 @@ namespace TomahaqCompanion
                 MassListFilter.MassList.AddMassListRecord(roundedMZ, 1);
             }
 
+        }
+
+        public void AddMassShiftGroupedMS2TriggerList(int treeIndex, List<TargetPeptide> targetPeptides)
+        {
+            string type = "TargetedMassTrigger";
+            bool above = false;
+            int msnLevel = 2 - 1;
+
+            MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
+
+            foreach(TargetPeptide targetPeptide in targetPeptides)
+            {
+                foreach(KeyValuePair<double, int> kvp in targetPeptide.TriggerIonsWithCharge)
+                {
+                    double roundedMZ = Math.Round(kvp.Key, 4);
+                    int charge = kvp.Value;
+                    MassListFilter.MassList.AddMassListRecord(roundedMZ, charge, targetPeptide.TriggerMZ);
+
+                    if(targetPeptide.TriggerMZ<0 || targetPeptide.TriggerMZ>2000)
+                    {
+                        Console.WriteLine(targetPeptide.TriggerMZ);
+                    }
+                }
+            }    
         }
 
         public void AddMS2TriggerList(int treeIndex, Dictionary<double, int> mzAndzDict)
@@ -304,6 +387,11 @@ namespace TomahaqCompanion
             Records.Add(new MassListRecord(mz, z));
         }
 
+        public void AddMassListRecord(double mz, int z, double groupID)
+        {
+            Records.Add(new MassListRecord(mz, z, groupID));
+        }
+
         public void AddMassListRecord(double mz, int z, double startTime, double endTime)
         {
             StartEndTime = "true";
@@ -322,6 +410,7 @@ namespace TomahaqCompanion
         public string Z;
         public string StartTime;
         public string EndTime;
+        public string GroupID;
 
         public MassListRecord() { }
 
@@ -329,6 +418,13 @@ namespace TomahaqCompanion
         {
             MOverZ = mOverZ.ToString();
             Z = z.ToString();
+        }
+
+        public MassListRecord(double mOverZ, int z, double groupID)
+        {
+            MOverZ = mOverZ.ToString();
+            Z = z.ToString();
+            GroupID = groupID.ToString();
         }
 
         public MassListRecord(double mOverZ)

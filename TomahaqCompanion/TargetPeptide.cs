@@ -568,10 +568,10 @@ namespace TomahaqCompanion
             }
         }
 
-        public void PopulateTriggerAndTargetIons(int numIons, bool force = false)
+        public void PopulateTriggerAndTargetIons(int numTriggerIons, int numTargetIons, bool force = false)
         {
-            PopulateTriggerIons(numIons, force);
-            PopulateTargetSPSIons(numIons, force);
+            PopulateTriggerIons(numTriggerIons, force);
+            PopulateTargetSPSIons(numTargetIons, force);
         }
 
         private string BuildDynamicModDict(string peptideString, Dictionary<string, Dictionary<Modification, string>> allDynMods)
@@ -1026,13 +1026,13 @@ namespace TomahaqCompanion
             }
         }
 
-        public void UpdateTargetIons(int numIons, bool spsEdited = false)
+        public void UpdateIons(int numTriggerIons, int numTargetIons, bool spsEdited = false)
         {
 
             //This will go through the composite spectrum and choose the topN most intense ions
             List<double> targetSPSIons = new List<double>();
             Dictionary<double, int> targetSPSIonsWithCharge = new Dictionary<double, int>();
-            GetTopNIons(TargetMZ, TargetCompositeSpectrum, numIons, out targetSPSIons, out targetSPSIonsWithCharge, "target");
+            GetTopNIons(TargetMZ, TargetCompositeSpectrum, numTargetIons, out targetSPSIons, out targetSPSIonsWithCharge, "target");
 
             TargetSPSIons = targetSPSIons;
             TargetSPSIonsWithCharge = targetSPSIonsWithCharge;
@@ -1040,7 +1040,7 @@ namespace TomahaqCompanion
             //This will go through the composite spectrum and choose the topN most intense ions
             List<double> triggerSPSIons = new List<double>();
             Dictionary<double, int> triggerSPSIonsWithCharge = new Dictionary<double, int>();
-            GetTopNIons(TriggerMZ, TriggerCompositeSpectrum, numIons, out triggerSPSIons, out triggerSPSIonsWithCharge, "trigger");
+            GetTopNIons(TriggerMZ, TriggerCompositeSpectrum, numTriggerIons, out triggerSPSIons, out triggerSPSIonsWithCharge, "trigger");
 
             TriggerIons = triggerSPSIons;
             TriggerIonsWithCharge = triggerSPSIonsWithCharge;
