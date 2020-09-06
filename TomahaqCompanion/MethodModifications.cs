@@ -206,8 +206,8 @@ namespace TomahaqCompanion
         public void AddMassShiftGroupedMS3InclusionList(int treeIndex, List<TargetPeptide> targetPeptides, double massShift)
         {
             string type = "TargetedMassInclusion";
-            bool above = true;
-            int msnLevel = 3;
+            bool above = false; //TODO: reset true
+            int msnLevel = 3 - 1;
 
             MassListFilter = new MassListFilter(treeIndex, type, msnLevel, above);
 
@@ -217,7 +217,7 @@ namespace TomahaqCompanion
                 {
                     double roundedMZ = Math.Round(kvp.Key, 4);
                     int charge = kvp.Value;
-                    MassListFilter.MassList.AddMassListRecord(roundedMZ, charge, targetPeptide.TriggerMZ + massShift);
+                    MassListFilter.MassList.AddMassListRecord(roundedMZ, charge, targetPeptide.TriggerMZ);
 
                     if (targetPeptide.TriggerMZ + massShift < 0 || targetPeptide.TriggerMZ + massShift > 2000)
                     {
