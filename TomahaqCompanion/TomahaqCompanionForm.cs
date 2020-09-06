@@ -97,7 +97,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.1.0.0");
+            UpdateLog("Version = 1.1.0.1");
         }
 
         //These are the main buttons that perform functions within the program
@@ -1291,7 +1291,7 @@ namespace TomahaqCompanion
             SortedDictionary<double, List<TargetPeptide>> massShift_to_TargetList = new SortedDictionary<double, List<TargetPeptide>>();
             foreach (TargetPeptide targetPep in _targetList)
             {
-                double massShift = Math.Round(targetPep.TriggerMZ - targetPep.TargetMZ, 2);
+                double massShift = Math.Round(targetPep.TargetMZ - targetPep.TriggerMZ, 2);
 
                 List<TargetPeptide> outList = null;
                 if(massShift_to_TargetList.TryGetValue(massShift, out outList))

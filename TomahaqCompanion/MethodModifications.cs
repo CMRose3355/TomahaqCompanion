@@ -217,11 +217,11 @@ namespace TomahaqCompanion
                 {
                     double roundedMZ = Math.Round(kvp.Key, 4);
                     int charge = kvp.Value;
-                    MassListFilter.MassList.AddMassListRecord(roundedMZ, charge, targetPeptide.TriggerMZ - massShift);
+                    MassListFilter.MassList.AddMassListRecord(roundedMZ, charge, targetPeptide.TriggerMZ + massShift);
 
-                    if (targetPeptide.TriggerMZ - massShift < 0 || targetPeptide.TriggerMZ - massShift > 2000)
+                    if (targetPeptide.TriggerMZ + massShift < 0 || targetPeptide.TriggerMZ + massShift > 2000)
                     {
-                        Console.WriteLine(targetPeptide.TriggerMZ - massShift);
+                        Console.WriteLine(targetPeptide.TriggerMZ + massShift);
                     }
                 }
             }
