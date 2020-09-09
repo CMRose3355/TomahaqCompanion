@@ -499,7 +499,7 @@ namespace TomahaqCompanion
             }
         }
 
-        private void PopulateTriggerIons(int numIons, bool force = false)
+        private void PopulateTriggerIons(double triggerIonMinMZ, double triggerIonMaxMZ, int numIons, bool force = false)
         {
             if (TriggerIons.Count > 0 && !force)
             {
@@ -527,23 +527,11 @@ namespace TomahaqCompanion
                         double fragMZ = frag.ToMz(i);
                         double distanceFromPrec = fragMZ - TriggerMZ;
 
-                        bool addTriggerIon = true; //TODO:Make this a user paramater & September 2020
-                        if(fragMZ <= 400 || fragMZ >= 1000)
+                        bool addTriggerIon = true;
+                        if(fragMZ <= triggerIonMinMZ || fragMZ >= triggerIonMaxMZ)
                         {
                             addTriggerIon = false;
                         }
-
-                        //if(!addTriggerIon) //I don't think that I want to put a filter on the trigger ions...this shouldn't be necessary anymore
-                        //{
-                        //    //Check the the fragment is above 400, less than 2000 and that it is ion #2 or higher
-                        //    double fragMZMin = TriggerMZ - 70;
-                        //    double fragMZMax = TriggerMZ + 5;
-                        //
-                        //    if (fragMZ > 400 && fragMZ < 2000 && (fragMZ < fragMZMin || fragMZ > fragMZMax))
-                        //    {
-                        //        addTriggerIon = true;
-                        //    }
-                        //}
 
                         //check if there is another entry with the same distance from the precursor
                         if (addTriggerIon)
@@ -572,9 +560,9 @@ namespace TomahaqCompanion
             }
         }
 
-        public void PopulateTriggerAndTargetIons(int numTriggerIons, int numTargetIons, bool force = false)
+        public void PopulateTriggerAndTargetIons(int numTriggerIons, int numTargetIons, double triggerIonMinMZ, double triggerIonMaxMZ, bool force = false)
         {
-            PopulateTriggerIons(numTriggerIons, force);
+            PopulateTriggerIons(triggerIonMinMZ, triggerIonMaxMZ, numTriggerIons, force);
             PopulateTargetSPSIons(numTargetIons, force);
         }
 

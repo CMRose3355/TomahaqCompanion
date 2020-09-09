@@ -29,15 +29,15 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
             this.targetGridView = new System.Windows.Forms.DataGridView();
             this.sortTargetsMZ = new System.Windows.Forms.Button();
             this.sortTargetsRT = new System.Windows.Forms.Button();
@@ -73,6 +73,14 @@
             this.sitesBox = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.minNumTriggerIonsNB = new System.Windows.Forms.NumericUpDown();
+            this.groupIDCheckBox = new System.Windows.Forms.CheckBox();
+            this.eclipseCheckbox = new System.Windows.Forms.CheckBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.targetIonMax = new System.Windows.Forms.NumericUpDown();
+            this.triggerIonMax = new System.Windows.Forms.NumericUpDown();
             this.label18 = new System.Windows.Forms.Label();
             this.spsMaxMZ = new System.Windows.Forms.TextBox();
             this.spsMinMZ = new System.Windows.Forms.TextBox();
@@ -138,12 +146,9 @@
             this.rawFileFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawFDB = new System.Windows.Forms.OpenFileDialog();
             this.primingRawOFDia = new System.Windows.Forms.OpenFileDialog();
-            this.label21 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.targetIonMax = new System.Windows.Forms.NumericUpDown();
-            this.triggerIonMax = new System.Windows.Forms.NumericUpDown();
-            this.groupIDCheckBox = new System.Windows.Forms.CheckBox();
-            this.eclipseCheckbox = new System.Windows.Forms.CheckBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.triggerIonMZMaxTB = new System.Windows.Forms.TextBox();
+            this.triggerIonMZMinTB = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.targetGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.scanGridView)).BeginInit();
             this.tabControl.SuspendLayout();
@@ -153,34 +158,35 @@
             ((System.ComponentModel.ISupportInitialize)(this.modGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.userModGridView)).BeginInit();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.minNumTriggerIonsNB)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.targetIonMax)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.triggerIonMax)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.analysisTab.SuspendLayout();
             this.paramTab.SuspendLayout();
             this.modSaveLoadGroup.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.targetIonMax)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.triggerIonMax)).BeginInit();
             this.SuspendLayout();
             // 
             // targetGridView
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.targetGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.targetGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             this.targetGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.targetGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.targetGridView.DefaultCellStyle = dataGridViewCellStyle11;
             this.targetGridView.Location = new System.Drawing.Point(3, 34);
             this.targetGridView.Name = "targetGridView";
             this.targetGridView.Size = new System.Drawing.Size(472, 495);
@@ -274,23 +280,23 @@
             // 
             // scanGridView
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.scanGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.scanGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle12;
             this.scanGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.scanGridView.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.scanGridView.DefaultCellStyle = dataGridViewCellStyle13;
             this.scanGridView.Location = new System.Drawing.Point(482, 401);
             this.scanGridView.Name = "scanGridView";
             this.scanGridView.Size = new System.Drawing.Size(952, 153);
@@ -309,9 +315,9 @@
             // 
             // logBox
             // 
-            this.logBox.Location = new System.Drawing.Point(6, 623);
+            this.logBox.Location = new System.Drawing.Point(2, 662);
             this.logBox.Name = "logBox";
-            this.logBox.Size = new System.Drawing.Size(1449, 39);
+            this.logBox.Size = new System.Drawing.Size(1449, 77);
             this.logBox.TabIndex = 57;
             this.logBox.Text = "";
             // 
@@ -323,7 +329,7 @@
             this.tabControl.Location = new System.Drawing.Point(2, 2);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1457, 615);
+            this.tabControl.Size = new System.Drawing.Size(1457, 654);
             this.tabControl.TabIndex = 59;
             // 
             // methodTab
@@ -340,7 +346,7 @@
             this.methodTab.Controls.Add(this.groupBox2);
             this.methodTab.Location = new System.Drawing.Point(4, 22);
             this.methodTab.Name = "methodTab";
-            this.methodTab.Size = new System.Drawing.Size(1449, 589);
+            this.methodTab.Size = new System.Drawing.Size(1449, 628);
             this.methodTab.TabIndex = 3;
             this.methodTab.Text = "TOMAHAQ File Loader and Method Builder";
             this.methodTab.UseVisualStyleBackColor = true;
@@ -388,7 +394,7 @@
             this.groupBox5.Controls.Add(this.rawFileBox);
             this.groupBox5.Controls.Add(this.label3);
             this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox5.Location = new System.Drawing.Point(10, 469);
+            this.groupBox5.Location = new System.Drawing.Point(10, 518);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(958, 100);
             this.groupBox5.TabIndex = 78;
@@ -470,23 +476,23 @@
             // 
             // modGridView
             // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.modGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.modGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle14;
             this.modGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.modGridView.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.modGridView.DefaultCellStyle = dataGridViewCellStyle15;
             this.modGridView.Location = new System.Drawing.Point(977, 21);
             this.modGridView.Name = "modGridView";
             this.modGridView.Size = new System.Drawing.Size(467, 375);
@@ -505,14 +511,14 @@
             // 
             // userModGridView
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.userModGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.userModGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
             this.userModGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.userModGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.triggerCB,
@@ -522,24 +528,24 @@
             this.typeCombo,
             this.symbolBox,
             this.sitesBox});
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.userModGridView.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.userModGridView.DefaultCellStyle = dataGridViewCellStyle17;
             this.userModGridView.Location = new System.Drawing.Point(977, 432);
             this.userModGridView.Name = "userModGridView";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.userModGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.userModGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle18;
             this.userModGridView.Size = new System.Drawing.Size(467, 137);
             this.userModGridView.TabIndex = 73;
             // 
@@ -604,6 +610,11 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label22);
+            this.groupBox3.Controls.Add(this.triggerIonMZMaxTB);
+            this.groupBox3.Controls.Add(this.triggerIonMZMinTB);
+            this.groupBox3.Controls.Add(this.label14);
+            this.groupBox3.Controls.Add(this.minNumTriggerIonsNB);
             this.groupBox3.Controls.Add(this.groupIDCheckBox);
             this.groupBox3.Controls.Add(this.eclipseCheckbox);
             this.groupBox3.Controls.Add(this.label21);
@@ -639,10 +650,102 @@
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(10, 174);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(958, 284);
+            this.groupBox3.Size = new System.Drawing.Size(958, 338);
             this.groupBox3.TabIndex = 70;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Create TOMAHAQ Method";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.Location = new System.Drawing.Point(623, 277);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(165, 13);
+            this.label14.TabIndex = 104;
+            this.label14.Text = "Min # Trigger Ions to Include Pep";
+            // 
+            // minNumTriggerIonsNB
+            // 
+            this.minNumTriggerIonsNB.Location = new System.Drawing.Point(567, 274);
+            this.minNumTriggerIonsNB.Name = "minNumTriggerIonsNB";
+            this.minNumTriggerIonsNB.Size = new System.Drawing.Size(52, 20);
+            this.minNumTriggerIonsNB.TabIndex = 103;
+            this.minNumTriggerIonsNB.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.minNumTriggerIonsNB.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // groupIDCheckBox
+            // 
+            this.groupIDCheckBox.AutoSize = true;
+            this.groupIDCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupIDCheckBox.Location = new System.Drawing.Point(802, 276);
+            this.groupIDCheckBox.Name = "groupIDCheckBox";
+            this.groupIDCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.groupIDCheckBox.TabIndex = 102;
+            this.groupIDCheckBox.Text = "Use Group ID";
+            this.groupIDCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // eclipseCheckbox
+            // 
+            this.eclipseCheckbox.AutoSize = true;
+            this.eclipseCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.eclipseCheckbox.Location = new System.Drawing.Point(802, 248);
+            this.eclipseCheckbox.Name = "eclipseCheckbox";
+            this.eclipseCheckbox.Size = new System.Drawing.Size(100, 17);
+            this.eclipseCheckbox.TabIndex = 101;
+            this.eclipseCheckbox.Text = "Orbitrap Eclipse";
+            this.eclipseCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label21.Location = new System.Drawing.Point(623, 237);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(130, 13);
+            this.label21.TabIndex = 100;
+            this.label21.Text = "Max # of Target SPS Ions";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(623, 196);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(108, 13);
+            this.label20.TabIndex = 99;
+            this.label20.Text = "Max # of Trigger Ions";
+            this.label20.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // targetIonMax
+            // 
+            this.targetIonMax.Location = new System.Drawing.Point(567, 234);
+            this.targetIonMax.Name = "targetIonMax";
+            this.targetIonMax.Size = new System.Drawing.Size(52, 20);
+            this.targetIonMax.TabIndex = 98;
+            this.targetIonMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.targetIonMax.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // triggerIonMax
+            // 
+            this.triggerIonMax.Location = new System.Drawing.Point(567, 192);
+            this.triggerIonMax.Name = "triggerIonMax";
+            this.triggerIonMax.Size = new System.Drawing.Size(52, 20);
+            this.triggerIonMax.TabIndex = 97;
+            this.triggerIonMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.triggerIonMax.Value = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
             // 
             // label18
             // 
@@ -736,7 +839,7 @@
             // 
             this.spsIonsAbovePrec.AutoSize = true;
             this.spsIonsAbovePrec.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.spsIonsAbovePrec.Location = new System.Drawing.Point(792, 219);
+            this.spsIonsAbovePrec.Location = new System.Drawing.Point(802, 222);
             this.spsIonsAbovePrec.Name = "spsIonsAbovePrec";
             this.spsIonsAbovePrec.Size = new System.Drawing.Size(122, 17);
             this.spsIonsAbovePrec.TabIndex = 88;
@@ -747,7 +850,7 @@
             // 
             this.chooseBestCharge.AutoSize = true;
             this.chooseBestCharge.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chooseBestCharge.Location = new System.Drawing.Point(792, 189);
+            this.chooseBestCharge.Location = new System.Drawing.Point(802, 195);
             this.chooseBestCharge.Name = "chooseBestCharge";
             this.chooseBestCharge.Size = new System.Drawing.Size(151, 17);
             this.chooseBestCharge.TabIndex = 86;
@@ -780,7 +883,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(424, 178);
+            this.label10.Location = new System.Drawing.Point(424, 169);
             this.label10.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(120, 13);
@@ -790,7 +893,7 @@
             // fragTolBox
             // 
             this.fragTolBox.AllowDrop = true;
-            this.fragTolBox.Location = new System.Drawing.Point(425, 198);
+            this.fragTolBox.Location = new System.Drawing.Point(425, 190);
             this.fragTolBox.Margin = new System.Windows.Forms.Padding(1);
             this.fragTolBox.Name = "fragTolBox";
             this.fragTolBox.Size = new System.Drawing.Size(119, 20);
@@ -802,7 +905,7 @@
             // 
             this.ppmRB.AutoSize = true;
             this.ppmRB.Checked = true;
-            this.ppmRB.Location = new System.Drawing.Point(435, 222);
+            this.ppmRB.Location = new System.Drawing.Point(435, 218);
             this.ppmRB.Name = "ppmRB";
             this.ppmRB.Size = new System.Drawing.Size(51, 17);
             this.ppmRB.TabIndex = 64;
@@ -813,7 +916,7 @@
             // daRB
             // 
             this.daRB.AutoSize = true;
-            this.daRB.Location = new System.Drawing.Point(496, 223);
+            this.daRB.Location = new System.Drawing.Point(496, 219);
             this.daRB.Name = "daRB";
             this.daRB.Size = new System.Drawing.Size(42, 17);
             this.daRB.TabIndex = 65;
@@ -895,7 +998,7 @@
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(20, 110);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(398, 165);
+            this.groupBox1.Size = new System.Drawing.Size(398, 185);
             this.groupBox1.TabIndex = 69;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Method Modifications";
@@ -903,7 +1006,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(4, 23);
+            this.label7.Location = new System.Drawing.Point(7, 24);
             this.label7.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(380, 13);
@@ -916,7 +1019,7 @@
             this.addMS3TargetMassList.AutoSize = true;
             this.addMS3TargetMassList.Checked = true;
             this.addMS3TargetMassList.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.addMS3TargetMassList.Location = new System.Drawing.Point(21, 131);
+            this.addMS3TargetMassList.Location = new System.Drawing.Point(21, 141);
             this.addMS3TargetMassList.Name = "addMS3TargetMassList";
             this.addMS3TargetMassList.Size = new System.Drawing.Size(263, 17);
             this.addMS3TargetMassList.TabIndex = 11;
@@ -928,7 +1031,7 @@
             this.addMS1TargetMassList.AutoSize = true;
             this.addMS1TargetMassList.Checked = true;
             this.addMS1TargetMassList.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.addMS1TargetMassList.Location = new System.Drawing.Point(21, 47);
+            this.addMS1TargetMassList.Location = new System.Drawing.Point(21, 53);
             this.addMS1TargetMassList.Name = "addMS1TargetMassList";
             this.addMS1TargetMassList.Size = new System.Drawing.Size(280, 17);
             this.addMS1TargetMassList.TabIndex = 8;
@@ -940,7 +1043,7 @@
             this.addMS2IsolationOffset.AutoSize = true;
             this.addMS2IsolationOffset.Checked = true;
             this.addMS2IsolationOffset.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.addMS2IsolationOffset.Location = new System.Drawing.Point(21, 103);
+            this.addMS2IsolationOffset.Location = new System.Drawing.Point(21, 111);
             this.addMS2IsolationOffset.Name = "addMS2IsolationOffset";
             this.addMS2IsolationOffset.Size = new System.Drawing.Size(219, 17);
             this.addMS2IsolationOffset.TabIndex = 10;
@@ -952,7 +1055,7 @@
             this.addMS2TriggerMassList.AutoSize = true;
             this.addMS2TriggerMassList.Checked = true;
             this.addMS2TriggerMassList.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.addMS2TriggerMassList.Location = new System.Drawing.Point(21, 75);
+            this.addMS2TriggerMassList.Location = new System.Drawing.Point(21, 81);
             this.addMS2TriggerMassList.Name = "addMS2TriggerMassList";
             this.addMS2TriggerMassList.Size = new System.Drawing.Size(267, 17);
             this.addMS2TriggerMassList.TabIndex = 9;
@@ -981,7 +1084,7 @@
             // 
             // createMethod
             // 
-            this.createMethod.Location = new System.Drawing.Point(819, 252);
+            this.createMethod.Location = new System.Drawing.Point(819, 309);
             this.createMethod.Name = "createMethod";
             this.createMethod.Size = new System.Drawing.Size(128, 23);
             this.createMethod.TabIndex = 63;
@@ -1332,81 +1435,45 @@
             this.primingRawOFDia.FileName = "openFileDialog1";
             this.primingRawOFDia.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
-            // label21
+            // label22
             // 
-            this.label21.AutoSize = true;
-            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.Location = new System.Drawing.Point(632, 219);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(130, 13);
-            this.label21.TabIndex = 100;
-            this.label21.Text = "Max # of Target SPS Ions";
+            this.label22.AutoSize = true;
+            this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label22.Location = new System.Drawing.Point(425, 252);
+            this.label22.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(120, 13);
+            this.label22.TabIndex = 107;
+            this.label22.Text = "Trigger Ion Range (m/z)";
             // 
-            // label20
+            // triggerIonMZMaxTB
             // 
-            this.label20.AutoSize = true;
-            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label20.Location = new System.Drawing.Point(632, 187);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(108, 13);
-            this.label20.TabIndex = 99;
-            this.label20.Text = "Max # of Trigger Ions";
-            this.label20.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.triggerIonMZMaxTB.AllowDrop = true;
+            this.triggerIonMZMaxTB.Location = new System.Drawing.Point(489, 275);
+            this.triggerIonMZMaxTB.Margin = new System.Windows.Forms.Padding(1);
+            this.triggerIonMZMaxTB.Name = "triggerIonMZMaxTB";
+            this.triggerIonMZMaxTB.Size = new System.Drawing.Size(52, 20);
+            this.triggerIonMZMaxTB.TabIndex = 106;
+            this.triggerIonMZMaxTB.Text = "2000";
+            this.triggerIonMZMaxTB.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // targetIonMax
+            // triggerIonMZMinTB
             // 
-            this.targetIonMax.Location = new System.Drawing.Point(573, 216);
-            this.targetIonMax.Name = "targetIonMax";
-            this.targetIonMax.Size = new System.Drawing.Size(52, 20);
-            this.targetIonMax.TabIndex = 98;
-            this.targetIonMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.targetIonMax.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            // 
-            // triggerIonMax
-            // 
-            this.triggerIonMax.Location = new System.Drawing.Point(573, 182);
-            this.triggerIonMax.Name = "triggerIonMax";
-            this.triggerIonMax.Size = new System.Drawing.Size(52, 20);
-            this.triggerIonMax.TabIndex = 97;
-            this.triggerIonMax.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.triggerIonMax.Value = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            // 
-            // groupIDCheckBox
-            // 
-            this.groupIDCheckBox.AutoSize = true;
-            this.groupIDCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupIDCheckBox.Location = new System.Drawing.Point(427, 256);
-            this.groupIDCheckBox.Name = "groupIDCheckBox";
-            this.groupIDCheckBox.Size = new System.Drawing.Size(91, 17);
-            this.groupIDCheckBox.TabIndex = 102;
-            this.groupIDCheckBox.Text = "Use Group ID";
-            this.groupIDCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // eclipseCheckbox
-            // 
-            this.eclipseCheckbox.AutoSize = true;
-            this.eclipseCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.eclipseCheckbox.Location = new System.Drawing.Point(574, 256);
-            this.eclipseCheckbox.Name = "eclipseCheckbox";
-            this.eclipseCheckbox.Size = new System.Drawing.Size(100, 17);
-            this.eclipseCheckbox.TabIndex = 101;
-            this.eclipseCheckbox.Text = "Orbitrap Eclipse";
-            this.eclipseCheckbox.UseVisualStyleBackColor = true;
+            this.triggerIonMZMinTB.AllowDrop = true;
+            this.triggerIonMZMinTB.Location = new System.Drawing.Point(428, 275);
+            this.triggerIonMZMinTB.Margin = new System.Windows.Forms.Padding(1);
+            this.triggerIonMZMinTB.Name = "triggerIonMZMinTB";
+            this.triggerIonMZMinTB.Size = new System.Drawing.Size(42, 20);
+            this.triggerIonMZMinTB.TabIndex = 105;
+            this.triggerIonMZMinTB.Text = "200";
+            this.triggerIonMZMinTB.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // TomahaqCompanionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1476, 673);
+            this.ClientSize = new System.Drawing.Size(1476, 751);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.logBox);
             this.Name = "TomahaqCompanionForm";
@@ -1424,6 +1491,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.userModGridView)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.minNumTriggerIonsNB)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.targetIonMax)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.triggerIonMax)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -1434,8 +1504,6 @@
             this.paramTab.PerformLayout();
             this.modSaveLoadGroup.ResumeLayout(false);
             this.modSaveLoadGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.targetIonMax)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.triggerIonMax)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1548,6 +1616,11 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.NumericUpDown targetIonMax;
         private System.Windows.Forms.NumericUpDown triggerIonMax;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.NumericUpDown minNumTriggerIonsNB;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.TextBox triggerIonMZMaxTB;
+        private System.Windows.Forms.TextBox triggerIonMZMinTB;
     }
 }
 

@@ -97,7 +97,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.1.0.1");
+            UpdateLog("Version = 1.1.0.2");
         }
 
         //These are the main buttons that perform functions within the program
@@ -225,7 +225,7 @@ namespace TomahaqCompanion
                     }
 
                     //This code will ensure that target or trigger ions are produced in the absence of a raw file
-                    target.PopulateTriggerAndTargetIons((int)triggerIonMax.Value, (int)targetIonMax.Value); //TODO: Change this to a user param
+                    target.PopulateTriggerAndTargetIons((int)triggerIonMax.Value, (int)targetIonMax.Value, double.Parse(triggerIonMZMinTB.Text), double.Parse(triggerIonMZMaxTB.Text));
 
                     //Add this to a list of targets that is not indexed on m/z
                     targets.Add(target);
@@ -1287,7 +1287,7 @@ namespace TomahaqCompanion
                     targetPep.TargetMZ = targetMZ;
                     targetPep.TriggerMZ = triggerMZ;
 
-                    if(targetPep.TriggerIonsWithCharge.Count >= 5) //TODO: September 2020
+                    if(targetPep.TriggerIonsWithCharge.Count >= (int) minNumTriggerIonsNB.Value)
                     {
                         _methodTargetList.Add(triggerMZ, targetPep);
                         _targetList.Add(targetPep);

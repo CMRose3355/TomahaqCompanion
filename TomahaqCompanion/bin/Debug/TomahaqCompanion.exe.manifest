@@ -55,13 +55,13 @@
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="320000">
-      <assemblyIdentity name="CSMSL" version="0.3.7554.18339" language="neutral" processorArchitecture="amd64" />
+      <assemblyIdentity name="CSMSL" version="0.3.7557.11329" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>6vlwATuAdzH4m8bC+8GJfHbrewDImBrRKRHHgu7/vxI=</dsig:DigestValue>
+        <dsig:DigestValue>/bIMYrHDH7VwC9mRdclrZC6OHCuZQnFJYD/DsJdvfQA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -73,7 +73,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>EHn2ALgmaRZWAq8X+HTWRgwtPrv4fLmQSOM2Mqh1RWI=</dsig:DigestValue>
+        <dsig:DigestValue>5q8sucXN1X6F+r070NcxA2wizkq4T9erSWI0WQs/tgo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -169,7 +169,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>WQbmp3wiUF54Twf1JsP/Qxmu0lYWjtNEW0fqU3mwSoE=</dsig:DigestValue>
+        <dsig:DigestValue>R7Ej3I0xQ9QV0JxG/GyuQ1zTmlvUaCocxYWwx9paoR4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -341,13 +341,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="License-LGPL.txt" size="26929">
+  <file name="License-LGPL.txt" size="26423">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>iRL7QXHiwgsVa4v7NiBCs2EsyLPNa+AsIWSrkpApH1A=</dsig:DigestValue>
+      <dsig:DigestValue>oqjJYhaAjQO20xcfZuzoDiRY2bMRWjLe9nkQQ/wGpm8=</dsig:DigestValue>
     </hash>
   </file>
   <file name="TomahaqCompanion.exe.config" size="530">
