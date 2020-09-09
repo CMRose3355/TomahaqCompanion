@@ -346,10 +346,10 @@ namespace TomahaqCompanion
             }
             catch (Exception ex)
             {
-                Console.WriteLine("*** Error occured executing the following commands.");
-                Console.WriteLine(exePath);
-                Console.WriteLine(args);
-                Console.WriteLine(ex.Message);
+                UpdateLog("*** Error occured executing the following commands.");
+                UpdateLog(exePath);
+                UpdateLog(args);
+                UpdateLog(ex.Message);
                 return false;
             }
         }
@@ -620,16 +620,20 @@ namespace TomahaqCompanion
                         TargetPeptide target = new TargetPeptide(peptideString, proteinString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), eo, spsIonsAbovePrec.Checked);
 
                         TargetPeptide outPep = null;
-                        double mz = target.Trigger.ToMz(charge);
+                        double mz = Math.Round(target.Trigger.ToMz(charge),4);
+
                         if (!retList.TryGetValue(mz, out outPep))
                         {
                             retList.Add(mz, target);
                         }
                         else
                         {
-                            double rand = rnd.Next(1, 1000);
-                            double newMass = mz + (rand * 0.000001);
-                            retList.Add(newMass, target);
+                            while (retList.TryGetValue(mz, out outPep))
+                            {
+                                mz += 0.0001;
+                            }
+
+                            retList.Add(mz, target);
                             UpdateLog("Error! Multiple targets with same mass detected");
                             UpdateLog("Adding Peptide Anyway...Be Careful with analysis");
                         }
@@ -1283,8 +1287,11 @@ namespace TomahaqCompanion
                     targetPep.TargetMZ = targetMZ;
                     targetPep.TriggerMZ = triggerMZ;
 
-                    _methodTargetList.Add(triggerMZ, targetPep);
-                    _targetList.Add(targetPep);
+                    if(targetPep.TriggerIonsWithCharge.Count >= 5) //TODO: September 2020
+                    {
+                        _methodTargetList.Add(triggerMZ, targetPep);
+                        _targetList.Add(targetPep);
+                    }
                 }
             }
 

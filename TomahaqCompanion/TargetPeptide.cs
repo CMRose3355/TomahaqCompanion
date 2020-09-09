@@ -527,7 +527,11 @@ namespace TomahaqCompanion
                         double fragMZ = frag.ToMz(i);
                         double distanceFromPrec = fragMZ - TriggerMZ;
 
-                        bool addTriggerIon = true; //TODO:Make this a user paramater
+                        bool addTriggerIon = true; //TODO:Make this a user paramater & September 2020
+                        if(fragMZ <= 400 || fragMZ >= 1000)
+                        {
+                            addTriggerIon = false;
+                        }
 
                         //if(!addTriggerIon) //I don't think that I want to put a filter on the trigger ions...this shouldn't be necessary anymore
                         //{
