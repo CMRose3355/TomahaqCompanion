@@ -301,21 +301,22 @@ namespace TomahaqCompanion
 
         public void EditMethod(string templatePath, string modPath, string outputPath)
         {
-
+            string exePath = ".\\XMLMethodChanger\\XmlMethodChanger.exe";
             string templateCleanedPath = string.Format("\"{0}\"", templatePath);
             string modPathCleanedPath = string.Format("\"{0}\"", modPath);
             string outputCleanedPath = string.Format("\"{0}\"", outputPath);
-            string argsCleaned = "-i " + templateCleanedPath + " -m " + modPathCleanedPath + " -o " + outputCleanedPath;
-
-            //File.Copy(templatePath, ".\\XMLMethodChanger\\Template.meth", true);
-            //File.Copy(modPath, ".\\XMLMethodChanger\\Mods.xml", true);
-
-            string exePath = ".\\XMLMethodChanger\\XmlMethodChanger.exe";
-            string args = "-i .\\XMLMethodChanger\\Template.meth -m .\\XMLMethodChanger\\Mods.xml -o .\\XMLMethodChanger\\Output.meth";
-            args = argsCleaned;
+            string args = "-i " + templateCleanedPath + " -m " + modPathCleanedPath + " -o " + outputCleanedPath;
 
             Console.WriteLine(args);
             ExecuteCommand(exePath, args);
+
+            //File.Copy(templatePath, ".\\XMLMethodChanger\\Template.meth", true);
+            //File.Copy(modPath, ".\\XMLMethodChanger\\Mods.xml", true);
+            //string args = "-i .\\XMLMethodChanger\\Template.meth -m .\\XMLMethodChanger\\Mods.xml -o .\\XMLMethodChanger\\Output.meth";
+            //args = argsCleaned;
+
+            //Console.WriteLine(args);
+            //ExecuteCommand(exePath, args);
 
             //File.Copy(".\\XMLMethodChanger\\Output.meth", outputPath, true);
 
