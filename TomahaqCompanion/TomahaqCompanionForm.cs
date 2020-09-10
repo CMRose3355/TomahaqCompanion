@@ -97,7 +97,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.1.0.2");
+            UpdateLog("Version = 1.1.0.3");
         }
 
         //These are the main buttons that perform functions within the program
@@ -133,8 +133,8 @@ namespace TomahaqCompanion
 
         private void createMethod_Click_1(object sender, EventArgs e)
         {
-            //try
-            //{
+            try
+            {
                 Priming = true;
                 Analysis = false;
                 SPSIonsEdited = false;
@@ -286,11 +286,11 @@ namespace TomahaqCompanion
 
                 //This will switch the GUI to the data analysis tab, whose index is 1
                 tabControl.SelectTab(1);
-            //}
-            //catch (Exception exp)
-            //{
-            //    UpdateLog("Error! " + exp.Message);
-            //}
+            }
+            catch (Exception exp)
+            {
+                UpdateLog("Error! " + exp.Message);
+            }
 
         }
 
@@ -340,7 +340,17 @@ namespace TomahaqCompanion
                     process.WaitForExit();
 
                     string result = process.StandardOutput.ReadToEnd();
-                    Console.WriteLine(result);
+
+                    if(result.Contains("Error"))
+                    {
+                        UpdateLog("*** Error occured executing the following commands.");
+                        UpdateLog(exePath);
+                        UpdateLog(args);
+                        UpdateLog(result);
+                        return false;
+                    }
+
+                    UpdateLog(result);
                 }
                 return true;
             }

@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="319488">
-      <assemblyIdentity name="CSMSL" version="0.3.7557.22559" language="neutral" processorArchitecture="amd64" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="320000">
+      <assemblyIdentity name="CSMSL" version="0.3.7554.18339" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>ojZV1tP6EB6QxEv9rv5KFIQKkK7tAxt41UsQBMi/fT8=</dsig:DigestValue>
+        <dsig:DigestValue>6vlwATuAdzH4m8bC+8GJfHbrewDImBrRKRHHgu7/vxI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -73,7 +73,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>YalDoAfakrF9yGoSYlKv2YGA1dp2mYBet9sAGNfr7LE=</dsig:DigestValue>
+        <dsig:DigestValue>EHn2ALgmaRZWAq8X+HTWRgwtPrv4fLmQSOM2Mqh1RWI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -169,7 +169,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>NIwY4NdIgosjbwABif3ePZr38NvbU8UBgEFEEPj6JFQ=</dsig:DigestValue>
+        <dsig:DigestValue>VpOnlyEldu6pn7s40BopznKvEPm59h0UL1EAy1Onevk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -341,13 +341,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="License-LGPL.txt" size="26423">
+  <file name="License-LGPL.txt" size="26929">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>oqjJYhaAjQO20xcfZuzoDiRY2bMRWjLe9nkQQ/wGpm8=</dsig:DigestValue>
+      <dsig:DigestValue>iRL7QXHiwgsVa4v7NiBCs2EsyLPNa+AsIWSrkpApH1A=</dsig:DigestValue>
     </hash>
   </file>
   <file name="TomahaqCompanion.exe.config" size="530">
