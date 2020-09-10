@@ -21,10 +21,6 @@ using ZedGraph;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Diagnostics;
-using XmlMethodChanger; 
-using XmlMethodChanger.lib;
-
-
 
 namespace TomahaqCompanion
 {
@@ -97,7 +93,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.1.0.3");
+            UpdateLog("Version = 1.1.0.4");
         }
 
         //These are the main buttons that perform functions within the program
@@ -276,7 +272,7 @@ namespace TomahaqCompanion
                     string templateMethod = templateBox.Text;
                     string outputMethod = targetFile.Replace(".csv", ".meth");
                     EditMethod(templateMethod, xmlFile, outputMethod);
-                    ////XmlMethodChanger.lib.MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
+                    //MethodChanger.ModifyMethod(templateMethod, xmlFile, outputMethod: outputMethod);
                     UpdateLog("Writing method to " + outputMethod);
                 }
                 else
@@ -305,19 +301,27 @@ namespace TomahaqCompanion
 
         public void EditMethod(string templatePath, string modPath, string outputPath)
         {
-            File.Copy(templatePath, ".\\XMLMethodChanger\\Template.meth", true);
-            File.Copy(modPath, ".\\XMLMethodChanger\\Mods.xml", true);
+
+            string templateCleanedPath = string.Format("\"{0}\"", templatePath);
+            string modPathCleanedPath = string.Format("\"{0}\"", modPath);
+            string outputCleanedPath = string.Format("\"{0}\"", outputPath);
+            string argsCleaned = "-i " + templateCleanedPath + " -m " + modPathCleanedPath + " -o " + outputCleanedPath;
+
+            //File.Copy(templatePath, ".\\XMLMethodChanger\\Template.meth", true);
+            //File.Copy(modPath, ".\\XMLMethodChanger\\Mods.xml", true);
 
             string exePath = ".\\XMLMethodChanger\\XmlMethodChanger.exe";
             string args = "-i .\\XMLMethodChanger\\Template.meth -m .\\XMLMethodChanger\\Mods.xml -o .\\XMLMethodChanger\\Output.meth";
+            args = argsCleaned;
+
             Console.WriteLine(args);
             ExecuteCommand(exePath, args);
 
-            File.Copy(".\\XMLMethodChanger\\Output.meth", outputPath, true);
+            //File.Copy(".\\XMLMethodChanger\\Output.meth", outputPath, true);
 
-            File.Delete(".\\XMLMethodChanger\\Template.meth");
-            File.Delete(".\\XMLMethodChanger\\Mods.xml");
-            File.Delete(".\\XMLMethodChanger\\Output.meth");
+            //File.Delete(".\\XMLMethodChanger\\Template.meth");
+            //File.Delete(".\\XMLMethodChanger\\Mods.xml");
+            //File.Delete(".\\XMLMethodChanger\\Output.meth");
         }
 
         public bool ExecuteCommand(string exePath, string args)

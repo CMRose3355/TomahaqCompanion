@@ -236,3 +236,41 @@ C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csproj.CopyComplete
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.exe
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.exe.config
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.exe.manifest
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.application
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.exe
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\TomahaqCompanion.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.Thermo.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\LumenWorks.Framework.IO.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\MethodChanger.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ZedGraph.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\CSMSL.Thermo.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\LumenWorks.Framework.IO.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\LumenWorks.Framework.IO.xml
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ZedGraph.xml
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\de\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\es\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\fr\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\hu\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\it\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ja\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\pt\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ru\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\sk\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\sv\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\tr\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\zh-cn\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\zh-tw\ZedGraph.resources.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csprojAssemblyReference.cache
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.TomahaqCompanionForm.resources
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.Properties.Resources.resources
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csproj.GenerateResource.cache
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csproj.CoreCompileInputs.cache
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.exe.manifest
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.application
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csproj.CopyComplete
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.exe
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.pdb
