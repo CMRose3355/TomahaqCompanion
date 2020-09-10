@@ -313,3 +313,4 @@ C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csproj.CopyComplete
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.exe
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csproj.CoreCompileInputs.cache

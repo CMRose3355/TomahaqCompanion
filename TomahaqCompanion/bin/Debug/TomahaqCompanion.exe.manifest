@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="320000">
-      <assemblyIdentity name="CSMSL" version="0.3.7557.11329" language="neutral" processorArchitecture="amd64" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="319488">
+      <assemblyIdentity name="CSMSL" version="0.3.7557.22559" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>/bIMYrHDH7VwC9mRdclrZC6OHCuZQnFJYD/DsJdvfQA=</dsig:DigestValue>
+        <dsig:DigestValue>ojZV1tP6EB6QxEv9rv5KFIQKkK7tAxt41UsQBMi/fT8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -73,7 +73,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>5q8sucXN1X6F+r070NcxA2wizkq4T9erSWI0WQs/tgo=</dsig:DigestValue>
+        <dsig:DigestValue>YalDoAfakrF9yGoSYlKv2YGA1dp2mYBet9sAGNfr7LE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -162,14 +162,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="131072">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="132608">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>R7Ej3I0xQ9QV0JxG/GyuQ1zTmlvUaCocxYWwx9paoR4=</dsig:DigestValue>
+        <dsig:DigestValue>NIwY4NdIgosjbwABif3ePZr38NvbU8UBgEFEEPj6JFQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
