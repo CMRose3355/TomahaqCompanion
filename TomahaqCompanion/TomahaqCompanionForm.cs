@@ -93,7 +93,7 @@ namespace TomahaqCompanion
 
             InitializePrimingRunGraphs();
 
-            UpdateLog("Version = 1.1.0.4");
+            UpdateLog("Version = 1.1.0.5");
         }
 
         //These are the main buttons that perform functions within the program
