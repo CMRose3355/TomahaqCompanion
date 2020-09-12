@@ -274,3 +274,7 @@ C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\To
 C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.csproj.CopyComplete
 C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.exe
 C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Release\TomahaqCompanion.pdb
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ThermoFisher.CommonCore.BackgroundSubtraction.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ThermoFisher.CommonCore.Data.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ThermoFisher.CommonCore.MassPrecisionEstimator.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Release\ThermoFisher.CommonCore.RawFileReader.dll

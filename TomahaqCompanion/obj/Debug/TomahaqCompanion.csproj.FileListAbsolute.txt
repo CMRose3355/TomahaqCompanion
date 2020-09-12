@@ -314,3 +314,7 @@ C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.exe
 C:\Users\Orbitrap Eclipse\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.pdb
 C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\obj\Debug\TomahaqCompanion.csproj.CoreCompileInputs.cache
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Debug\ThermoFisher.CommonCore.BackgroundSubtraction.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Debug\ThermoFisher.CommonCore.Data.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Debug\ThermoFisher.CommonCore.MassPrecisionEstimator.dll
+C:\Users\lumos\Documents\GitHub\TomahaqCompanion\TomahaqCompanion\bin\Debug\ThermoFisher.CommonCore.RawFileReader.dll

@@ -9,14 +9,14 @@
     <framework targetVersion="4.5.2" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="TomahaqCompanion.exe.manifest" size="20261">
+    <dependentAssembly dependencyType="install" codebase="TomahaqCompanion.exe.manifest" size="23149">
       <assemblyIdentity name="TomahaqCompanion.exe" version="1.0.1.30" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="amd64" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>EcVC0OOeW1hdw0Haj5MuOHxrcLdHMwjnfgdNh2LoCaE=</dsig:DigestValue>
+        <dsig:DigestValue>g8pXYBzuV8dQqQCTb2Hl3Lqr/CnPQcly20k5FZDaY9k=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

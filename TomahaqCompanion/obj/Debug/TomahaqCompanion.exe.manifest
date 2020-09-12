@@ -162,14 +162,62 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="132096">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.BackgroundSubtraction.dll" size="44032">
+      <assemblyIdentity name="ThermoFisher.CommonCore.BackgroundSubtraction" version="1.0.0.0" publicKeyToken="1AEF06AFB5ABD953" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>snsaDEq0bcsBYoFwjeNuRxpN6shFKm2fsyaM/GnK4zw=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.Data.dll" size="366080">
+      <assemblyIdentity name="ThermoFisher.CommonCore.Data" version="1.0.0.0" publicKeyToken="1AEF06AFB5ABD953" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>Bd6fVeVi0xlZqPar/3XQ7TbwxF9+m+Fby33eBlft3dw=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.MassPrecisionEstimator.dll" size="11264">
+      <assemblyIdentity name="ThermoFisher.CommonCore.MassPrecisionEstimator" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>PUuDjt7XeO98pULLwwqJbJkE7cwMi5GG5F3jgIl84F8=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.RawFileReader.dll" size="620032">
+      <assemblyIdentity name="ThermoFisher.CommonCore.RawFileReader" version="1.0.0.0" publicKeyToken="1AEF06AFB5ABD953" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>rXhF/t8B5xjJk+UfHuDQhxsif8iL3FThBZK3qhyfncc=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="134656">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>CXOy1aXpfRttU1pcD5s99HpN/q8M9ZX9uogpZfpIOUI=</dsig:DigestValue>
+        <dsig:DigestValue>y7FNHGMTaz/qGcWOjpX/sDfnpbTeb3+tqY0Yw9LNZFY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

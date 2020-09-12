@@ -292,8 +292,8 @@ namespace TomahaqCompanion
 
         private void methodChangerAlone_Click(object sender, EventArgs e)
         {
-            string templateMethod = templateBox.Text;
-            string outputMethod = targetTextBox.Text.Replace(".csv", ".meth");
+            string templateMethod = xmlTemplateTB.Text;
+            string outputMethod = xmlTargetPepTB.Text.Replace(".csv", ".meth");
             string xmlFile = xmlTextBox.Text;
 
             EditMethod(templateMethod, xmlFile, outputMethod);
@@ -411,7 +411,7 @@ namespace TomahaqCompanion
 
                 //Get a spectrum number in the middle of the run
                 int midSpectrum = rawFile.LastSpectrumNumber / 2;
-                string scanDescription = rawFile.GetScanDescription(midSpectrum);
+                ////string scanDescription = rawFile.GetScanDescription(midSpectrum);
 
                 List<int> ms1Scans = new List<int>();
                 if (tomaAPIRawFile.Checked) //USER_INPUT
@@ -1040,6 +1040,7 @@ namespace TomahaqCompanion
                 //Grab all of the data for the target and add that data
                 double rt = rawFile.GetRetentionTime(targetScanNumber);
                 double it = rawFile.GetInjectionTime(targetScanNumber);
+
                 ThermoSpectrum spectrum = rawFile.GetSpectrum(targetScanNumber);
 
                 //If we found a target peptide then see if we did an MS3
@@ -3142,6 +3143,40 @@ namespace TomahaqCompanion
         private void eclipseCheckbox_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void xmlBrowse_Click(object sender, EventArgs e)
+        {
+            if (xmlOFDB.ShowDialog() == DialogResult.OK)
+            {
+                xmlTextBox.Text = xmlOFDB.FileName;
+            }
+        }
+
+        private void targetTextBox_TextChanged(object sender, EventArgs e)
+        {
+            xmlTargetPepTB.Text = targetTextBox.Text;
+        }
+
+        private void templateBox_TextChanged(object sender, EventArgs e)
+        {
+            xmlTemplateTB.Text = templateBox.Text;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (targetOnlyFDB.ShowDialog() == DialogResult.OK)
+            {
+                xmlTargetPepTB.Text = targetOnlyFDB.FileName;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (templateMethodFDB.ShowDialog() == DialogResult.OK)
+            {
+                xmlTemplateTB.Text = templateMethodFDB.FileName;
+            }
         }
     }
 }
