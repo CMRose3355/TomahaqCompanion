@@ -139,6 +139,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TargetPeptideGroup.cs" />
     <Compile Include="TomahaqCompanionForm.cs">
       <SubType>Form</SubType>
     </Compile>

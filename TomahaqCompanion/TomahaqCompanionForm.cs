@@ -632,7 +632,8 @@ namespace TomahaqCompanion
                     //
                     for (int charge = minCharge; charge <= maxCharge;charge++)
                     {
-                        TargetPeptide target = new TargetPeptide(peptideString, proteinString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), eo, spsIonsAbovePrec.Checked);
+                        TargetPeptide target = new TargetPeptide(peptideString, proteinString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, 
+                            double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), eo, spsIonsAbovePrec.Checked);
 
                         TargetPeptide outPep = null;
                         double mz = Math.Round(target.Trigger.ToMz(charge),4);
