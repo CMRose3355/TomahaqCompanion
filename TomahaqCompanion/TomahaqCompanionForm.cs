@@ -568,6 +568,7 @@ namespace TomahaqCompanion
         {
             //This will be the list to return, it is a sorted list so we can do a binary search if the list gets large in the future
             SortedList<double, TargetPeptide> retList = new SortedList<double, TargetPeptide>();
+            Dictionary<string, TargetPeptideGroup> peptideGroupDictionary = new Dictionary<string, TargetPeptideGroup>();
             chargeProvided = false;
 
             //Cycle through the csv and load in each peptide
@@ -629,15 +630,26 @@ namespace TomahaqCompanion
                         targetSPSIons = LoadUserIons(reader["MS3 Target m/z"]);
                     }
 
-                    //
+                    //TODO: Add Peptide Group Functionality Here
                     for (int charge = minCharge; charge <= maxCharge;charge++)
                     {
                         TargetPeptide target = new TargetPeptide(peptideString, proteinString, charge, modificationDict, targetSPSIons, triggerFragIons, startTime, endTime, FragmentTol, 
                             double.Parse(spsMinMZ.Text), double.Parse(spsMaxMZ.Text), double.Parse(precExLow.Text), double.Parse(precExHigh.Text), eo, spsIonsAbovePrec.Checked);
 
-                        TargetPeptide outPep = null;
-                        double mz = Math.Round(target.Trigger.ToMz(charge),4);
+                        //Here we will add this peptide to the 
+                        TargetPeptideGroup outPepGroup = null;
+                        if(peptideGroupDictionary.TryGetValue(target.PeptideString, out outPepGroup))
+                        {
+                            peptideGroupDictionary[target.PeptideString].AddTargetPeptide(target);
+                        }
+                        else
+                        {
+                            TargetPeptideGroup addGroup = new TargetPeptideGroup(target);
+                            peptideGroupDictionary.Add(target.PeptideString, addGroup);
+                        }
 
+                        TargetPeptide outPep = null;
+                        double mz = Math.Round(target.Trigger.ToMz(charge), 4);
                         if (!retList.TryGetValue(mz, out outPep))
                         {
                             retList.Add(mz, target);

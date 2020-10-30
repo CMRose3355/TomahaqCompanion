@@ -8,14 +8,14 @@ using System.Globalization;
 namespace TomahaqCompanion
 {
     public class TargetPeptideLine
-    { 
+    {
         public TargetPeptide Peptide { get; set; }
+        public TargetPeptideGroup PeptideGroup {get; set;}
         public bool Selected { get; set; }
         public string PeptideString { get; set; }
         public string ProteinString { get; set; }
         public double TargetMZ { get; set; }
         public double TriggerMZ { get; set; }
-        public string Name { get; set; }
         public string Charge { get; set; }
         public string MaxIntensity { get; set; }
 
@@ -50,6 +50,17 @@ namespace TomahaqCompanion
             MaxIntensity = maxInt.ToString("G2", CultureInfo.InvariantCulture);
 
             Selected = true;
+        }
+
+        public TargetPeptideLine(TargetPeptideGroup targetPeptideGroup)
+        {
+            Selected = true;
+
+            PeptideGroup = targetPeptideGroup;
+
+            ProteinString = targetPeptideGroup.ProteinString;
+
+            PeptideString = targetPeptideGroup.PeptideString;
         }
 
         public override string ToString()
