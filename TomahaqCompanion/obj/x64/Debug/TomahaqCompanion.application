@@ -3,20 +3,20 @@
   <assemblyIdentity name="TomahaqCompanion.application" version="1.0.1.30" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="amd64" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <description asmv2:publisher="TomahaqCompanion" asmv2:product="TomahaqCompanion" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <deployment install="true" mapFileExtensions="true">
-    <deploymentProvider codebase="http://lab413040-lum3/TomahaqCompanion/TomahaqCompanion.application" />
+    <deploymentProvider codebase="http://gnedtsl04936zv/TomahaqCompanion/TomahaqCompanion.application" />
   </deployment>
   <compatibleFrameworks xmlns="urn:schemas-microsoft-com:clickonce.v2">
-    <framework targetVersion="4.5.2" profile="Full" supportedRuntime="4.0.30319" />
+    <framework targetVersion="4.8" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="TomahaqCompanion.exe.manifest" size="18919">
+    <dependentAssembly dependencyType="install" codebase="TomahaqCompanion.exe.manifest" size="21809">
       <assemblyIdentity name="TomahaqCompanion.exe" version="1.0.1.30" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="amd64" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>mj1NP1gkwYWHvxCec16PpLnUR9nzb066CD7CS9iod9Q=</dsig:DigestValue>
+        <dsig:DigestValue>ZByHBSTRIlWCc3r0M7k7KL30JSOYas9QmO5JNWbghok=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

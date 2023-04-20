@@ -42,26 +42,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="318976">
-      <assemblyIdentity name="CSMSL" version="0.3.7542.12211" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.dll" size="290304">
+      <assemblyIdentity name="CSMSL" version="0.3.8466.26626" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>dMlj+SvvU/D4rKcpZRtRcXywTZBm6C+wvtz/UZ2V/QM=</dsig:DigestValue>
+        <dsig:DigestValue>RDooVsfsDmMhpIh0ERd3cVAtTw84cQ2polFNfFDt+eE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CSMSL.Thermo.dll" size="23552">
-      <assemblyIdentity name="CSMSL.Thermo" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <assemblyIdentity name="CSMSL.Thermo" version="1.0.0.0" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>xkABBGATq/HUhgDioXVUgMIO4GAzJMdF6ODh3ySgnTo=</dsig:DigestValue>
+        <dsig:DigestValue>oaPi/JkDwyLP4F/my4EAwKN2eNkgwahvqS+KifMutsA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -138,14 +138,62 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="131072">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.BackgroundSubtraction.dll" size="44032">
+      <assemblyIdentity name="ThermoFisher.CommonCore.BackgroundSubtraction" version="1.0.0.0" publicKeyToken="1AEF06AFB5ABD953" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>snsaDEq0bcsBYoFwjeNuRxpN6shFKm2fsyaM/GnK4zw=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.Data.dll" size="366080">
+      <assemblyIdentity name="ThermoFisher.CommonCore.Data" version="1.0.0.0" publicKeyToken="1AEF06AFB5ABD953" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>Bd6fVeVi0xlZqPar/3XQ7TbwxF9+m+Fby33eBlft3dw=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.MassPrecisionEstimator.dll" size="11264">
+      <assemblyIdentity name="ThermoFisher.CommonCore.MassPrecisionEstimator" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>PUuDjt7XeO98pULLwwqJbJkE7cwMi5GG5F3jgIl84F8=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ThermoFisher.CommonCore.RawFileReader.dll" size="620032">
+      <assemblyIdentity name="ThermoFisher.CommonCore.RawFileReader" version="1.0.0.0" publicKeyToken="1AEF06AFB5ABD953" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>rXhF/t8B5xjJk+UfHuDQhxsif8iL3FThBZK3qhyfncc=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="TomahaqCompanion.exe" size="139264">
       <assemblyIdentity name="TomahaqCompanion" version="1.0.0.0" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>eBz9ca66tekWI9PvtUuQr4znB6Ax496zy27UueQHkIU=</dsig:DigestValue>
+        <dsig:DigestValue>Ad1bOrHUNVc+7QeMmFJBoC/4tLWn31yMSXbZb6FD860=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -326,13 +374,13 @@
       <dsig:DigestValue>iRL7QXHiwgsVa4v7NiBCs2EsyLPNa+AsIWSrkpApH1A=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="TomahaqCompanion.exe.config" size="530">
+  <file name="TomahaqCompanion.exe.config" size="528">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>y+vqcyACvf0e/SZ7zN0CuK3IbAgUVQKdEZcvNOtCEFk=</dsig:DigestValue>
+      <dsig:DigestValue>DtQp/nshbgxbLedTnXuxR1QGzNcpCmPAavQEFNppcmc=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

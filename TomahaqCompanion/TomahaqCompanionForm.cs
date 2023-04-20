@@ -480,6 +480,9 @@ namespace TomahaqCompanion
 
             retDict.Add("TMT11", new Dictionary<string, double>());
             retDict.Add("TMT6", new Dictionary<string, double>());
+            retDict.Add("TMTsh", new Dictionary<string, double>());
+            retDict.Add("TMT0", new Dictionary<string, double>());
+            retDict.Add("TMTpro", new Dictionary<string, double>());
             //retDict.Add("iTRAQ4", new Dictionary<string, double>());
             //retDict.Add("iTRAQ8", new Dictionary<string, double>());
 
@@ -506,6 +509,40 @@ namespace TomahaqCompanion
             retDict["TMT6"].Add("130c", 130.141141);
             retDict["TMT6"].Add("131n", 131.138176);
             retDict["TMT6"].Add("131c", 131.144499);
+
+            retDict["TMTsh"].Add("132", 132.1405);
+
+            retDict["TMT0"].Add("126", 126.127725);
+            retDict["TMT0"].Add("127n", 127.124760);
+            retDict["TMT0"].Add("127c", 127.131079);
+            retDict["TMT0"].Add("128n", 128.128114);
+            retDict["TMT0"].Add("128c", 128.134433);
+            retDict["TMT0"].Add("129n", 129.131468);
+            retDict["TMT0"].Add("129c", 129.137787);
+            retDict["TMT0"].Add("130n", 130.134822);
+            retDict["TMT0"].Add("130c", 130.141141);
+            retDict["TMT0"].Add("131n", 131.138176);
+            retDict["TMT0"].Add("131c", 131.144499);
+            retDict["TMT0"].Add("132", 132.1405);
+
+            retDict["TMTpro"].Add("126", 126.127726);
+            retDict["TMTpro"].Add("127n", 127.124761);
+            retDict["TMTpro"].Add("127c", 127.131081);
+            retDict["TMTpro"].Add("128n", 128.128116);
+            retDict["TMTpro"].Add("128c", 128.134436);
+            retDict["TMTpro"].Add("129n", 129.131471);
+            retDict["TMTpro"].Add("129c", 129.137790);
+            retDict["TMTpro"].Add("130n", 130.134825);
+            retDict["TMTpro"].Add("130c", 130.141145);
+            retDict["TMTpro"].Add("131n", 131.138180);
+            retDict["TMTpro"].Add("131c", 131.144500);
+            retDict["TMTpro"].Add("132n", 131.138176);
+            retDict["TMTpro"].Add("132c", 132.141535);
+            retDict["TMTpro"].Add("133n", 132.147855);
+            retDict["TMTpro"].Add("133c", 133.144890);
+            retDict["TMTpro"].Add("134n", 134.148245);
+            retDict["TMTpro"].Add("134c", 134.154565);
+            retDict["TMTpro"].Add("135n", 135.151600);
 
             return retDict;
         }
@@ -1606,6 +1643,11 @@ namespace TomahaqCompanion
 
             Modification tmt11OL = new Modification(229.162932, "TMT11OL", ModificationSites.S | ModificationSites.T | ModificationSites.Y | ModificationSites.H);
 
+            Modification tmtProSH = new Modification(313.23102, "TMTpro-SH", ModificationSites.K | ModificationSites.NPep);
+            Modification tmtProSHy = new Modification(313.23102, "TMTpro-SH-Y", ModificationSites.Y);
+            Modification tmtPro = new Modification(304.20715, "TMTpro", ModificationSites.K | ModificationSites.NPep);
+            Modification tmtProy = new Modification(304.20715, "TMTpro-Y", ModificationSites.Y);
+
             ModLines.Add(new ModificationLine("TMT0", Math.Round(tmt0.MonoisotopicMass, 5), "K,NPep", "", "Static", true, false, tmt0));
             //ModLines.Add(new ModificationLine("TMT2", Math.Round(tmt2.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmt2));
             ModLines.Add(new ModificationLine("SH-TMT", Math.Round(tmtSH.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmtSH));
@@ -1622,6 +1664,12 @@ namespace TomahaqCompanion
             ModLines.Add(new ModificationLine("ggTMT11", Math.Round(ggTMT11.MonoisotopicMass, 5), "K", "^", "Dynamic", false, false, ggTMT11));
             ModLines.Add(new ModificationLine("ggTMTsh", Math.Round(ggTMTsh.MonoisotopicMass, 5), "K", "^", "Dynamic", false, false, ggTMTsh));
             ModLines.Add(new ModificationLine("OX", Math.Round(ox.MonoisotopicMass, 5), "M", "*", "Dynamic", true, true, ox));
+
+            ModLines.Add(new ModificationLine("SH-TMTpro", Math.Round(tmtProSH.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmtProSH));
+            ModLines.Add(new ModificationLine("SH-TMTpro-Y", Math.Round(tmtProSHy.MonoisotopicMass, 5), "Y", "^", "Dynamic", false, false, tmtProSHy));
+            ModLines.Add(new ModificationLine("TMTpro", Math.Round(tmtPro.MonoisotopicMass, 5), "K,NPep", "", "Static", false, false, tmtPro));
+            ModLines.Add(new ModificationLine("TMTproY", Math.Round(tmtProy.MonoisotopicMass, 5), "Y", "^", "Dynamic", false, false, tmtProy));
+
             //ModLines.Add(new ModificationLine("C2N1", Math.Round(C2N1.MonoisotopicMass, 5), "G", "^", "Dynamic", false, false, C2N1));
             //ModLines.Add(new ModificationLine("C3N1", Math.Round(C3N1.MonoisotopicMass, 5), "A", "#", "Dynamic", false, false, C3N1));
             //ModLines.Add(new ModificationLine("C5N1", Math.Round(C5N1.MonoisotopicMass, 5), "V,P", "&", "Dynamic", false, false, C5N1));
@@ -2324,7 +2372,9 @@ namespace TomahaqCompanion
             {
                 writer.WriteLine("Peptide,Protein,Charge,TriggerMZ,TargetMZ,MS1TriggerIntensity,MS2RetentionTime," +
                     "MS2ScanNumber,MS3ScanNumber,MS2InjectionTime,MS3InjectionTime,MS3SPSIons,MS3SumSN,MS3IS,MS3Quant1,MS3Quant2,MS3Quant3,MS3Quant4,MS3Quant5," +
-                    "MS3Quant6,MS3Quant7,MS3Quant8,MS3Quant9,MS3Quant10,MSQuant11,QuantError1,QuantError2,QuantError3,QuantError4,QuantError5,QuantError6,QuantError7,QuantError8,QuantError9,QuantError10,QuantError11");
+                    "MS3Quant6,MS3Quant7,MS3Quant8,MS3Quant9,MS3Quant10,MSQuant11,MSQuant12,MSQuant13,MSQuant14,MSQuant15,MSQuant16,MSQuant17,MSQuant18," +
+                    "QuantError1,QuantError2,QuantError3,QuantError4,QuantError5,QuantError6,QuantError7,QuantError8,QuantError9,QuantError10,QuantError11," +
+                    "QuantError12,QuantError13,QuantError14,QuantError15,QuantError16,QuantError17,QuantError18");
 
                 foreach (TargetPeptideLine targetPepLine in TargetsDisplayed)
                 {
@@ -2905,8 +2955,12 @@ namespace TomahaqCompanion
         {
             Directory.CreateDirectory(".\\ModificationFiles");
 
-            ModificationFiles.Clear();
-            foreach (string fileName in Directory.GetFiles(".\\ModificationFiles", "*.csv", SearchOption.TopDirectoryOnly).ToList())
+            ModificationFiles = new BindingList<string>();
+            modFileListBox.DataSource = ModificationFiles;
+
+            List<string> testList = Directory.GetFiles(".\\ModificationFiles", "*.csv", SearchOption.TopDirectoryOnly).ToList();
+
+            foreach (string fileName in testList)
             {
                 ModificationFiles.Add(fileName);
             }
@@ -3178,5 +3232,6 @@ namespace TomahaqCompanion
                 xmlTemplateTB.Text = templateMethodFDB.FileName;
             }
         }
+
     }
 }
