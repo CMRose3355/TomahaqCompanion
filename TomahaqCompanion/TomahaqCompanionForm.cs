@@ -2956,7 +2956,7 @@ namespace TomahaqCompanion
             Directory.CreateDirectory(".\\ModificationFiles");
 
             ModificationFiles = new BindingList<string>();
-            modFileListBox.DataSource = ModificationFiles;
+            
 
             List<string> testList = Directory.GetFiles(".\\ModificationFiles", "*.csv", SearchOption.TopDirectoryOnly).ToList();
 
@@ -2964,6 +2964,8 @@ namespace TomahaqCompanion
             {
                 ModificationFiles.Add(fileName);
             }
+
+            modFileListBox.DataSource = ModificationFiles;
         }
 
         private void exportModificationTable_Click_1(object sender, EventArgs e)
@@ -3231,7 +3233,7 @@ namespace TomahaqCompanion
             {
                 xmlTemplateTB.Text = templateMethodFDB.FileName;
             }
-        }
+        } 
 
     }
 }
